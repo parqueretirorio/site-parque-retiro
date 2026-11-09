@@ -1,0 +1,7 @@
+Nome;Categoria;Quantidade;Unidade;Localização;Conservação;Status;Responsável;Projeto/Campanha;Marca;Modelo;Número de série;Descrição;Observações
+Mesa A;Móveis, Utensílios e Equipamentos;2;un;Sala 1;Bom;Disponível;Ana;;;;;;
+Furadeira;Ferramentas e Máquinas;1;un;Oficina;Regular;Disponível;Ana;;Bosch;X1;SN123;;
+Furadeira cópia;Ferramentas e Máquinas;1;un;Depósito;Bom;Disponível;Ana;;Bosch;X1;SN123;;
+Mesa A;Móveis, Utensílios e Equipamentos;1;un;Sala 1;Bom;Disponível;Ana;;;;;;
+Item ruim;Categoria X;abc;un;;Péssimo;Disponível;;;;;;;
+=cmd|' /C calc'!A0;Limpeza e Consumo;5;un;Almoxarifado;Novo;Disponível;Ana;;;;;;

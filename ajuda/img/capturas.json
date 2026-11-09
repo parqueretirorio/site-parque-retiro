@@ -1,0 +1,306 @@
+{
+ "menu-do-site": [
+  {
+   "src": "ajuda/img/menu-topo.jpg",
+   "legenda": "1. Menu do site · 2. Entrar na área restrita · 3. Ajuda desta tela.",
+   "alt": "Captura de tela: 1. Menu do site · 2. Entrar na área restrita · 3. Ajuda desta tela."
+  }
+ ],
+ "como-usar-a-ajuda": [
+  {
+   "src": "ajuda/img/ajuda-dica.jpg",
+   "legenda": "Dica rápida: aparece ao parar o mouse sobre o campo. \"Saiba mais\" abre o artigo completo.",
+   "alt": "Captura de tela: Dica rápida: aparece ao parar o mouse sobre o campo. \"Saiba mais\" abre o artigo completo."
+  },
+  {
+   "src": "ajuda/img/ajuda-painel.jpg",
+   "legenda": "O botão ? Ajuda abre o painel: 1. ajuda desta tela · 2. ligar o modo ajuda.",
+   "alt": "Captura de tela: O botão ? Ajuda abre o painel: 1. ajuda desta tela · 2. ligar o modo ajuda."
+  },
+  {
+   "src": "ajuda/img/ajuda-modo.jpg",
+   "legenda": "Modo ajuda: os itens com explicação ficam contornados; clique em um deles para ler.",
+   "alt": "Captura de tela: Modo ajuda: os itens com explicação ficam contornados; clique em um deles para ler."
+  }
+ ],
+ "pedir-reserva": [
+  {
+   "src": "ajuda/img/reserva-formulario.jpg",
+   "legenda": "1–2. Datas de chegada e saída · 3. Cama no alojamento · 4. Detalhes e nomes do grupo.",
+   "alt": "Captura de tela: 1–2. Datas de chegada e saída · 3. Cama no alojamento · 4. Detalhes e nomes do grupo."
+  }
+ ],
+ "calendario-de-uso": [
+  {
+   "src": "ajuda/img/calendario.jpg",
+   "legenda": "1. Mês anterior · 2. Hoje · 3. Mês seguinte. Cada dia mostra se o Centro de Estudo está ocupado.",
+   "alt": "Captura de tela: 1. Mês anterior · 2. Hoje · 3. Mês seguinte. Cada dia mostra se o Centro de Estudo está ocupado."
+  }
+ ],
+ "enviar-fotos-album": [
+  {
+   "src": "ajuda/img/fotos-envio.jpg",
+   "legenda": "1. Escolha até 10 fotos · 2. Atividade · 3. Mostrar ou não o seu nome.",
+   "alt": "Captura de tela: 1. Escolha até 10 fotos · 2. Atividade · 3. Mostrar ou não o seu nome."
+  }
+ ],
+ "ser-voluntario": [
+  {
+   "src": "ajuda/img/voluntario-form.jpg",
+   "legenda": "1. Nome completo · 2. Celular/WhatsApp · 3. Formas de colaborar.",
+   "alt": "Captura de tela: 1. Nome completo · 2. Celular/WhatsApp · 3. Formas de colaborar."
+  }
+ ],
+ "doar-e-pagar-online": [
+  {
+   "src": "ajuda/img/pagar-online.jpg",
+   "legenda": "1. O que pagar · 2. Valor · 3. Ir para o pagamento seguro (Asaas).",
+   "alt": "Captura de tela: 1. O que pagar · 2. Valor · 3. Ir para o pagamento seguro (Asaas)."
+  }
+ ],
+ "receber-comunicado": [
+  {
+   "src": "ajuda/img/newsletter.jpg",
+   "legenda": "1. Seu e-mail · 2. Concordar em receber.",
+   "alt": "Captura de tela: 1. Seu e-mail · 2. Concordar em receber."
+  }
+ ],
+ "criar-conta-e-entrar": [
+  {
+   "src": "ajuda/img/login.jpg",
+   "legenda": "1. Entrar (conta aprovada) · 2. Criar conta (aguarda aprovação).",
+   "alt": "Captura de tela: 1. Entrar (conta aprovada) · 2. Criar conta (aguarda aprovação)."
+  }
+ ],
+ "painel-conecta": [
+  {
+   "src": "ajuda/img/painel.jpg",
+   "legenda": "1. Comissões Parque Retiro · 2. Administração · 3. Ajuda desta tela.",
+   "alt": "Captura de tela: 1. Comissões Parque Retiro · 2. Administração · 3. Ajuda desta tela."
+  }
+ ],
+ "biblioteca-gestao": [
+  {
+   "src": "ajuda/img/biblioteca-cadastro.jpg",
+   "legenda": "1. Título · 2. Localização física (aparece para o público) · 3. Foto da capa.",
+   "alt": "Captura de tela: 1. Título · 2. Localização física (aparece para o público) · 3. Foto da capa."
+  }
+ ],
+ "livraria-gestao": [
+  {
+   "src": "ajuda/img/livraria.jpg",
+   "legenda": "1. Catálogo e estoque · 2. Registrar venda · 3. Pré-lançamento e encomendas.",
+   "alt": "Captura de tela: 1. Catálogo e estoque · 2. Registrar venda · 3. Pré-lançamento e encomendas."
+  }
+ ],
+ "zoom-agendamento": [
+  {
+   "src": "ajuda/img/zoom.jpg",
+   "legenda": "1. Título · 2. Data e horário · 3. Link do Zoom.",
+   "alt": "Captura de tela: 1. Título · 2. Data e horário · 3. Link do Zoom."
+  }
+ ],
+ "reservas-alojamento": [
+  {
+   "src": "ajuda/img/reservas-abas.jpg",
+   "legenda": "1. Pedidos · 2. Ocupação (camas e ASSEFAZ) · 3. Registrar pedido · 4. Relatório e recebimentos.",
+   "alt": "Captura de tela: 1. Pedidos · 2. Ocupação (camas e ASSEFAZ) · 3. Registrar pedido · 4. Relatório e recebimentos."
+  }
+ ],
+ "estela-gestao": [
+  {
+   "src": "ajuda/img/estela.jpg",
+   "legenda": "1. Etapa 1: cadastro · 2. Etapa 2: publicação · 3. Nome completo.",
+   "alt": "Captura de tela: 1. Etapa 1: cadastro · 2. Etapa 2: publicação · 3. Nome completo."
+  }
+ ],
+ "elementos-descricoes": [
+  {
+   "src": "ajuda/img/elemento.jpg",
+   "legenda": "Descrição do elemento (aqui, a Sala).",
+   "alt": "Captura de tela: Descrição do elemento (aqui, a Sala)."
+  }
+ ],
+ "album-gestao": [
+  {
+   "src": "ajuda/img/album.jpg",
+   "legenda": "1. Enviar e minhas fotos · 2. Curadoria · 3. Escolher as fotos.",
+   "alt": "Captura de tela: 1. Enviar e minhas fotos · 2. Curadoria · 3. Escolher as fotos."
+  }
+ ],
+ "documentos-calendarios": [
+  {
+   "src": "ajuda/img/documentos.jpg",
+   "legenda": "1. Atas · 2. Calendários · 3. Novo documento · 4. Só atas com encaminhamentos em aberto.",
+   "alt": "Captura de tela: 1. Atas · 2. Calendários · 3. Novo documento · 4. Só atas com encaminhamentos em aberto."
+  }
+ ],
+ "atividades-gestao": [
+  {
+   "src": "ajuda/img/atividades.jpg",
+   "legenda": "1. Nova atividade · 2. Filtrar por tipo.",
+   "alt": "Captura de tela: 1. Nova atividade · 2. Filtrar por tipo."
+  }
+ ],
+ "multiuso-gestao": [
+  {
+   "src": "ajuda/img/multiuso.jpg",
+   "legenda": "1. Agenda de uso · 2. Data · 3. Situação.",
+   "alt": "Captura de tela: 1. Agenda de uso · 2. Data · 3. Situação."
+  }
+ ],
+ "jardinagem-gestao": [
+  {
+   "src": "ajuda/img/jardinagem.jpg",
+   "legenda": "1. Jardinagem · 2. Reflorestamento · 3. Resumo.",
+   "alt": "Captura de tela: 1. Jardinagem · 2. Reflorestamento · 3. Resumo."
+  }
+ ],
+ "lojinha-gestao": [
+  {
+   "src": "ajuda/img/lojinha.jpg",
+   "legenda": "1. Nome do produto · 2. Preço · 3. Publicar no site.",
+   "alt": "Captura de tela: 1. Nome do produto · 2. Preço · 3. Publicar no site."
+  }
+ ],
+ "rifa-gestao": [
+  {
+   "src": "ajuda/img/rifa.jpg",
+   "legenda": "1. Quantidade de números · 2. Dia do sorteio · 3. Aberta no site.",
+   "alt": "Captura de tela: 1. Quantidade de números · 2. Dia do sorteio · 3. Aberta no site."
+  }
+ ],
+ "vaquinha-gestao": [
+  {
+   "src": "ajuda/img/vaquinha.jpg",
+   "legenda": "1. Meta · 2. Instruções de pagamento · 3. Aberta no site.",
+   "alt": "Captura de tela: 1. Meta · 2. Instruções de pagamento · 3. Aberta no site."
+  }
+ ],
+ "voluntarios-gestao": [
+  {
+   "src": "ajuda/img/voluntarios.jpg",
+   "legenda": "Ações de Voluntário: 1. Nome · 2. Objetivo · 3. Plano.",
+   "alt": "Captura de tela: Ações de Voluntário: 1. Nome · 2. Objetivo · 3. Plano."
+  }
+ ],
+ "comunicacao-visao-geral": [
+  {
+   "src": "ajuda/img/comunicacao.jpg",
+   "legenda": "As 12 sub-abas da Comunicação.",
+   "alt": "Captura de tela: As 12 sub-abas da Comunicação."
+  }
+ ],
+ "painel-publicacoes": [
+  {
+   "src": "ajuda/img/publicacoes.jpg",
+   "legenda": "1. Painel · 2. Fila de publicação · 3. Lista · 4. Nova ação de comunicação.",
+   "alt": "Captura de tela: 1. Painel · 2. Fila de publicação · 3. Lista · 4. Nova ação de comunicação."
+  }
+ ],
+ "banners-do-site": [
+  {
+   "src": "ajuda/img/banners.jpg",
+   "legenda": "1. Baixar pacote para publicar · 2. Configurar o banner de uma página.",
+   "alt": "Captura de tela: 1. Baixar pacote para publicar · 2. Configurar o banner de uma página."
+  }
+ ],
+ "equipe-convidados": [
+  {
+   "src": "ajuda/img/equipe.jpg",
+   "legenda": "1. Quem criou não aprova · 2. E-mail do convidado · 3. Válido até.",
+   "alt": "Captura de tela: 1. Quem criou não aprova · 2. E-mail do convidado · 3. Válido até."
+  }
+ ],
+ "listas-email": [
+  {
+   "src": "ajuda/img/listas-email.jpg",
+   "legenda": "1. Escolha a lista · 2. Importar vários contatos.",
+   "alt": "Captura de tela: 1. Escolha a lista · 2. Importar vários contatos."
+  }
+ ],
+ "prestacao-contas": [
+  {
+   "src": "ajuda/img/contas.jpg",
+   "legenda": "1. Centro de custo · 2. Tipo de operação · 3. Valor · 4. Forma de pagamento.",
+   "alt": "Captura de tela: 1. Centro de custo · 2. Tipo de operação · 3. Valor · 4. Forma de pagamento."
+  }
+ ],
+ "compras-orcamento": [
+  {
+   "src": "ajuda/img/compras.jpg",
+   "legenda": "1. Pedidos · 2. Planejamento anual · 3. Consolidado · 4. Novo pedido de compra.",
+   "alt": "Captura de tela: 1. Pedidos · 2. Planejamento anual · 3. Consolidado · 4. Novo pedido de compra."
+  }
+ ],
+ "inventario-gestao": [
+  {
+   "src": "ajuda/img/inventario-cadastro.jpg",
+   "legenda": "1. Categoria · 2. Nome do item · 3. Quantidade. Mais abaixo: localização, estado, foto e a opção É patrimônio do Parque.",
+   "alt": "Captura de tela: 1. Categoria · 2. Nome do item · 3. Quantidade. Mais abaixo: localização, estado, foto e a opção É patrimônio do Parque."
+  }
+ ],
+ "inventario-importar": [
+  {
+   "src": "ajuda/img/inventario-importar.jpg",
+   "legenda": "1. Baixar o modelo · 2. Escolher a planilha preenchida.",
+   "alt": "Captura de tela: 1. Baixar o modelo · 2. Escolher a planilha preenchida."
+  }
+ ],
+ "patrimonio-gestao": [
+  {
+   "src": "ajuda/img/patrimonio.jpg",
+   "legenda": "1. Buscar · 2. Bens com dados em aberto.",
+   "alt": "Captura de tela: 1. Buscar · 2. Bens com dados em aberto."
+  }
+ ],
+ "gestao-de-responsaveis": [
+  {
+   "src": "ajuda/img/responsaveis.jpg",
+   "legenda": "1. Nível de acesso · 2. Responsabilidades · 3. Senha provisória.",
+   "alt": "Captura de tela: 1. Nível de acesso · 2. Responsabilidades · 3. Senha provisória."
+  }
+ ],
+ "mapa-de-contas": [
+  {
+   "src": "ajuda/img/mapa.jpg",
+   "legenda": "Adicionar uma conta digital ao mapa.",
+   "alt": "Captura de tela: Adicionar uma conta digital ao mapa."
+  }
+ ],
+ "backup-e-restauracao": [
+  {
+   "src": "ajuda/img/backup.jpg",
+   "legenda": "1. Baixar backup completo · 2. Arquivo para restaurar.",
+   "alt": "Captura de tela: 1. Baixar backup completo · 2. Arquivo para restaurar."
+  }
+ ],
+ "relatorios-consolidados": [
+  {
+   "src": "ajuda/img/relatorios.jpg",
+   "legenda": "1. Módulo · 2. Relatório · 3. Agrupar por.",
+   "alt": "Captura de tela: 1. Módulo · 2. Relatório · 3. Agrupar por."
+  }
+ ],
+ "administrar-central-ajuda": [
+  {
+   "src": "ajuda/img/central-admin.jpg",
+   "legenda": "1. Artigos, Categorias, Explicações rápidas, Cobertura e Publicar · 2. Novo artigo.",
+   "alt": "Captura de tela: 1. Artigos, Categorias, Explicações rápidas, Cobertura e Publicar · 2. Novo artigo."
+  }
+ ],
+ "editar-explicacoes-rapidas": [
+  {
+   "src": "ajuda/img/editar-dica.jpg",
+   "legenda": "No modo ajuda, clique no item e use \"Editar esta explicação\".",
+   "alt": "Captura de tela: No modo ajuda, clique no item e use \"Editar esta explicação\"."
+  }
+ ],
+ "publicar-ajuda": [
+  {
+   "src": "ajuda/img/publicar.jpg",
+   "legenda": "1. Arquivo para a hospedagem do site · 2. JSON para o aplicativo.",
+   "alt": "Captura de tela: 1. Arquivo para a hospedagem do site · 2. JSON para o aplicativo."
+  }
+ ]
+}

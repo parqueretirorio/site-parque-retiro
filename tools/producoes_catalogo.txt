@@ -1,0 +1,1200 @@
+# Catálogo das produções próprias de cada Parque (levantamento de novembro de 2026).
+# Formato: [chave] abre um Parque; "# Categoria" abre uma categoria; "@Autor" define o autor das linhas seguintes;
+# cada linha é um título. Uma produção aparece uma só vez, no idioma original.
+# Depois de editar, rode: python3 tools/gerar_producoes_catalogo.py
+
+[pdv]
+# Monografias, estudos e investigações
+@Karen Rohn
+Investigación de campo: Las raíces energéticas en la Experiencia profunda en el Sur de India
+Estudio e investigación de campo: Antecedentes de las raíces de la Disciplina Energética y Ascesis en el Occidente, Asia menor, Creta e Islas Egeas
+La Ruptura
+Tamil Nadu: Ceremonias (presentación)
+@Alicia Ordoñez
+El Budismo en Sri Lanka
+@Francisco Granella
+Raíces de la Disciplina Energética
+El Chamanismo en Siberia y sus procedimientos para experimentar lo Sagrado
+El viaje de la Vida (libro)
+@Marcos Pampillon
+El Budismo en Camboya
+@Agostino Lotti
+Espacialidad y temporalidad en la pintura, escultura y arquitectura, en el momento en que se manifiesta una nueva espiritualidad
+@Danny Zuckerbrot
+Miel loca
+@Bruno Pezzuto
+Intoxicaciones con mercurio en los alquimistas
+@Hugo Novotny
+La entrada a lo Profundo en Buda
+@Aurelio Carretero
+La Disciplina Material en Mesopotamia
+@Guillermo Sullings
+La internalización de la moral
+@Eduardo Gozalo
+Estudio sobre Antecedentes en Mesopotamia de la Disciplina Material
+Antecedentes de la Disciplina Material en el Antiguo Egipto
+Antecedentes de la Disciplina Material en la Antigua China
+Comentarios a El Mensaje de Silo
+Comentarios a El Mensaje de Silo (Cuaderno de Notas)
+Alquimia China (notas)
+@Madeleine John
+La Hierogamia en Sumeria
+El Doble y el Espíritu
+Maestro Eckhart
+La Bondad
+Breve relato de experiencia en torno al mito nórdico
+Dionisio
+El mito de Deméter
+Expulsión del Paraíso
+@Dario Ergas
+Investigación sobre la conciencia moral
+Unidad, dualismo y Libertad en Zarathustra
+Breve escrito sobre la fe interna
+Conclusiones y Entrevista Ramiyar Karanjia
+El Reencuentro de la Unidad en los Mitos de Abraham y Demeter
+La mirada y su profundidad
+Relaciones entre la conciencia inspirada y el sentido de la vida
+Un posible esquema de la acción humana
+Registros y posibilidades del centro interno en la ascesis
+Reflexiones Disciplina Material con y sin laboratorio
+@Pia Figueroa
+Referencias a los estados de conciencia inspirada en Platón
+Estudio sobre Fidias
+Investigación Sueños
+El Guía Interno: testimonios
+Notas de Morfología
+La Experiencia Trascendental
+@Claudio Miconi
+La Doble Hacha Cretense
+@Federico Palumbo
+La inspiración en el Surrealismo
+Ascesis y Cámara de Silencio
+Procedimientos en Cámara de Silencio
+@José Gabriel Feres
+Estudio sobre "La Oración del Corazón": un procedimiento de acceso a lo profundo
+@Mariana Uzielli
+Los presocráticos
+Antecedentes de la Disciplina Morfológica
+@Fernando Garcia
+El Guía Interno como apoyo para los trabajos de Escuela
+Terminología de Escuela: encuadre y vocabulario
+Aperturas y cierres de la Escuela: estudio breve
+La Convergencia de la Diversidad: un paradigma de los nuevos tiempos
+El "Desequilibrio" como procedimiento del Trabajo Interno
+Fracaso y Cambio (relato e interpretación de experiencia)
+Nuestra Historia (aprendiendo a resistir la violencia)
+La Reconciliación
+Nuestra Historia Trascendente
+2010: Refundación
+@Ernesto de Casas
+Estudio sobre el Buen Conocimiento y relación con Aura Mazda
+Resúmenes y menciones
+Prólogo de Habla Silo
+Estudio sobre el Sentimiento Religioso
+Estudio de la era axial
+Sobre los Estados Internos
+Conciencia y Mundo
+Nihilismo y Humanismo
+@Daniel Zimmermann
+Comentarios sobre el eneagrama sextenario
+Iconografía y Estados Internos
+Proyecto Iconográfico (níveis 1 e 2)
+Un Poco de Poética
+Poética Menor y Cartas T
+La conciencia como hábitat
+Relato
+@Maxi Elegido
+El estilo de vida
+La Memoria distinta
+La sensibilidad
+Hacia la Inteligencia Conjunta
+Los Significados
+@Ariel Niro
+El vidrio en los Oficios del Fuego (partes I e II)
+@Tomas Hirsch
+En busca del Plan
+@Susana Lucero
+Muerte y trascendencia
+Sobre Mitos y Dioses (partes I e II)
+La mística en el cristianismo occidental
+Breve Estudio del Éxtasis Colectivo, el Origen de la Alegría en los Pueblos
+La Escuela y sus Temas
+La continuidad en el proceso budista y siloísta
+Experiencia de pedido, luz y corrimiento del yo en el chamanismo
+Lo fenomenológico: luces en la conciencia y el cerebro
+Oficio: producir vidrio
+Experiencias de Ascesis, revisión y proceso
+Las Condiciones del Diálogo en el Ámbito de Escuela
+Información e interpretación en nuestro ámbito
+¿Qué significa "no están dadas las condiciones"?
+Moisés en el Desierto: el mito
+El surgimiento de una nueva Civilización
+La Escuela y su continuidad en la historia
+La Escuela en la historia
+El Silencio como Revelación, o como Elección
+La Ascesis en el ámbito de Escuela
+Los Oficios en la Escuela: la iconografía
+Cosmogonía del tejido
+Relato de experiencias en el ámbito de Escuela
+Lo fenomenológico y la conciencia
+Taller para Maestros: autotransferencias
+Las interpretaciones en la historia: el alma, el guía, el pedido, la religiosidad
+Los orígenes de minerales y metales en América y su relación con los mitos
+Entre el Espacio y el Tiempo
+Entre lo sutil, lo onírico y lo intuitivo
+La búsqueda de conocimiento como Ascesis
+Miradas y paisajes
+La Escuela en el Siloísmo
+Sobre el pensamiento crítico
+Relatos históricos
+Qué es aquello que nos interesa desde el punto de vista de la Escuela
+Que florezcan mil flores
+La precisión en el lenguaje dentro del ámbito de Escuela
+Procedimientos en los impulsos de las llamadas escuelas históricas
+Alquimia (recopilación)
+Las peregrinaciones y los festivales en la historia
+El laberinto interno
+El viaje en solitario
+@Daniel Capriolo
+Sobre el significado de las cosas
+@Richie Seco
+Reflexiones sobre la venganza
+Reflexiones sobre la soledad
+Reflexiones sobre la Moral Siloísta (la moral de los registros)
+Producción de Objetos Significativos desde el punto de vista de la Ascesis
+@Graciela Romero
+Contacto con lo profundo en hombres y mujeres contemporáneos
+Elogio de la Atención
+Entornos: las nuevas ciencias
+Ciencia, espiritualidad y trascendencia
+El conocimiento de uno mismo
+Cenestesia
+Lo humano y el entorno de la inteligencia artificial
+Nudos y cicatrices
+Una medicina de la imagen
+@Raúl Valenzuela
+Aporte de Experiencia de Contacto
+Explicación Experiencia de Contacto
+Una Pizca de Universo
+Sí mismo
+Estados Sagrados
+Hay algo que sostiene, que contiene a todo
+Mis trabajos con la Fuerza
+Siempre he estado solo
+Lo que da sentido a uno y a todo
+@José Caballero
+El Místico Influjo del Número Puro
+Los Modelos y los Guías (5 partes)
+@Gloria Barboza
+El Camino, comentarios y comprensiones
+@Marcia Jaramillo
+La aventura humana
+@Roberto Blueh
+El amor verdadero está en el fondo de tu corazón
+@Rubén Camacho
+Breves comentarios del Camino
+@Sandra Amor
+Oh Finitud! Relatos de experiencias con El Mensaje de Silo
+Relato de Experiencia sobre Ascesis Energética
+@Emilia Sanicovich
+Ciudad Escondida: relato de comprensiones y experiencias
+@Carlos Buj
+Jardinería, una vía de acceso a lo profundo
+@Daniel Robaldo
+El felino en el mito raíz de los pueblos andinos
+Las Huayras: hornos para la metalurgia
+América del Sur: Abya Yala
+Los Fenómenos Psicosociales en el camino hacia una Nación Humana Universal
+@Marta Icarte
+Revisión de disciplina, ascesis y momento actual
+@Flavio Onetto
+La Experiencia Trascendental
+@Enrique Guerrero
+Memoria: inicios de un Alquimista
+@Esteban Boasso
+#finito.in.finito
+Experiencias de taller con Silo
+# Recopilações de Andrés Koryzma
+@Andrés Koryzma
+Sobre la compasión
+El Fracaso y la Reconciliación
+Silo: recopilación de apuntes y notas informales sobre El Mensaje 2002-2010
+Comentarios de Silo sobre alma-doble, centro de gravedad y espíritu
+La Finitud y la Muerte
+Breves Relatos de Experiencia
+Experiencias Guiadas
+Acerca de las Comisiones
+Dirección Mental
+Atención
+Guía Interno
+Momento y Proceso Histórico
+La Fuerza
+Silo y la fe
+Intencionalidad e intención
+Coherencia, unidad y contradicción
+Conciencia Inspirada
+El Propósito
+Acerca del Temor
+El yo
+No-violencia y Violencia
+La Trascendencia y lo Sagrado
+Sufrimiento y Superación del Sufrimiento
+La Cenestesia
+Espacio de Representación, Profundidad y Punto de Control
+Conciencia emocionada
+El Sentido del Humor y la Alegría
+Libertad y Liberación
+Centro Luminoso y Luz
+Silo y la Conciencia de Sí
+Los Principios de Acción Válida
+Feminismo, discriminación y temas complementarios
+El Fuego: proceso evolutivo, homínidas y temas afines
+Diversidad y Convergencia
+Ceremonias
+Afinidad, Cohesión, Resonancia y Sintonía
+La vida ha cesado en este cuerpo
+Paisaje de Formación
+Breves Recopilaciones (varios temas)
+Deseo y Posesión
+Núcleo de Ensueño y Nudo Biográfico
+El proceso de los Parques de Estudio y Reflexión
+Transformación Personal y Social
+Conversaciones con Silo (6 entrevistas de Enrique Nassar)
+Sonidos, Inspiración y Silencio
+Nación Humana Universal
+Las Creencias
+La Mente
+Comportamiento y Centros de respuesta
+El Sentido de la Vida
+El Trance
+El Dinero
+Los Mitos
+Lo más importante...
+Diosas, Dioses y Divinidades
+Tiempo, Espacio y lo Profundo
+Silencio, Paz Mental y Vacío Dinámico
+Ámbitos, Ambientes y Atmósferas
+Compulsión
+# Vídeos e apresentações
+@Karen Rohn
+Estudio e investigación de campo, Asia Menor, Creta e Islas Egeas (vídeos I e II)
+Presentación La Ruptura (vídeos)
+@Francisco Granella
+Investigación de Campo Himalaya e India (vídeos, 3 partes)
+Chamanismo Siberiano (vídeo e presentación)
+Fotografías de la gira asiática 2005
+@Dario Ergas
+Entrevista Ramiyar Karanjia (vídeo subtitulado)
+@Mariana Uzielli
+Presentación Antecedentes de la Disciplina Morfológica (vídeo)
+@Ariel Niro
+Vídeos do Ofício do Vidro (sopro, fornos, queimador, crisol, oficinas 2014-2016, busto de Silo)
+@Daniel Robaldo
+América del Sur: Abya Yala (presentación)
+@Daniel Zimmermann
+Cartas T A4 (para imprimir)
+
+[lr]
+# Produções
+@Norma Coronel
+Brief study on reconciliation (com Andrés Pellegrini)
+La Inmortalidad: relato de experiencia
+Procedimientos de Entrada a lo Profundo en El Mensaje de Silo
+Reconciliación y Venganza (com Andrés Pellegrini)
+@Jano Arrechea
+El deleite en la experiencia del silencio
+Aporte sobre el futuro
+El campo de copresencia en la estructura conciencia-mundo
+Relato de experiencia: Equilibrando voltajes. Vamos al mundo bello
+Rumbo al Centro
+Síntesis en dos lenguajes
+Sobre experiencias con la atención
+Sobre la alegría
+Sobre las traducciones de impulsos profundos
+Sobre Simultaneidades y Concomitancias
+Una meditación en la montaña
+Venganza, ensueño y conciencia de sí: relato de experiencia
+@Victor Piccininni
+Acerca de la conciencia
+El transcurrir
+Experiencias de Reconocimiento
+La Experiencia del Tiempo
+Yo existo porque usted existe... y a la inversa
+@Gustavo Hoerth
+Acertijos, Formas, Espacialidad y Sentido
+Experiencias visionarias de acceso a los espacios sagrados
+La Temporalidad de la Conciencia: mirada, mirar y tiempo
+@Manuel Manzano
+Anotaciones sobre el avance del proceso de la Ascesis
+@Carlos Sarmasky
+Antecedentes de la Disciplina Energética en la cultura Tiwanakota
+Estilo de Vida
+Sobre la Reconciliación
+@Eduardo Cicari
+Arte Sacerdotal en el Antiguo Egipto
+Disciplina Alquímico Material en la Antigua Persia (com Alicia Lejtman)
+@Lisandro Gracia Romero
+Inicio de la arenga como ingreso a lo profundo
+Conciencia de Sí: apuntes y experiencias 2023
+El origen de la mística
+En torno a la Conciencia Inspirada: reflexiones, experiencias y propuestas
+@Luis Milani
+Conciencia inspirada y momentos de convergencia psicosocial
+@Pablo Fernandez
+Condición
+Estudio Breve sobre la Dirección Mental
+Pequeños Aportes II
+Síntesis del Trabajo de Ascesis
+Sobre la transmisión de las Disciplinas
+Una Mirada sobre el Romanticismo
+@Alicia Lejtman
+Disciplina Material: estudio de su estructura interna (com Cicari e Manzano)
+Estudio alegórico sobre la DM: emblemas de Maier (com Gentili e Vidal Zinno)
+Interpretación alegórica de la DM (com Gentili, Cicari e Manzano)
+La Alquimia-Material en la Antigua China
+@Maximiliano Romero
+Dragones y otros mundos
+@Alicia Ordoñez
+El Budismo en Sri Lanka
+El Oscurecimiento del Ser en Occidente
+@Fernando Contreras
+El registro de Bondad: relato de experiencia
+Peregrinaje: relato de experiencia
+@Carlos Sotomayor
+El Relato Histórico
+@Ariel Niro
+El Vidrio en los Oficios del Fuego (partes I e II)
+@Javier Zaldarriaga
+Elevar, superar, purificar el Deseo
+@Pedro Calderon
+Estudio Teórico y Experimental del Oficio Metalúrgico (com Cicari, García e Lejtman)
+Oficio de Metalurgia (com Cicari, García e Lejtman)
+Síntesis Trabajo de Ascesis
+Una Investigación Arqueológica de la Alquimia en Praga y Bohemia (com Cicari, García, Lejtman e Manzano)
+@Corinne Figueroa
+Experiencias de contacto con lo sagrado: relato de experiencia
+@Daniel Zimmermann
+La conciencia como hábitat
+Poética Menor y Cartas T
+@Nestor Tato
+Un universo de sentido
+La estructura acto-objeto, sostén conceptual de la energía y el tiempo
+@Daniel Bustos
+La historia como desarrollo evolutivo de la conciencia
+@Oscar Mileti
+Las limitaciones de mi aparato razonador
+@Juan Jose Castro
+Lo Humano y la Luminosidad Interna
+@German Bes
+Luchas Generacionales
+@Aporte conjunto
+Manifiesto
+@Jose Luis Miranda
+Mito y Propósito: breve estudio
+@Andres Pellegrini
+Mitos, algunos comentarios
+@Eduardo Montes
+Poemas mentales
+Siloísmo, Mŷthos y Lógos, parte I
+@Diego Garcia Ruffinelli
+Sobre el Estilo de Vida
+@Melanie Clutterbuck
+Sobre la Conformación de un Nuevo Paisaje de Formación
+# Outros aportes
+@Jano Arrechea
+Crisis terminal y oportunidad en el momento actual de nuestra civilización (com Piccininni e Fernández)
+Horizonte temporal y capas de registro
+Indicadores favorables en la dinámica de la Ascesis
+Relato mítico
+@Nestor Tato
+¿Sirve lo Espiritual?
+Acerca del Propósito
+Acerca del Punto de Vista
+Aproximación a El Método. Trasfondo de la Creencia
+Aproximación a las Zonas de Conciencia
+Apuntes Cosmológicos
+Conciencia: apertura o trampa
+Del Apetecer al Darse Cuenta
+Dinámica Psíquica y Trascendencia
+Dirección mental, gratitud, agradecimiento y reciprocidad
+El Alboroto del Corazón
+Papeles I: sobre el yo
+El eje Z, la mirada, perspectivas y el escotoma
+El Emplazamiento Humano en el Mundo
+El Misterio de la vida
+El nacimiento del objeto o la obnubilación del vacío
+El orgasmo es mío porque Dios me ama
+El salto sobre el abismo
+El Telar Humano
+El Yo y sus Transformaciones: los emplazamientos del punto
+El Yo y Yo
+Imaginario y Espacio de Representación
+Intencionalidad, contradicción y fracaso
+La Anestesia Corporal
+La Aparición del Mundo
+La compresión del sentido
+La conciencia como representación
+La identificación de la conciencia con el yo
+La intencionalidad y el fuego
+La Internalización de la Mirada
+La mecanicidad, la manipulación y las claves de la concordia
+La Mirada, estructura y direcciones
+La Necesidad de una Ética Sabrosa
+La No-Violencia a través de sus Guías (com Clara Serfaty)
+La Paradoja Conciencia-Mundo… es un rulo
+La revolución de la mirada
+La Trascendencia
+Las Etapas de lo Trascendental en el Pensamiento de Silo
+Las vicisitudes del eje Z: intencionalidad, contradicción y fracaso
+Lo sagrado, lo que no es y el consagrar
+Notas sobre el trabajo con la fuerza
+Omnipresencia de Yo: Miser Cor
+Pensar y Método (recopilación de textos y charlas de Silo)
+Posibilidad y Objeto de una Psicología Trascendental
+Psicología y ascesis
+Qué es el Humanismo
+Qué es la Humanidad
+Reflexiones sobre la Actitud Humanista
+Registros de yo
+Sólo para devocionales
+Semillero de almas
+Ser o No-Ser
+Significar es Representar
+Sobre las producciones
+Sobre Técnicas de Oración
+Soy el mundo y más allá
+Taller de Psicología Aplicada
+Taller: Raíz y Matriz de la Violencia
+Trabajo Corporal
+Tratado de la Mirada
+Vivo: el origen de Yo
+@Juan Jose Castro
+Ámbitos de Interés para la Escuela
+Ascesis I Parte: producción
+Desde la ermita
+El Día de la Arenga
+La acción válida
+@Hector Lefer
+Aceites Esenciales y Nombres Científicos
+Eneagramas y Gráficos para Talleres
+Extracción de Resinas en Alcohol
+Ficha de Procedimientos
+Ficha de Registro
+Historia del Perfume, lo Profano y lo Sagrado
+Introducción al Oficio de Perfumería
+La Métrica Universal, Estructura Energética: perspectivas
+Preparación de Clorofila
+Proceso de Destilación
+Proceso de Macerado en Alcohol
+Proyecto Oficio Perfumería
+Pulcritud, Permanencia, Tono
+Seminario de Nivelación 2ª Etapa
+Seminario Oficio Perfumería
+Seminario sobre Estilo de Vida
+Taller Colorimetría, Manejo del Eneagrama
+Taller de Introducción a la Elaboración de Perfumes
+Taller de Medición de Concentración de Esencias
+Taller de Preparación de Sahumerios
+@Eduardo Montes
+Acerca de la Experiencia Poética
+Prólogo Poemas Mentales 2013
+@Victor Piccininni
+Acerca del agradecimiento
+@Daniel Bustos
+Analogías entre la Disciplina Material y la Guía del Camino Interno
+Experiencia con la Guía del camino interno
+@Roberto Kohanoff
+Aporte para el 2022
+Aporte sobre el día del León Alado
+Informe sobre seis encuentros de Ascesis compartida (2016)
+Invitación al diálogo sobre el 2022
+La Regla de Oro de la No Violencia
+Mándala Fractal
+Mito y Parques
+Trabajo en equipo 2018
+Tratar como quiero ser tratado
+@Alejandro Roger
+Aporte sobre el Trabajo con el Complemento en la Disciplina Energética
+Creando Vida (desde los modelos profundos)
+Dolor y Reconciliación
+El Mito de la Muerte en la Cultura Material
+El Nuevo Impulso Creativo en la Historia Humana
+El Pedido como Procedimiento Universal
+El Proceso Actual en Relación a la Superación del Dolor y el Sufrimiento
+En Búsqueda de la Acción Válida
+Informe sobre Nuevos Procesos
+La Experiencia de Fuerza y la Acción en el Mundo
+Ser de Luz
+@Pablo Fernandez
+Aporte sobre las alegorías
+Relato de experiencia (2023 e 2024)
+El arco temporal en tiempos de crisis
+El fin de las banderas del pasado
+El mundo
+El portal
+En torno a los milagros
+En torno al agua
+Glosario
+La Historia y el Momento Histórico
+La Unanimidad: reflexiones en torno al tratamiento de las diferencias
+Panorama sobre la salud
+Pequeños Aportes (I e III)
+Siete elementos
+Síntesis sobre el Método y las Máquinas
+Sobre la última charla de Enrique Nassar con Silo
+Tradicionalismo
+@Susana Chialina
+Aprender sin límites
+Entrada
+Relato de Experiencia
+@Carlos Sarmasky
+Apuntes sobre la Ascesis 2011-2014
+Atención y Ascesis
+Emplazamientos y Ascesis: relato de experiencia
+Imágenes inspiradas
+Investigación con Trabajo de Campo: comentarios
+Resumen de aprendizajes en el trabajo con la Fuerza
+Silo: Guía Interno, Guía Espiritual y Dios Interno
+@Fernando Contreras
+Ascesis hacia lo social
+Centralidad y periferia
+Relato de Experiencia: atmósferas y cenestesia en mi Ascesis
+@Susana Grillo
+Aspirando a ser... siendo poesía
+Mística Interior
+Peregrinando hacia nuevos mundos
+@Veronica Torres
+Bondad
+Viaje Interior
+@Gustavo Hoerth
+Comentarios de la DM
+@Patricia Nagy
+Condiciones de la vigilia en la ascesis
+Eco Imperfecto
+@Cristina Suarez
+Dos relatos
+@Evangelina Reinhardt
+El Amanecer de un nuevo Ser
+@Jorge Pozo
+El Despertar del León Alado: superando autocensuras en el mundo virtual
+@Pedro Velazquez
+El estado de agradecimiento
+@Pedro Calderon
+El Señor Hermes
+Propósito
+@Carlos Santos
+El ser humano del futuro
+Se cayó el sistema
+@Andres Pellegrini
+El Siloísmo y su influencia en el cambio del trasfondo psicosocial
+@Romina Vera
+Evaluación del trabajo de Ascesis
+@Lisandro Gracia Romero
+Experiencias en el nivel de sueño, marzo 2010 a marzo 2012
+Gracias Silo (relato de experiencia)
+@Puchi Pellegrini
+History of the Works of Silo (revision, update and summary)
+@Julio Aquino
+Historia de la Obra de Silo: una interpretación (com Coronel, Güntsche e Pellegrini)
+@Laura Abril Campo Cordero
+Lo Único que Queda
+Lo Humano y La Piedra
+@Eduardo Molinaro
+Los Estados Mentales
+Relato de Experiencia
+Testimonio
+Un sueño con el Maestro
+@Maria Luisa Eyras
+Relato de experiencia en el acompañamiento y partida de mis padres
+@Fabiana Martinez
+Sala del Parque de Estudio y Reflexión Punta de Vacas
+
+[man]
+# Monografias
+@Ana L'Homme
+Recopilación de mitos vinculados al fuego
+El cuenco y la semilla
+Relatos del Fuego I, sobre la evolución de la conciencia humana
+Relatos II: las mujeres sobre la evolución de la conciencia humana
+Relatos III: ruptura de la trayectoria evolutiva
+Relatos del Fuego: los cambios humanos profundos
+@Bruno Pezzutto
+Intoxicación con mercurio en los alquimistas de la Edad Media
+Una foto especial
+@Marcos Pampillon
+El Budismo en Camboya
+@Rosita Ergas Benmayor
+Desde el sufrimiento al Nirvana
+Una experiencia de reconciliación súbita
+Relato de experiencia en torno a la Oración Gnóstica
+@Susana Rubio
+Apolonio de Tiana, filósofo místico neopitagórico del siglo I
+Comentarios sobre los Versos de Oro pitagóricos
+Los Versos de Oro: la divina senda de la Perfección
+Las Regiones en lo Profundo
+El adentro y el afuera
+@Joaquín Valenzuela
+Un Puente: reflexiones y experiencias en torno a la Esfera Mental
+La repetición y la construcción de la vida
+@Florcita Motuda
+Elaboración del Propósito buscando el encaje cenestésico y la kinestesia de la verbalización
+@Luz María Mansilla Perez
+Canto armónico en prácticas de budismo tántrico
+@Patricio Ascui
+Acerca del pensar
+@Autor não indicado
+Física, miradas y paisajes
+La imagen de Buda, una traducción de lo Profundo
+El comienzo del pensamiento abstracto en Grecia
+Experiencia paradojal como tránsito aperceptivo (presentación)
+La Ascesis: cambio profundo y esencial
+La inspiración y conciencia inspirada
+Ciencia y Mística
+El hermetismo sistemático alejandrino
+Reflexiones sobre creencias, mitos y Ascesis
+La contemplación de la belleza, una vía de entrada a lo profundo
+Yantras y mandalas, una vía de entrada a lo profundo
+Mudras, un apoyo en la entrada a lo profundo
+
+[car]
+# Monografias
+@Daniel León
+Estudio sobre la analogía
+Conciencia y Mundo
+El Legado de Akop
+La Conciencia, el Yo, y la conciencia del Yo
+Teoría sobre el funcionamiento de la conciencia
+@Gabriel Parnisari
+Lo sexual como vehículo hacia lo sagrado
+Carl Gustav Jung: una mente brillante
+Comentarios al Libro Rojo de Carl Gustav Jung
+La imaginación como una vía fundamental de ingreso a estados no habituales de conciencia
+Estoicos, Epicúreos y el pensamiento de Silo
+@Héctor Lefer
+Introducción a la Perfumería: nuestro Oficio
+Nuestra Tipología: recopilación sobre "Los Tipos Humanos" descriptos por Silo
+@Hugo Novotny
+Intencionalidad en la evolución humana y universal
+La entrada a lo Profundo en Buda (con anexo de campo)
+La conciencia inspirada en el chamanismo siberiano-mongol y el budismo tibetano en Buryatia y Mongolia
+La entrada a lo Profundo en Lao Tsé
+Luz y Tiempo
+Luz, Gravedad y Tiempo
+Luz, Gravedad, Tiempo y Mente
+Amanecer de la civilización en América
+@Iván Novotny
+Conciencia inspirada en Rumi
+@Patricia Lacolla
+Encuentro con la Cultura Kallawaya
+# Relatos de experiência
+@Anabel Mattei
+Lo único importante: obrar con unidad
+Reflexiones sobre El Fracaso
+@Varios autores
+Proceso de Ascesis Conjunta
+Retiro con la Ceremonia de Imposición
+@Andrea Novotny
+La vocación como traducción del sentido
+@Daniel León
+Una Experiencia de Ascesis
+@Gabriel Gómez Fiori
+Corazón inspirado, justo in tempo
+@Gabriel Guzmán
+Impresiones sobre viaje a India, del Hinduismo y el Ayurveda
+@Héctor Lefer
+Revelaciones
+@Hugo Novotny
+Ascenso a la Ciudad Escondida. El proceso de Ascesis 2009-2021
+@Iván Novotny
+La vía poética en el rescate y traducción de significados profundos
+Un recorrido hacia lo alto. Notas de un viaje a Jujuy y Bolivia
+La Bocanada como apoyo en la Ascesis
+El temor como resistencia en el avance por el camino interno
+@Lucy Humeres
+Entre lo terreno y lo eterno
+@María Ramírez
+Síntesis de proceso en los últimos 12 años
+@Mirta Latuf
+El Bienestar como Vía de Profundización en la Compasión
+La experiencia de Ascesis en nuevos paisajes
+El Ser Conjunto que habita en dos planos
+@Pamela Fascello
+Reunión con Alfredo Massolo
+@Patricia Lacolla
+Equivalencia de la danza de giro Derviche con la entrada energética
+La Danza de Clara
+@Silvia Gómez
+La Chispa Divina
+Experiencias y reflexiones en el Taller del Vidrio
+# Aportes e comentários
+@Daniel León
+El sentido de la vida
+Formas, Analogía e Inspiración
+Unidad y contradicción
+La exploración del espacio interior y el trabajo con la Fuerza
+Individualidad origen y destino
+La Purificación (experiencia guiada)
+Monografías, Ascesis y Comprensión
+Ascesis y Conocimiento
+De lo simple a lo complejo: alcanzar la Belleza
+Vislumbre de la Nación Humana Universal
+Pandemia, Humanidad, Nación Humana Universal
+Humanismo y Singularidad del Siglo XXI
+La Mirada Humanista
+Una burbuja flotando en el aire
+Precisiones sobre el psiquismo y la posible existencia de un Yo esencial
+Ramanujan y la conciencia inspirada
+Evidencias de la intención evolutiva universal, y el futuro inmediato
+@Anabel Mattei, Beatriz Aguirre e Rita Dobonyi
+Experiencia con El Mensaje de Silo en el Sur de India
+@Anabel Mattei, Lucía Humeres, Mirta Latuf, Lisandro García Romero, Beatriz Aguirre e Djamila Andrade
+Intercambio sobre El Camino: El Mensaje de Silo
+@Gabriel Gómez Fiori
+Apuntes de Trabajos de Distensión Profunda en Ambientes Acuáticos
+@Héctor Lefer
+Interpretaciones sobre el Capítulo 13 de la Mirada Interna
+Aproximación al Estudio de la Máquina de Procesos
+Aproximación al Estudio de la Máquina Punto
+Aproximación al Estudio de la Máquina Árbol
+Introducción al Pensamiento Relacional
+@Hugo Novotny
+Comunidad y Diversidad en la construcción de un mundo más humano
+Reflexiones sobre Autocuración o Curación Intencional Integral
+¿Qué es el tiempo? Proceso, ciclo y evolución en la experiencia humana
+Aportes para una Teoría y Práctica del Aprendizaje Intencional (com De Angelis, A. Novotny e Pirolo)
+Algunas reflexiones sobre Organizaciones Monásticas
+Un nuevo horizonte espiritual para la humanidad
+@Iván Novotny
+Hacia el Sentido y el Despertar. Comentarios a El Mensaje de Silo
+@Patricia Lacolla
+Oficio: aporte sobre la Ceremonia de El Mensaje de Silo
+Reflexiones sobre los Orígenes del Patriarcado
+
+[cg]
+# Produções dos Mestres de Casa Giorgi
+@Massimo Solinas
+Esperienze e riflessioni
+@Rita Rombolotti
+Lavoro personale con i monumenti
+@Camillo Comelli
+Testimonianze sulla costruzione della Sala al Parco Casa Giorgi
+Difficoltà e fallimenti nei tentativi di affrontare lo studio per generare produzioni e ricerche nel processo di Ascesi
+@Antonio Piemontese
+Testimonianza sulle cerimonie del Messaggio di Silo
+@Gruppo di studio del Parco Casa Giorgi
+Studio del momento storico attuale all'interno del processo umano
+@Marta Elina Falchi
+Matilde de Magdeburgo
+@Antonello Molfese
+Complementi a Contributi al Pensiero
+La Cosa
+Luce Sutra, trattato di mistica contemporanea
+Frammenti sulla circolazione della Luce e sull'Immortalità nel Taoismo, Tantrismo e Siloismo
+@Anna Polo
+Le spirali nei luoghi sacri dell'Europa neolitica e dell'Età del Bronzo
+I labirinti e l'accesso al sacro
+@Elisabetta Raffo
+Racconto di esperienza: per aspera ad astra
+@Thomas Schmid
+L'accesso al Profondo attraverso la natura
+# Ofícios
+@Eduardo Gozalo
+La mistica degli Offizi
+@Gruppo di Studio
+Una introduzione agli Offizi (2011)
+@Autor não indicado
+Argilla e Profumi
+La Guida Interiore: esperienze e comprensioni con il Messaggio di Silo
+
+[cau]
+# Monografias
+@Beatriz Aguirre
+O Rio da Consciência: Transcendendo as Dualidades
+@Paulo Genovese
+Quando o ser humano descobre a si mesmo
+# Relatos de experiência
+@Samuel Chaves
+Experiências de uma peregrinação e suas consequências no processo de ascese
+@Gunther Aleksander
+A Bússola Interior
+@Adriana Pucci
+Relações… Ofício do Vidro. Ascese
+@Fernando Suarez
+Reencontro com Significados
+@Rogério Ceroni
+Relato de viagem, uma experiência
+@Ana Facundes, Denise Chaves, Rodrigo Ul, Samuel Chaves e outros
+Ascese Conjunta
+@Cristiane Prudenciano
+Estado de Graça
+# Outros aportes
+@Cristiane Prudenciano (org.)
+Experiências Compartilhadas: comentários sobre o livro A Mensagem de Silo
+@Alexandre Sammogini
+Comentários à Mensagem de Silo: experiências espirituais de reconciliação parental
+@Beatriz Aguirre
+A Mensagem de Silo e a Consciência Inspirada
+@Beatriz Aguirre e outros
+Intercâmbio sobre O Caminho
+
+[lbi]
+# Monografias, estudos e relatos
+@Alain Ducq
+Mystique d'amour en Iran aux XIe et XIIe siècles
+La voie dévotionnelle du soufisme en Irak du VIIIe au IXe siècle
+El camino interno
+@Antoine Batt
+Phénoménologie du mal
+La réconciliation du point de vue de l'idéalisme absolu
+Prélude à l'invocation, ou mémoire et réflexions sur la suspension du moi
+Méditations sur la Demande
+@Ariane Weinberger
+Le Dessein d'Homo sapiens au Paléolithique supérieur: de la quête de survie à la quête de transcendance
+Étude de la fiction La Chasseresse
+Le rire mystique
+Travaux avec le niveau de sommeil dans les écoles de l'éveil
+Le remerciement comme voie d'Ascèse
+Les 12 pas de la Discipline de la Morphologie en relation avec la vie quotidienne
+Le paysage onirique
+Les rêves qui changent nos vies
+@Christophe Coudert
+L'insignifiant, le fou et l'exalté (récit d'un voyage en Iran)
+@Claire Cabé
+Le Message de Marie Madeleine
+@Claudia Salé
+La mystique féminine dans la région rhéno-flamande (XIIe et XIIIe siècles)
+Astarté et l'intention évolutive
+Approfondir les expériences
+@Claudie Baudoin
+4 voies de prédisposition à la divination (en Mésopotamie et dans le monde hellénistique)
+Réflexion et méditation sur les Principes de l'Action Valable: témoignage
+La Beauté comme appât
+La vision siloïste des sciences
+La Non-violence: fondement de l'évolution humaine
+Présentation de l'œuvre de Silo
+La caresse à l'univers
+Paroles d'Yggdrasil
+Interprétations sur Le jour du Lion ailé
+@Obra coletiva de La Belle Idée
+Manuel du métier Ludisme
+Manuel du métier de médecine naturelle
+Manuel du métier Iconographie
+Sur les traces de l'humain du futur
+Synthèse de 10 ans d'ascèse
+Unité d'investigation sur l'Action de Forme
+Étude du processus d'une relation de coopération entre deux maîtres de l'École
+À propos de la cérémonie de bien-être
+La cérémonie d'Imposition, un procédé pour aller vers le Profond
+@Denis Dégé
+Caspar David Friedrich, la mystique du Sublime
+La experiencia de Mani
+Dans le sillage des miniaturistes persans
+@Didier Gay
+Étude de la fiction La Chasseresse
+@François Giorgi
+Rencontre avec ma mère
+@Gabi Noack
+La Demande et le Message de Silo
+@Gabriela Koval Dieuaide
+Akhenaton et Moïse: contact avec le Centre Lumineux et ses traductions
+Résonances avec Akhenaton
+Jacob: le mythe du changement d'état
+Sur le thème de l'Être
+Taoïsme et Ascèse
+Dessein et substitution du paysage de formation
+Homo Entheus (l'homme inspiré)
+@Isabelle Chapre
+Récit d'activation du Centre Supérieur par la pratique de vibrations, sons et couleurs
+Une réconciliation pour avancer dans les actes unitifs
+@Isabelle Montané
+Expression de la bonté dans la pensée de Silo (essai)
+Le dépassement de la souffrance par l'expérience spirituelle ou «L'évidence du sens»
+Expérience spirituelle de la Bonté (récit d'expérience)
+Cérémonie d'assistance et Ascèse
+@Jon Swinden
+Dancing Truths (partes 1 e 2)
+@Luigi D'Aria
+Faire l'expérience de l'humanité en deux fractions de seconde
+@Marie Prost
+La retraite en Chambre de Suppression Sensorielle
+L'accompagnement de Fabienne
+Les mandalas mentalos
+La Beauté
+@Michel Darracq
+Étude des processus
+Double
+Un processus avec la Force
+@Michel Deslandes
+Amour
+@Michelle Salaméro
+Expérience avec la mort et le remerciement
+Pratique d'ascèse: l'office et la manifestation de l'Esprit
+Science et spiritualité: les relations créent la matière?
+@Nathalie Douay
+L'invention de l'écriture. Une quête d'élévation et d'éternité
+@Olivier Georges
+Recherche des racines de la souffrance
+Processus d'Ascèse d'avril 2012 à novembre 2014
+Le Ravissement
+@Paquita Ortiz
+L'attitude ludique
+Recueil de poèmes
+@Peter Deno
+Méthode d'expression corporelle pour le théâtre et la danse
+Investigation sur la possibilité de voyager dans le temps
+@Philippe Bariol e Gilles Smedts
+Ligo: fête du solstice d'été en Lettonie
+@Pierre-Yann Dieuaide
+L'imposition des mains
+@René Oster
+Le Chant des Femmes. Une renaissance à la sacralité féminine
+Dionysos ou la recherche de l'unité intérieure
+La Danse, outil d'accès à des états inspirés de conscience
+L'Éveil spirituel?
+Les éléments du Parc La Belle Idée
+@Silvia Bercu Swinden
+L'espace de représentation comme expérience psychosociale (2017)
+@Stéphane Rennesson
+Une lumière dans la nuit
+@Sylvie Fornasier
+Osiris, le plus grand des espoirs
+@Thérèse Neroud
+Le Chemin intérieur de Thérèse de l'Enfant-Jésus et de la Sainte-Face
+La prière (procédé de dépassement de la souffrance et de contact avec le Profond)
+Vivre dans son Dessein (expérience)
+Naissance de l'Esprit
+@Catherine Franchel
+La page blanche
+@Charles Ruiz
+Le lâcher prise dans la posture et dans le quotidien
+@Jean Luc Guerard
+Considérations sur l'Office
+Clin d'œil à Parménide
+La ficelle; Les nœuds (essais)
+L'unité et l'éveil
+@Jean-Michel Morel
+L'Aventure intérieure
+@Mariano Quiroga
+20 años de poemas
+@Martine de Henau
+À la vie forte, belle et joyeuse
+@Robert Nageli
+39 sphinx
+@Salika Chabi
+Le Chant
+
+[att]
+# Monografias e estudos
+@Agostino Lotti
+Spazialità e temporalità in pittura, scultura e architettura (parte 1)
+Spiritualità in Anatolia e Mezzaluna Fertile nel mesolitico e inizio neolitico (parte 2)
+L'idiota e la spirale
+Breve storia della spiritualità primitiva
+Rimanere attaccati al palo (contributo breve)
+Azione di forma del tempo
+Passeggiando in una spirale (annotazioni)
+@Alessandro Iacovella
+Il Fuoco e la Specie umana: il primo incontro
+@Antonia Esposito
+In viaggio verso il Profondo (racconto di esperienza attraverso la via energetica)
+@Daniel Bustos
+Le pratiche di incubazione nell'antica Grecia
+@Emanuela Widmar
+Empedocle, lo Sfero e i quattro elementi
+L'autunno e il cambiamento
+@Emiliano Granatelli
+Cerchio e Centralità, simboli dell'Amore Equidistante e Universale (com vídeos)
+Uffizio del Fuoco: dalla Conservazione alla Ceramica
+I XII Principi
+@Fulvio De Vita
+Tra Mito ed Esperienza
+L'Universo Casuale
+@Fulvio Faro
+Il "Salvagente" delle esperienze con il Messaggio di Silo nel fallimento dell'ascesi
+Concomitanze e relazione: una esperienza e due risultanze
+@Loredana Cici
+Antecedenti della Disciplina mentale: la via mentale in Parmenide
+Il Messaggio di Silo e la trasformazione del trasfondo psicosociale
+@Monica Brocco
+Commenti al libro Lo sguardo interno in Il Messaggio di Silo
+L'ombra della Dea
+@Roberto Benatti
+La Natura come porta d'accesso a stati di coscienza ispirata
+Il Portale Torii
+La luce mistica, un nuovo mito
+@Salvatore Puledda
+Un humanista contemporáneo
+Les organisations monastiques
+@Sandro Curatolo
+Verità e rivelazione nell'opera di Silo e nell'esperienza personale
+@Vito Correddu
+Un caffè all'inferno: cattiva coscienza, sacrificio e direzione mentale
+# Outros aportes
+@Costanzo Di Mizio
+Il Piano
+Dio
+@Daniel Alvarez
+Ai figli dell'Arte
+Il Giorno del Leone Alato (com Olivier Turquet)
+@Cetty Coriglione
+La Riconciliazione e la Coppia Ideale
+L'intenzionalità nella riconciliazione
+@Autores diversos
+Studio sulla "manipolazione"
+@Isabel Torres-Carrilho
+Commenti al Messaggio di Silo
+Descrizione di Esperienza
+@Luigi Ventriglia
+Il desiderio e la via trascendentale
+@Antonella Cici e Emanuela Widmar
+Relatos de experiencias
+@Alessandra Crocchiante
+Más allá del límite
+Algo ha fracasado y está naciendo otra cosa
+@Simone Casu
+Riflessioni sulla carica affettiva
+L'ennemi au miroir. De l'autocensure à la liberté intérieure
+La perception subtile, un accès aux états inspirés de conscience
+@Antòn Morà
+La Conciencia del Fuego
+@Federica Fratini e Roberto Kohanoff
+Impariamo la Nonviolenza: la pratica della regola d'oro per tutte le età
+@Rafael Edwards
+L'Inutil Arte
+@Olivier Turquet
+Intuizioni di un possibile senso dei monumenti nel Parco Attigliano
+@Alberto Malcangi
+Il Folle Volo, dialoghi con la morte (e con la vita)
+@Daniela Mencarelli
+La illusione
+
+[min]
+# Publicações
+@Luís Filipe Guerra
+Unidade e contradição nos modelos sociais e estilos de vida contemporâneos
+Dependência, culpa e futuro
+O Bom conhecimento partilha
+
+[ihu]
+# Relatos de experiência
+@Javier Zorrilla
+Explorando el campo de lo profundo
+Cargando el propósito
+La reconciliación con uno mismo (breve)
+Revisión de Ascesis 18-20 diciembre 2015
+@Lucho Mora
+Testimonio de un proceso de experiencias, dialogando con Silo
+@Miguel Lozada
+Testimonio de Experiencia Sacsayhuaman
+# Outras produções
+@Javier Zorrilla Eguren
+Lo Sagrado en el mundo andino
+@Doris Balvín Díaz
+Las Virtudes como apoyo a la ascesis
+@Mary Hellen Reátegui
+Relatos, estudio y reflexión 2010-2021
+
+[alo]
+# Trabalhos de Escola
+@Carlos Crespo
+Testimonio de experiencia: Ascesis
+@Amparo Egas Maffeo
+La Resolución
+@Autor não indicado
+La Esfera Transparente y Luminosa
+Rota 2010-2022
+
+[bos]
+# Produções de Escola
+@Fernanda Truffini
+La Vía Mental y los Fragmentos de Heráclito
+Presentación Final Rota
+Relato de experiencia: control de tiempo y energía
+Síntesis de los propios registros en las Osadías sobre el control del tiempo y la energía
+Relato de Experiencia: El Camino de la Intención
+@Fernanda Truffini, Patricia Werchowsky, Juan José Giménez e Nahuel Tejada
+Osadías al control del tiempo
+@Leonardo Nuñez
+Relato de Experiencia
+@Silvia Andrea Recioy
+Síntesis de mis primeros 12 años de Ascesis como Maestra Formal
+Relato sobre el contacto con lo Sagrado y el intento del manejo de la Fuerza a través del Arte
+Relato de experiencia sobre El Pedido
+Estudio breve y relato de experiencia sobre el Muralismo
+Relato de Experiencia sobre mi trabajo personal
+Breve Estudio y Relato de Experiencia sobre Kandinsky
+Relato de Experiencia sobre el Arte
+Relato de Experiencia sobre mis padres
+Leonardo Da Vinci: ¿gran ejemplo de Conciencia Inspirada o producto de su época?
+@Gustavo Schierff e Mónica Mingrone
+Resumen: Trabajo en Equipo
+@Paula Maboni
+Síntesis de Experiencia en Relación al Propósito
+@Leonardo Slucki
+Develando un Pensar Esencial
+@Claudio Graisman
+Encuentro con el Sentido
+@Mabel Luna
+Relato de Experiencia: El Propósito y El Núcleo de Ensueño
+@Gabriel Yastrubni
+Relato de Experiencia: La Misión
+@Luciano Fiacchi, Ariel Lazovic, Hernán Trinidad, Yolanda Guibelalde e Daniela Yastrubni
+Notas de Retiro con la Guía del Camino Interno
+@Antonio Santiago Martínez
+Relato de Experiencia Ast (Isis), com notas
+Un puente de Luz en la obscuridad
+@Fernanda Truffini, Jaqueline Beraud, Patricia Losada, Jorge Vila e Guillermo Schierff
+La Escuela en el Siloísmo
+@Jaqueline Beraud e Fernanda Truffini
+Estudio Breve: La Escuela en Parque de Estudio y Reflexión Bosques y la Dirección Siloísta
+@Luciano Fiacchi
+El Principio Ordenador
+Obtención de un módulo de Mandala
+
+[ald]
+# Produções
+@David Sámano Chávez
+La noción del macroantropos como apoyo para la disciplina mental
+Interpretando al Nuevo Humanismo
+Parque Aldama
+@Silvia Reyes García
+Estudio sobre la Obra Poética de Netzahualcóyotl, como una expresión de contacto con lo Sagrado
+@Autor não indicado
+Virikuta: una peregrinación a lo profundo
+
+[rem]
+# Livros
+@Paulina Hunt
+Pedagogía de la Expresión
+@Marcelo Rioseco Pais
+De la domesticación a una Evaluación Libertaria
+# Aportes
+@Leticia García Farías
+Los Parques de Estudio y Reflexión como cohesores sociales
+@Paulina Hunt
+Relato de experiencia "Yo no soy digna"
+Taller de Teatro Pedagógico: Necesidad y Deseo (en los 50 años de la Arenga)
+Talleres de Teatro temáticos
+@Javier Tolcachier
+8 de marzo: Día Internacional de la Mujer Trabajadora
+@Juan Guillermo Ossa
+Los humanistas universalistas estamos de regreso del futuro y vamos a encender el Espíritu
+@Parque El Remanso
+Estudio de Situación Actual (noviembro de 2018)
+@JGol
+Síntesis de Pasos y Cuaternas: Disciplina Mental
+
+[joq]
+# Produções
+@Lourdes Cuéllar
+Sobre el determinismo
+@Victor Manuel Sánchez
+La necesidad de una mística social para la transformación social profunda
+
+[lp]
+# Produções de Escola
+@Graciela Temperini
+Testimonio de experiencia: La búsqueda del vacío
+
+[nav]
+[cha]

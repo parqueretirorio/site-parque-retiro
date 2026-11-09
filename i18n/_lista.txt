@@ -1,0 +1,885 @@
+0	Parque de Estudo e Reflexão Retiro
+1	Quem somos
+2	Início
+3	O Parque
+4	Sobre o Parque
+5	Elementos
+6	Como Chegar
+7	Atividades
+8	Eventos
+9	Encontros
+10	Retiros
+11	Reuniões
+12	Álbum de fotos
+13	Reservas
+14	Como Fazer
+15	Calendário de uso
+16	Silo
+17	Mensagem de Silo
+18	Comunidades da Mensagem
+19	Organismos do Movimento
+20	Centro de Estudo
+21	Escola
+22	Nivelação
+23	Biblioteca do Parque
+24	Produções de Escola
+25	Livros, Áudios e App
+26	Ofícios
+27	Ajude o Parque
+28	Doação
+29	Pagar online
+30	Livraria
+31	Lojinha
+32	Rifa Solidária
+33	Vaquinha Coletiva
+34	Voluntário
+35	Comissões
+36	Jardinagem / Área Externa
+37	Comunicação, Redes Sociais e Site
+38	Multiuso
+39	Parques no Mundo
+40	Blogger
+41	Entrar
+42	A Comunidade para o Desenvolvimento Humano
+43	Organismo social e cultural do Movimento Humanista, dedicado a uma nova cultura baseada no Humanismo Universalista.
+44	Origem
+45	Criada em meados de 1980 como o organismo social e cultural do Movimento Humanista.
+46	Objetivos
+47	Estudar, desenvolver, difundir e instalar uma nova cultura na qual toda forma de violência provoque repúdio. A atitude humanista é uma sensibilidade: reconhecer a intenção e a liberdade dos outros e assumir um compromisso de luta não-violenta contra a discriminação e a violência.
+48	Escala de valores
+49	O ser humano como valor central; a igualdade de todos e a igualdade de oportunidades; o reconhecimento da diversidade pessoal e cultural; o conhecimento além de preconceitos tidos como verdades absolutas; a liberdade de ideias e crenças; e o repúdio a toda forma de violência (física, econômica, racial, religiosa, moral e psicológica).
+50	Metodologia: Não-violência Ativa
+51	Recusa e vazio às formas de discriminação e violência, não-colaboração, denúncia, desobediência civil diante da violência institucionalizada, organização solidária e superação da violência em si mesmo. Ação social e transformação pessoal caminham juntas.
+52	Organização
+53	Equipes de Base (cerca de 10 membros plenos e reuniões periódicas), Equipes de Coordenação Nacionais (4 a 12 pessoas) e Equipe de Coordenação Mundial (12 membros, eleitos a cada dois anos por voto direto). Financiada por contribuições voluntárias dos membros, e participação aberta a todos sem discriminação.
+54	Materiais
+55	O Livro da Comunidade; Manual de Formação Pessoal; O Documento Humanista, de Silo (1992); Autoliberação, de Luis A. Ammann.
+56	Site oficial do organismo
+57	Fonte: <a href="https://www.humanistmovement.net/" target="_blank" rel="noopener">humanistmovement.net</a>
+58	Receba o Comunicado do Parque por e-mail
+59	© 2026 Parque de Estudo e Reflexão Retiro - Maricá, Rio de Janeiro, Brasil
+60	Fale com o Parque Retiro pelo WhatsApp
+61	Mandala da Escola
+62	Abrir menu
+63	Abrir submenu de O Parque
+64	Abrir submenu de Atividades
+65	Abrir submenu de Reservas
+66	Abrir submenu de Silo
+67	Abrir submenu de Mensagem de Silo
+68	Abrir submenu de Centro de Estudo
+69	Abrir submenu de Escola
+70	Abrir submenu de Ajude o Parque
+71	Abrir submenu de Comissões
+72	Logo A Comunidade para o Desenvolvimento Humano
+73	Facebook
+74	Instagram
+75	YouTube
+76	A Comunidade para o Desenvolvimento Humano | Parque de Estudo e Reflexão Retiro
+77	Doação, pagamento online, livraria, lojinha, rifa solidária, vaquinha coletiva, voluntário e comissões
+78	Os Parques de Estudo e Reflexão são construídos e mantidos exclusivamente pela contribuição voluntária e desinteressada das pessoas que participam das atividades do Parque e do Instituto Pangeia.
+79	Contribua para a manutenção das instalações e a construção de novos elementos do Parque Retiro.
+80	Como doar →
+81	Doe, compre ou pague ao Parque com PIX, cartão de crédito, cartão de débito ou boleto.
+82	Pagar agora →
+83	Obras Completas de Silo, livros de Psicologia e produções do Centro de Estudos.
+84	Ver livraria →
+85	Materiais promocionais e artesanais do Parque Retiro.
+86	Ver lojinha →
+87	Participe das rifas realizadas em benefício do Parque Retiro.
+88	Ver rifa →
+89	Una-se a outras pessoas para custear uma necessidade específica do Parque.
+90	Ver vaquinhas →
+91	Sem condições de contribuir com dinheiro? Coopere com o seu tempo e o seu trabalho nas atividades do Parque.
+92	Quero ser voluntário(a) →
+93	Conheça as comissões do Parque (Jardinagem / Área Externa e Comunicação, Redes Sociais e Site) e escolha onde ajudar.
+94	Ver comissões →
+95	© 2026 Parque de Estudo e Reflexão Retiro - Maricá, Rio de Janeiro, Brasil | Instituto Pangeia
+96	Ajude o Parque | Parque de Estudo e Reflexão Retiro
+97	Registro das atividades do Parque Retiro
+98	Esta atividade não foi encontrada ou ainda não foi publicada.
+99	Ver todas as atividades
+100	Atividade | Parque de Estudo e Reflexão Retiro
+101	Eventos, encontros, retiros e reuniões do Parque Retiro e atividades ligadas a ele
+102	Aqui você acompanha o que acontece no Parque Retiro, com o registro escrito de cada atividade, e também as atividades realizadas fora do Parque que têm relação com ele.
+103	Todas
+104	As atividades serão publicadas aqui. Volte em breve.
+105	Mais sobre o que acontece no Parque
+106	Imagens das atividades e momentos vividos no Parque, selecionadas pela curadoria do Álbum Parque Retiro.
+107	Ver fotos →
+108	Consulte as datas ocupadas e desocupadas do Parque.
+109	Ver calendário →
+110	Fechar submenu de O Parque
+111	Fechar submenu de Atividades
+112	Tipos de atividade
+113	Atividades | Parque de Estudo e Reflexão Retiro
+114	Acompanhe as publicações do Parque Retiro.
+115	Acervo da Biblioteca do Parque Retiro
+116	Obras Completas - Vol. I
+117	Apontamentos de Psicologia
+118	Fala de Silo
+119	Dicionário do Novo Humanismo
+120	Investigações sobre a Consciência Inspirada
+121	Fechar submenu de Centro de Estudo
+122	Livro sem capa cadastrada
+123	Biblioteca do Parque | Parque de Estudo e Reflexão Retiro
+124	Textos e novidades do Parque de Estudo e Reflexão Retiro.
+125	Esta página está em construção. O conteúdo será publicado em breve.
+126	Blogger | Parque de Estudo e Reflexão Retiro
+127	Bem-vindo ao Parque Retiro
+128	Cadastro de visitante
+129	Deixe seu e-mail para ficarmos em contato e enviarmos o Comunicado por e-mail do Parque.
+130	Nome
+131	E-mail *
+132	Quero receber
+133	Cadastro de visitante | Parque de Estudo e Reflexão Retiro
+134	Calendário de uso — Disponibilidade do Centro de Estudo
+135	Consulte abaixo a disponibilidade do Centro de Estudo (CE) para estudos, reuniões e visitas. Escolha o dia desejado para ver os detalhes e, em seguida, solicite a reserva pelo formulário da página <a href="reservas.html">Reservas</a>.
+136	Mês anterior
+137	Hoje
+138	Mês seguinte
+139	<i class="cal-swatch free"></i> Desocupado
+140	<i class="cal-swatch busy"></i> Ocupado
+141	<strong>CE:</strong> Centro de Estudo
+142	segunda
+143	terça
+144	quarta
+145	quinta
+146	sexta
+147	sábado
+148	domingo
+149	CE:
+150	Desocupado
+151	Ir para
+152	Ano
+153	Centro de Estudo (CE)
+154	Imprimir dia
+155	Sobre as reservas
+156	As reservas são feitas somente pelo <a href="como-fazer.html#solicitacao">formulário de solicitação</a>, que é enviado à Comissão do Parque.
+157	Se a reserva for aceita, de acordo com a disponibilidade na data solicitada, a Comissão informará o interessado sobre o espaço a ser utilizado.
+158	Se você reservar para um grupo, indique no campo "Detalhes" o nome dos participantes.
+159	Para cancelar uma reserva, avise com 24 horas de antecedência por <a href="mailto:parqueretirorio@gmail.com">e-mail</a>.
+160	Solicitar reserva
+161	Fechar submenu de Reservas
+162	Calendário de mesa com dias marcados, café e caderno em primeiro plano, com a casa do Centro de Estudo ao fundo, sobre o texto Calendário de uso — Disponibilidade do Centro de Estudo.
+163	Calendário de uso | Parque de Estudo e Reflexão Retiro
+164	Centro de Estudo — Pesquisa, reflexão e as produções da Escola
+165	O Centro de Estudo é um espaço destinado à pesquisa, ao aprendizado, à reflexão e à meditação. É um lugar de inspiração, onde se busca criar as melhores condições para aprofundar o conhecimento, investigar os grandes temas da vida e desenvolver uma compreensão mais ampla do ser humano e do mundo.
+166	Nele, o estudo não se limita à aquisição de informações, mas é uma oportunidade para o diálogo, a reflexão e o aprofundamento interior, constituindo um espaço dedicado à busca de conhecimento, inspiração e desenvolvimento pessoal.
+167	Monografias, relatos de experiência e outros aportes dos Mestres.
+168	Ver produções →
+169	Livros traduzidos, áudios das experiências guiadas e aplicativo.
+170	Ver materiais →
+171	Permanência, pulcritude e tom: o trabalho com os Ofícios.
+172	Saiba mais →
+173	Produções da Escola
+174	<strong>Atenção:</strong> todos os arquivos disponíveis para download estão em formato .doc, .pdf ou .zip. Para baixá-los, clique com o botão direito do mouse sobre o nome do arquivo e escolha "salvar link como", numa pasta do seu computador.
+175	Título
+176	Idioma
+177	Formato
+178	Tamanho
+179	Português
+180	Espanhol
+181	Inglês
+182	Outros Títulos
+183	Produções da Escola: Estudos e Monografias dos Mestres por Parque
+184	Autor
+185	Outros Idiomas
+186	Livros, óculos e um caderno sobre uma mesa de madeira, com vista para as montanhas ao entardecer, sobre o texto Centro de Estudo — Pesquisa, reflexão e as produções da Escola.
+187	Centro de Estudo | Parque de Estudo e Reflexão Retiro
+188	Centro Mundial de Estudos Humanistas
+189	Estudo, pesquisa e difusão do Humanismo Universalista e de sua aplicação aos problemas sociais e científicos atuais.
+190	Fundado no 1º Fórum Humanista Mundial, em Moscou, em outubro de 1993, por iniciativa de Silo. Em novembro de 2008, o 1º Simpósio Internacional “Ética no Conhecimento” (Parque Punta de Vacas) constituiu a Federação Mundial de Centros de Estudos Humanistas e o “Juramento de Ética”.
+191	Definição
+192	Organização dedicada ao estudo, à investigação e à difusão do pensamento do Humanismo Universalista. Promove produções, programas de trabalho, formações, cursos, seminários, congressos e simpósios, além de novos Centros de Estudos Humanistas (CEH), sobretudo onde estão pouco representados.
+193	Base conceitual
+194	O ser humano como ser histórico cuja ação social transforma a própria natureza; os “momentos humanistas” nas culturas; o começo pela experiência; uma metodologia do pensar baseada na experiência do pensamento; e uma ética da ação com “ações válidas” e a Regra de Ouro.
+195	Ética e não-violência
+196	Propõe que a pesquisa científica seja acompanhada por um “Juramento de Ética”, comprometendo pesquisadores a aplicar o conhecimento apenas em favor da vida humana. A não-violência é o método de ação coerente com essa ética.
+197	Soma de Centros de Estudos em diferentes cidades e continentes, coordenados por uma Equipe Coordenadora Mundial de cerca de 12 membros, renovados a cada 2 anos por eleição direta. Um CEH se constitui com cerca de 10 membros ativos, e todas as funções são ad honorem.
+198	Documento Humanista; Juramento de Ética; Obras Completas e Apontamentos de Psicologia, de Silo; Método Estrutural Dinâmico, de Jorge Pompei (CMEH, 2008); Anuários do CMEH.
+199	Logo Centro Mundial de Estudos Humanistas
+200	Centro Mundial de Estudos Humanistas | Parque de Estudo e Reflexão Retiro
+201	Centro Mundial de Estudo Humanistas
+202	Estudo, pesquisa e difusão do Humanismo Universalista
+203	O Centro Mundial de Estudo Humanistas (CMEH) é o organismo dedicado ao estudo, à pesquisa e à difusão do pensamento do Humanismo Universalista e de sua aplicação aos problemas sociais e científicos atuais. Foi fundado no Primeiro Fórum Humanista Mundial, realizado em Moscou, em outubro de 1993, por iniciativa de Silo.
+204	O CMEH reúne Centros de Estudos Humanistas organizados em diferentes cidades, países e continentes, formando uma federação mundial em constante desenvolvimento. Promove cursos, seminários, debates, congressos e simpósios voltados à difusão de suas produções, sempre orientados pelo compromisso de que o conhecimento seja aplicado unicamente em favor do bem-estar e do desenvolvimento do ser humano.
+205	Estudo e pesquisa
+206	Investiga a visão do Humanismo Universalista e sua aplicação a temas sociais e científicos contemporâneos.
+207	Ética no conhecimento
+208	Propõe que a pesquisa científica seja acompanhada por um compromisso ético que oriente seu uso sempre em favor da vida humana.
+209	Rede mundial
+210	Reúne Centros de Estudos Humanistas em diversas cidades e culturas, promovendo o intercâmbio entre pesquisadores.
+211	Em novembro de 2008, foi realizado o 1º Simpósio Internacional do CMEH, "Ética no Conhecimento", nos Parques de Estudo e Reflexão de Punta de Vacas, ocasião em que se constituiu a Federação Mundial de Centros de Estudos Humanistas.
+212	Visitar site oficial
+213	Logo do Centro Mundial de Estudo Humanistas
+214	Centro Mundial de Estudo Humanistas | Parque de Estudo e Reflexão Retiro
+215	Quem somos — Você nunca esteve em um Parque de Estudo e Reflexão?
+216	Você nunca esteve em um Parque de Estudo e Reflexão?
+217	Os Parques de Estudo e Reflexão são espaços abertos a qualquer pessoa, sejam quais forem suas crenças, dedicados ao silêncio, à reflexão e ao encontro consigo mesmo e com os demais. Neles acontecem visitas, cerimônias, retiros e atividades de estudo, sempre gratuitas e sem nenhuma exigência prévia. Esta página reúne, em poucos passos, tudo o que você precisa para conhecer o Parque Retiro e decidir como quer participar.
+218	Por onde começar
+219	O que é um Parque?
+220	O propósito e o sentido de busca do sagrado que dá origem aos Parques de Estudo e Reflexão.
+221	Conheça o Parque Retiro
+222	Uma breve apresentação do espaço em Maricá e do significado de cada um dos seus elementos.
+223	Veja a Agenda
+224	Calendário de uso do Centro de Estudo, para encontros, retiros e visitas.
+225	Visite
+226	Localização, como chegar e as recomendações de uso para quem vai visitar o Parque.
+227	Conheça o Centro de Estudo
+228	O espaço dedicado à pesquisa, à reflexão e às produções da Escola.
+229	Leia Silo
+230	A vida e a obra de Mario Luis Rodríguez Cobos (Silo), inspirador do Humanismo Universalista.
+231	O que buscamos aqui
+232	O Parque Retiro é um espaço de liberdade e busca de sentido, aberto a todo ser humano, independentemente de suas crenças. Nele, algumas ideias simples orientam tudo o que se faz:
+233	Estudo e Reflexão
+234	Um lugar para conhecer a si mesmo, aprofundar e refletir sobre a própria vida.
+235	Não Violência
+236	O compromisso com a paz e com a resolução não violenta dos conflitos, entre as pessoas e dentro delas.
+237	Silêncio
+238	A quietude interna como caminho para uma conexão mais profunda consigo mesmo.
+239	Comunidade
+240	O encontro entre as pessoas e a construção coletiva de um espaço comum.
+241	Cuidado Ambiental
+242	Uma relação de respeito e cuidado com a natureza que envolve o Parque.
+243	Para aprofundar
+244	Biblioteca Digital
+245	Textos e áudios de apoio para quem quer aprofundar o estudo e a reflexão.
+246	A Mensagem de Silo
+247	Uma introdução ao aspecto espiritual da Mensagem, composta pelo Livro, a Experiência e o Caminho.
+248	Opinião e Participação
+249	Um espaço para compartilhar experiências e se aproximar da comunidade do Parque Retiro.
+250	Participar →
+251	Como Apoiar
+252	Fale com a Comissão do Parque para saber como colaborar como voluntário ou apoiador.
+253	Falar com a Comissão →
+254	Banner com o texto: Um espaço para estudar, refletir e agir com humanidade. O Parque de Estudo e Reflexão Retiro é um lugar aberto a todas as pessoas, dedicado ao estudo, à contemplação e à prática da não violência. O Retiro é um farol de luz: um lugar para estudar, reconciliar, compartilhar e agir com humanidade.
+255	Quem somos | Parque de Estudo e Reflexão Retiro
+256	Comissão que divulga o que acontece no Parque Retiro
+257	A Comissão de Comunicação, Redes Sociais e Site mantém as pessoas informadas sobre o que acontece no Parque Retiro: divulga as atividades nas redes sociais e cuida do conteúdo deste site.
+258	Redes sociais
+259	Planejamento e publicação de textos, fotos e vídeos no Instagram, no Facebook e no YouTube do Parque.
+260	Site
+261	Atualização dos banners e dos textos do site e registro das <a href="atividades.html">Atividades</a> do Parque.
+262	Registro das atividades
+263	Fotos, filmagens e textos que contam o que foi vivido em cada encontro, retiro ou evento.
+264	Quero ser voluntário(a) nesta comissão
+265	Se você gosta de escrever, fotografar, filmar, desenhar ou cuidar de redes sociais, ou quer aprender, pode ajudar. Preencha o formulário de voluntário(a); a área de Comunicação, redes sociais e site já vem marcada. A Comissão entra em contato para combinar como você pode colaborar.
+266	Quero ajudar na Comunicação
+267	Quer ver outras formas de ajudar? Veja <a href="comissoes.html">todas as comissões</a> ou a página <a href="voluntario.html">Voluntário</a>.
+268	Fechar submenu de Ajude o Parque
+269	Fechar submenu de Comissões
+270	Comissão Comunicação, Redes Sociais e Site | Parque de Estudo e Reflexão Retiro
+271	Comissão responsável pelos espaços abertos do Parque Retiro
+272	A Comissão de Jardinagem / Área Externa cuida dos espaços abertos do Parque, para que quem vem estudar e refletir encontre um lugar acolhedor e em harmonia com a natureza.
+273	Jardinagem
+274	Cuidado das plantas, poda, plantio e manutenção dos jardins e dos caminhos do Parque.
+275	Reflorestamento
+276	Participação nos planos de plantio de mudas e de recuperação da área externa do Parque.
+277	Planejamento
+278	A Comissão organiza o que será feito, quando e com quantas pessoas, e convida voluntários para os dias de trabalho.
+279	Você não precisa ter experiência nem contribuir com dinheiro: basta ter vontade de ajudar. Preencha o formulário de voluntário(a); a área de Jardinagem e área externa já vem marcada. A Comissão entra em contato para combinar uma atividade que combine com o seu tempo.
+280	Quero ajudar na Jardinagem / Área Externa
+281	Comissão Jardinagem / Área Externa | Parque de Estudo e Reflexão Retiro
+282	Comissão responsável pelo espaço multiuso do Parque Retiro
+283	A Comissão Multiuso cuida do espaço multiuso do Parque: organiza a agenda de uso, as regras para quem utiliza o espaço e os planejamentos de melhorias, para que ele possa receber oficinas, reuniões e encontros.
+284	Agenda de uso
+285	Registro de quem usa o espaço, em que dia e horário, e para qual atividade.
+286	Regras e cuidados
+287	Orientações de uso, de limpeza e de zelo, para que o espaço fique em ordem para todas as pessoas.
+288	Planejamentos
+289	Organização do que será feito no espaço, quando e com quantas pessoas, e convite a voluntários para os dias de trabalho.
+290	Você não precisa ter experiência nem contribuir com dinheiro: basta ter vontade de ajudar. Preencha o formulário de voluntário(a); a área Multiuso já vem marcada. A Comissão entra em contato para combinar como você pode colaborar.
+291	Quero ajudar no Multiuso
+292	Comissão Multiuso | Parque de Estudo e Reflexão Retiro
+293	Grupos de voluntários que cuidam de cada área do Parque Retiro
+294	O Parque Retiro é cuidado por pessoas que oferecem o seu tempo de forma voluntária e desinteressada. Cada <strong>comissão</strong> reúne quem se dedica a uma área do Parque. Conheça as comissões abertas a novos voluntários e escolha onde você pode ajudar.
+295	Cuidado das plantas, poda, plantio, manutenção dos espaços abertos e reflorestamento do Parque.
+296	Conhecer a comissão →
+297	Divulgação das atividades do Parque nas redes sociais e cuidado do conteúdo do site.
+298	Agenda de uso, regras e planejamentos do espaço multiuso do Parque.
+299	Ainda não sei onde ajudar
+300	Preencha o formulário de voluntário(a) e a Comissão do Parque conversa com você para encontrar a melhor forma de colaborar.
+301	Comissões | Parque de Estudo e Reflexão Retiro
+302	Como Chegar — Localização e horários de ônibus até o Parque Retiro
+303	O Parque Retiro está localizado em Maricá, Rio de Janeiro. Utilize as linhas "Tarifa Zero" da EPT para chegar ao local.
+304	Localização no mapa
+305	Abrir no Google Maps
+306	Ônibus de São Paulo
+307	Ver horários E15 / E15A
+308	Baixar aplicativo EPT
+309	<strong>Dica:</strong> antes de sair, consulte os horários aqui no site ou pelo aplicativo EPT Maricá. Assim, você poderá verificar qual linha utilizar e acompanhar a localização do ônibus em tempo real.
+310	De carro
+311	Saindo do Rio de Janeiro, siga pela Ponte Rio-Niterói, no sentido Niterói.
+312	Após passar pelo pedágio, entre no acesso para Maricá, seguindo pela Alameda São Boaventura.
+313	Ao final da Alameda São Boaventura, siga pela Rodovia Amaral Peixoto (RJ-106), no sentido Maricá.
+314	Continue pela RJ-106 e faça o retorno no Km 24.
+315	Após realizar o retorno, entre na primeira saída à esquerda, na Estrada do Retiro.
+316	Siga pela Estrada do Retiro até chegar ao Parque de Estudo e Reflexão Retiro.
+317	De ônibus: São Paulo ⇄ Maricá
+318	A empresa que faz a viagem direta entre São Paulo e Maricá é a <strong>Viação 1001</strong>. A saída de São Paulo é na Rodoviária do Tietê (Av. Cruzeiro do Sul, 1800, Santana) e a chegada em Maricá é na Rodoviária de Maricá (Av. Roberto Silveira, 163).
+319	São Paulo → Maricá
+320	Dias
+321	Sai de São Paulo (Tietê)
+322	Chega em Maricá
+323	Duração
+324	Todos os dias
+325	07:50 (dia seguinte)
+326	cerca de 8h50
+327	Maricá → São Paulo
+328	Sai de Maricá (Rodoviária)
+329	Chega em São Paulo (Tietê)
+330	07:15 (dia seguinte)
+331	cerca de 9h
+332	<strong>Dias das viagens:</strong> a Viação 1001 faz esta viagem <strong>todos os dias da semana</strong>, de segunda a domingo, nos dois sentidos, no horário indicado. <strong>Confira antes de comprar:</strong> a empresa pode mudar horários e dias, principalmente em feriados. Confirme sempre com a Viação 1001 antes de comprar a passagem.
+333	Contato da Viação 1001
+334	WhatsApp (atendimento virtual): (11) 97264-5808
+335	Informações gerais: 4004-5001
+336	Cancelamentos, sugestões e solicitações: 0800 941 3334
+337	Atendimento para pessoas com deficiência auditiva ou de fala: 0800 770 3603
+338	Site: <a href="https://www.1001.com.br" target="_blank" rel="noopener">www.1001.com.br</a>
+339	Ao chegar à Rodoviária de Maricá, siga para o Retiro pelas linhas <strong>E15</strong> ou <strong>E15A</strong> da EPT (veja os horários mais abaixo nesta página).
+340	De ônibus
+341	Saindo do Centro do Rio
+342	É possível pegar um ônibus com destino a Maricá no Terminal Menezes Côrtes, no Centro do Rio.
+343	Também é possível embarcar em ônibus com destino a Maricá na região da Avenida Presidente Vargas, próximo à Central do Brasil.
+344	Pela Estação INTO do BRT
+345	Outra opção é utilizar o BRT Transbrasil e desembarcar na Estação INTO, localizada na região do Instituto Nacional de Traumatologia e Ortopedia (INTO), próximo à Rodoviária Novo Rio.
+346	A partir da região da Estação INTO, é possível utilizar as opções de transporte rodoviário com destino a Maricá.
+347	Chegando a Maricá
+348	Ao chegar ao Centro de Maricá, utilize uma das linhas da EPT – Empresa Pública de Transportes que atendem a região do Retiro:
+349	E15 — Centro x Retiro
+350	Via Cova da Onça. A linha segue até a região do Retiro e atende a Estrada do Retiro.
+351	E15A — Centro x Retiro
+352	Via Cachoeira. A linha também segue até o Retiro, passando pela região da Estrada do Retiro.
+353	As linhas E15 e E15A são opções de transporte para chegar à região do Parque.
+354	De van
+355	O embarque para vans com destino a Maricá pode ser feito na região da Rua Azevedo Coutinho, atrás do Rio Imagem e em frente à Central do Brasil.
+356	Pela região do INTO / Rodoviária Novo Rio
+357	Também é possível embarcar em vans com destino a Maricá na região da Avenida Rodrigues Alves, no sentido Ponte Rio-Niterói, próximo à Rodoviária Novo Rio e ao INTO.
+358	Outra opção é utilizar o BRT até a Estação INTO e, a partir dessa região, utilizar o transporte com destino a Maricá.
+359	Ao chegar ao Centro de Maricá, utilize as linhas E15 – Centro x Retiro (via Cova da Onça) ou E15A – Centro x Retiro (via Cachoeira) para continuar até a região do Parque.
+360	Horários dos ônibus e localização em tempo real
+361	Para facilitar o planejamento da sua visita, os horários atualizados das linhas E15 e E15A também estão disponíveis aqui no site do Parque. Você não precisa sair do site para procurar essas informações: consulte os horários abaixo antes de iniciar sua viagem.
+362	Horários de ônibus EPT
+363	E15: Centro x Retiro (via Cova da Onça)
+364	E15A: Centro x Retiro (via Cachoeira)
+365	Aplicativo EPT Maricá
+366	Também disponibilizamos aqui o link para baixar o aplicativo oficial da EPT Maricá, pelo qual é possível consultar:
+367	Horários dos ônibus
+368	Itinerários das linhas
+369	Localização do ônibus em tempo real
+370	Informações para planejar seu deslocamento
+371	Baixe o aplicativo EPT (Android ou iOS)
+372	Os horários e o link para baixar o aplicativo da EPT também estão disponíveis aqui no site, para facilitar sua chegada ao Parque.
+373	Ônibus da EPT Maricá na estrada e mapa do trajeto até o Parque Retiro, sobre o texto Como Chegar — Localização e horários de ônibus até o Parque Retiro.
+374	Mapa do Parque de Estudo e Reflexão Retiro
+375	Como Chegar | Parque de Estudo e Reflexão Retiro
+376	Como Fazer — Solicitação de reserva do Centro de Estudo
+377	Recomendações para o uso do Parque
+378	Espaço de pesquisa, aprendizado, reflexão e meditação. O uso é feito mediante reserva, sempre com antecedência.
+379	Demais instalações
+380	A Sala, o Portal, o Monólito, a Fonte, a Estela e os passeios do Parque são de uso público.
+381	Para conhecer o significado de cada espaço, veja a página <a href="elementos.html">Elementos</a>.
+382	<strong>Antes de solicitar:</strong> consulte o <a href="calendario.html">Calendário de uso</a> para ver quais datas estão desocupadas.
+383	Solicitação de reserva
+384	As reservas são feitas somente por meio deste formulário, que é enviado à Comissão do Parque.
+385	Se você reservar para um grupo de pessoas, indique em "Detalhes" o nome dos visitantes.
+386	Telefone
+387	Cidade
+388	País
+389	Comunidade / Organismo
+390	E-mail
+391	Dia de chegada
+392	Dia de saída
+393	Hora de chegada
+394	Quantidade de pessoas
+395	Necessidades específicas
+396	Detalhes
+397	Enviar solicitação
+398	Ao enviar, seu aplicativo de e-mail abrirá com a solicitação pronta, endereçada à Comissão do Parque (parqueretirorio@gmail.com).
+399	Dúvidas sobre reservas? Fale com a Comissão do Parque pela <a href="https://chat.whatsapp.com/BuHW4GY2R183cEBbvoLCXb" target="_blank">Comunidade do WhatsApp</a>.
+400	Casa do Centro de Estudo entre árvores, com vista para o mar ao fundo, sobre o texto Como Fazer — Solicitação de reserva do Centro de Estudo.
+401	Ex.: dificuldade de locomoção (cama de baixo), restrição alimentar, questões de saúde
+402	Objetivo da atividade e, se for um grupo, o nome dos visitantes
+403	Como Fazer | Parque de Estudo e Reflexão Retiro
+404	Comunidades que vivem e difundem a Mensagem de Silo.
+405	Fechar submenu de Silo
+406	Fechar submenu de Mensagem de Silo
+407	Comunidades da Mensagem | Parque de Estudo e Reflexão Retiro
+408	Convergência das Culturas
+409	O diálogo entre culturas e a luta contra a discriminação
+410	A Convergência das Culturas é o organismo do Movimento Humanista dedicado ao diálogo entre culturas. Foi criada em 1995 — inicialmente sob o nome de Centro de Culturas — com o propósito de facilitar e estimular o encontro entre pessoas de diferentes culturas, para além de qualquer abordagem abstrata ou institucional.
+411	Vivemos um momento de crescente planetarização, em que todas as culturas se aproximam e se influenciam mutuamente como nunca antes na história. A Convergência das Culturas busca resgatar, em cada cultura, as ideias, crenças e atitudes humanistas presentes no coração dos diferentes povos, distinguindo esse processo da globalização imposta por centros de poder.
+412	Aproximar culturas
+413	Promove encontros e espaços de intercâmbio entre pessoas de diferentes origens culturais, em busca de elementos comuns.
+414	Combater a discriminação
+415	Denuncia e combate toda forma de discriminação, aberta ou disfarçada, por meio de campanhas pela livre circulação dos seres humanos pelo planeta.
+416	Difundir suas ideias
+417	Estabelece contato com pessoas e organizações de diferentes países para dar a conhecer seus estudos e atividades.
+418	Logo da Convergência das Culturas
+419	Convergência das Culturas | Parque de Estudo e Reflexão Retiro
+420	Diálogo entre culturas e luta contra toda forma de discriminação e violência.
+421	Criada em 1995 como “Centro de Culturas” (nome usado até 2009), tornou-se a Convergência das Culturas, organismo do Movimento Humanista.
+422	Humanismo Universalista
+423	Sustenta que, nos momentos mais criativos de todas as culturas, prevalece a atitude humanista: repúdio à discriminação e à violência, liberdade de ideias e crenças. Propõe um diálogo entre culturas que seja um acordo em pontos fundamentais e uma colaboração concreta e mútua, e distingue a planetarização da globalização imposta por centros imperiais.
+424	Promover relações entre culturas, com encontros e âmbitos de intercâmbio; denunciar e combater a discriminação manifesta ou encoberta, com campanhas pelos direitos humanos e pela livre circulação de pessoas; e difundir suas ideias e atividades em todas as latitudes.
+425	Equipes de base (cerca de 10 participantes) formam uma equipe nacional a cada 10 equipes, eleita a cada dois anos. A coordenação mundial é uma Equipe Mundial eleita por voto direto, com cotas para membros de diferentes culturas. Financiada por anuidades dos membros plenos.
+426	O Caderno da CC; Manual de Formação Pessoal; O Documento Humanista; Autoliberação; Obras Completas e Apontamentos de Psicologia, de Silo.
+427	Logo Convergência das Culturas
+428	Deixar de receber o Comunicado
+429	Comunicado por e-mail do Parque Retiro
+430	Informe seu e-mail para deixar de receber o Comunicado por e-mail do Parque de Estudo e Reflexão Retiro.
+431	E-mail que recebe o Comunicado
+432	Deixar de receber o Comunicado do Parque Retiro
+433	Deixar de receber o Comunicado - Parque Retiro
+434	Contribua com a manutenção e a construção do Parque
+435	Como contribuir
+436	Sua doação ajuda a manter as instalações e a construir os novos elementos do Parque Retiro.
+437	<strong>PIX / Banco Mumbuca:</strong> doacao@parqueretiro.org.br
+438	<strong>Conta bancária institucional:</strong> Instituto Pangeia
+439	Doar online (PIX, cartão ou boleto)
+440	Dúvidas sobre como doar? Fale com a Comissão do Parque pelo e-mail <a href="mailto:parqueretirorio@gmail.com">parqueretirorio@gmail.com</a>.
+441	Doação | Parque de Estudo e Reflexão Retiro
+442	Elementos — O que significa cada elemento do Parque
+443	A Sala
+444	As Salas dos Parques de Estudo e Reflexão são espaços abertos, brancos e vazios, sem imagens, ícones ou símbolos. O vazio permite que cada pessoa encontre ali seu próprio significado.
+445	Sua forma semiesférica envolve o espaço e conduz o olhar para cima, enquanto, em seu interior, as pessoas se dispõem de forma circular e concêntrica, todas no mesmo nível.
+446	Desde a antiguidade, o ser humano buscou lugares de recolhimento — bosques, grutas, montanhas e construções destinadas à contemplação — onde pudesse relaxar, inspirar-se e tomar contato com uma realidade mais profunda.
+447	Na Sala, o mais importante são as pessoas, sua experiência interior e a possibilidade de encontrar um espaço de silêncio, reflexão e conexão consigo mesmas.
+448	O Portal
+449	O Portal marca o limite entre a exterioridade do mundo e a interioridade do ser humano.
+450	Inspirado nos torii dos santuários shinto, ele se eleva como indicação de uma possibilidade: atravessar um limite, superar um umbral e entrar em outro espaço, favorecendo também uma mudança no estado interno.
+451	O Portal é, ao mesmo tempo, fronteira e convite. Separa o ruído do silêncio, a vida cotidiana do recolhimento e a exterioridade da experiência interior.
+452	Ao atravessá-lo, a pessoa é convidada a deixar para trás, ainda que por um momento, o mundo habitual e entrar em um espaço destinado ao conhecimento, à reflexão e à inspiração.
+453	O Monólito
+454	Desde a antiguidade, encontram-se formas simbólicas que representam o "eixo do mundo", aquilo que conecta o céu e a terra.
+455	Árvores, montanhas, obeliscos, pirâmides e outras construções foram associadas, em diferentes culturas, à possibilidade de estabelecer uma ligação entre o terreno e o elevado, entre o mundo cotidiano e o sagrado.
+456	Nos Parques de Estudo e Reflexão, o Monólito é construído em aço inoxidável e recria esse eixo essencial.
+457	Ele também fixa as coordenadas espaço-temporais do lugar, marcando o ponto e o momento em que o Parque foi criado.
+458	A Fonte
+459	A água aparece nas antigas tradições e nos mitos de criação como fonte de vida, associada à nutrição, à purificação, ao cuidado e ao renascimento.
+460	As Fontes dos Parques de Estudo e Reflexão se inspiram nas formas do yoni-lingam, símbolo presente na tradição da Índia.
+461	O yoni representa o princípio feminino, acolhedor e fértil, enquanto o lingam representa o princípio masculino e criador. Unidos, expressam a integração de princípios que se complementam e dão origem à vida.
+462	No Tantra, o yoni-lingam representa a energia criadora que se manifesta no pensamento e na capacidade de gerar vida.
+463	A Fonte mantém viva essa antiga representação da água e da energia criadora.
+464	A Estela
+465	Em diferentes culturas e épocas, as estelas foram utilizadas para registrar e testemunhar acontecimentos históricos significativos.
+466	Encontramos exemplos entre os povos mesopotâmicos, egípcios, sumérios e maias, entre muitos outros.
+467	Nos Parques de Estudo e Reflexão, a Estela cumpre uma função semelhante: preservar a memória daqueles que participaram da construção do Parque.
+468	Suas placas de aço inoxidável recebem os nomes das pessoas que contribuíram para tornar possível sua construção.
+469	Assim, a Estela representa a memória, o reconhecimento e a continuidade de uma obra construída coletivamente.
+470	Estela Virtual
+471	O Centro de Trabalho
+472	O Centro de Trabalho oferece condições para a reflexão pessoal, o estudo e o intercâmbio em grupos, longe do ruído da vida cotidiana.
+473	É um lugar onde uma pessoa ou um grupo pode permanecer por um ou vários dias para trabalhar, estudar, refletir e encontrar inspiração.
+474	Os humanistas e mensageiros também realizam nesses espaços seus encontros, seminários, retiros, intercâmbios e cerimônias.
+475	O Centro de Trabalho favorece, portanto, a concentração e o desenvolvimento de atividades destinadas ao aprofundamento pessoal e coletivo.
+476	O Centro de Estudo
+477	O Centro de Estudo é um espaço destinado à pesquisa, ao aprendizado, à reflexão e à meditação.
+478	É um lugar de inspiração, onde se busca criar as melhores condições para aprofundar o conhecimento, investigar os grandes temas da vida e desenvolver uma compreensão mais ampla do ser humano e do mundo.
+479	Nele, o estudo não se limita à aquisição de informações. É também uma oportunidade para o diálogo, a reflexão e o aprofundamento interior.
+480	O Centro de Estudo constitui, assim, um espaço dedicado à busca de conhecimento, inspiração e desenvolvimento pessoal.
+481	A Oficina
+482	Equipada para as práticas dos Ofícios: conservação e produção do fogo, práticas com materiais frios e trabalhos com barro cozido, cerâmica, metais e, em um futuro próximo, com vidro.
+483	Ilustração do Parque com a Estela, o Portal, o Monólito, a Fonte, o Centro de Estudo e o Centro de Trabalho, sobre o texto Elementos — O que significa cada elemento do Parque.
+484	Elementos | Parque de Estudo e Reflexão Retiro
+485	Encomenda de livro
+486	Pré-lançamento com preço de pré-venda
+487	Não encontramos o livro deste link.
+488	Voltar à Livraria
+489	Encomenda de livro | Parque de Estudo e Reflexão Retiro
+490	Escola — Trabalhos de Escola no Parque Retiro
+491	Os interessados devem enviar e-mail para <a href="mailto:parqueretirorio@gmail.com">parqueretirorio@gmail.com</a>
+492	Textos e áudios de apoio: Autoliberação, Experiências Guiadas, Anotações de Psicologia, relaxamento e jogos de imagens.
+493	Acessar material →
+494	Fechar submenu de Escola
+495	Pessoas estudando em mesas dentro de uma sala com paredes de tijolo à vista, sobre o texto Escola — Trabalhos de Escola no Parque Retiro.
+496	Em breve: abertura aos Trabalhos de Escola. Os interessados devem enviar e-mail para parqueretirorio@gmail.com. Ao fundo, pessoas sentadas em círculo ao ar livre, conversando.
+497	Escola | Parque de Estudo e Reflexão Retiro
+498	Em memória e reconhecimento a quem construiu o Parque
+499	Nomes completos das pessoas que contribuíram, direta e indiretamente, na construção do Parque de Estudo e Reflexão Retiro.
+500	Os nomes estão sendo reunidos aos poucos. Volte em breve.
+501	Voltar aos Elementos
+502	Estela Virtual | Parque de Estudo e Reflexão Retiro
+503	Fotos
+504	Álbum Parque Retiro
+505	Momentos vividos no Parque Retiro, enviados pelas pessoas que estiveram presentes e frequentam o Parque e selecionados pela curadoria do Álbum.
+506	Enviar minhas fotos
+507	As fotos selecionadas pela curadoria aparecerão aqui.
+508	Enviar fotos
+509	Tirou fotos no Parque? Envie para o Álbum. A curadoria escolhe as que serão publicadas.
+510	Fotos (até 10 por vez) *
+511	Atividade (se souber)
+512	Dia em que tirou as fotos
+513	Mostrar meu nome junto da foto, se ela for publicada?
+514	Informe o dia em que tirou as fotos e/ou o autor. Ao enviar, você declara que as fotos são suas e autoriza o uso pelo Parque.
+515	Seu nome
+516	Foto ampliada
+517	Fechar
+518	Fotos | Parque de Estudo e Reflexão Retiro
+519	O que são e para que servem?
+520	Os Parques de Estudo e Reflexão são espaços abertos ao estudo, à reflexão interior e à elevação espiritual. Eles servem como pontos de convergência para aprofundar no Humanismo Universalista, promover a não violência e proporcionar momentos de meditação, troca e inspiração em harmonia com a natureza.
+521	Biblioteca do Parque — Acervo Aberto
+522	Consulte os livros disponíveis para leitura e consulta física no local durante as suas visitas ao Parque Retiro.
+523	Ver acervo completo
+524	Explore o Parque
+525	O Parque Retiro é um dos Parques de Estudo e Reflexão da rede mundial inspirada pelo Humanismo Universalista. Conheça abaixo o que oferecemos e como chegar até nós.
+526	O que são os Parques de Estudo e Reflexão e para que servem.
+527	A Sala, o Portal, o Monólito, a Fonte e a Estela — o significado de cada espaço.
+528	Localização, mapa e horários dos ônibus Tarifa Zero da EPT.
+529	Verifique disponibilidade e solicite sua visita ou retiro.
+530	Mario Luis Rodríguez Cobos (Silo) e o Humanismo Universalista.
+531	Pesquisa, aprendizado, reflexão e as produções da Escola.
+532	A rede mundial de Parques de Estudo e Reflexão nos cinco continentes.
+533	Abertura aos Trabalhos de Escola e o material de Nivelação.
+534	Conecte-se e acompanhe nossas redes
+535	Acompanhe nossas publicações, as notícias e vídeos do Parque Retiro em nossas redes.
+536	@parqueretirorio
+537	Fotos dos encontros, atividades e novidades do Parque.
+538	Ver no Instagram →
+539	Parque Retiro Maricá
+540	Avisos, atividades e informações como os horários dos ônibus Tarifa Zero da EPT.
+541	Ver no Facebook →
+542	Canal oficial Parque Retiro
+543	Vídeos sobre o significado da Sala, do Portal, do Monólito, da Fonte e da Estela.
+544	Assistir no YouTube →
+545	Pressenza IP
+546	Agência Internacional de Notícias
+547	Notícias sobre não-violência ativa, desarmamento e iniciativas pela paz no mundo.
+548	Ler na Pressenza →
+549	Celebração dos 15 anos do Parque de Estudo e Reflexão Retiro, nos dias 26 e 27 de setembro. Espaço de inspiração, reflexão e encontro. Endereço: Estrada do Retiro, 28A, Retiro, Maricá/RJ.
+550	O valor arrecadado sustenta o Parque
+551	Acervo à venda
+552	Adquira as Obras Completas de Silo, livros de Psicologia, Experiências Guiadas e produções do Centro de Estudos. O valor arrecadado é destinado à sustentabilidade do Parque.
+553	Fazer pedido por e-mail
+554	Para ler gratuitamente, visite a <a href="biblioteca.html">Biblioteca do Parque</a>.
+555	Livraria | Parque de Estudo e Reflexão Retiro
+556	Livros traduzidos, áudios das experiências guiadas e aplicativo
+557	Os textos e áudios dos livros estão disponíveis gratuitamente para o público interessado. Solicita-se a citação da fonte e dos respectivos autores.
+558	Livros traduzidos para o português
+559	A Mensagem de Silo – Silo
+560	Apontamentos de Psicologia – Silo
+561	Fala Silo – Silo
+562	O Dia do Leão Alado – Silo
+563	Humanizar a Terra – Silo
+564	Experiências Guiadas – Silo
+565	Conferência de Silo sobre Psicologia IV
+566	Autoliberação – Luis Ammann
+567	Áudios
+568	Todos os arquivos de áudio estão disponíveis para download, em formato MP3. Para baixar, clique com o botão direito do mouse sobre o nome do arquivo, escolha "salvar link como" e guarde numa pasta do seu computador.
+569	Relaxamento
+570	Relaxamento Completo
+571	Experiência de Paz
+572	Experiências Guiadas
+573	Explicações sobre as Experiências Guiadas (MP3)
+574	Jogos de Imagens
+575	O Trenó
+576	A Descida
+577	Os Disfarces <small>(áudio ainda não disponível no site de origem)</small>
+578	A Subida
+579	As Nuvens
+580	Avanços e Retrocessos
+581	Reconciliação com o Passado
+582	A Criança
+583	O Animal
+584	O Inimigo
+585	O Grande Erro
+586	O Ressentimento
+587	O Limpador de Chaminés
+588	A Saudade
+589	O Par Ideal
+590	Momento Atual
+591	A Protetora da Vida
+592	O Mineiro
+593	O Guia Interno
+594	A Desorientação e o Guia Interno
+595	A Perturbação e o Guia Interno
+596	A Indecisão e o Guia Interno
+597	A Ação Salvadora
+598	As Falsas Esperanças
+599	Sentido da Vida
+600	A Repetição <small>(áudio ainda não disponível no site de origem)</small>
+601	A Viagem
+602	O Festival
+603	A Agonia
+604	A Morte
+605	Aplicativo
+606	<strong>Por enquanto apenas para Android</strong>; não funciona em iPhone ou Windows.
+607	<strong>Atenção:</strong> por ser um aplicativo para Android acessado fora da Play Store, podem aparecer mensagens de advertência e de confirmação para a instalação. É só confirmar.
+608	A Mensagem de Silo – download do apk
+609	Conteúdo do <a href="https://parquecaucaia.org.br" target="_blank" rel="noopener">Parque de Estudos e Reflexão Caucaia</a>, liberado para uso (cite a fonte).
+610	Voltar ao Centro de Estudo
+611	Livros, Áudios e App | Parque de Estudo e Reflexão Retiro
+612	Materiais do Parque Retiro
+613	Produtos
+614	Encontre produtos artesanais do Parque Retiro, como camisetas, broches e cadernos de anotação de oficinas.
+615	Lojinha | Parque de Estudo e Reflexão Retiro
+616	Composta pelo Livro (O Olhar Interior), a Experiência (cerimônias) e o Caminho (reflexões diárias).
+617	A Mensagem de Silo | Parque de Estudo e Reflexão Retiro
+618	Movimento Humanista
+619	Expressão prática do ideal de humanizar a Terra e da aspiração a uma Nação Humana Universal.
+620	O Movimento Humanista é o conjunto de pessoas que participam das propostas do Novo Humanismo, também chamado Humanismo Universalista, expresso na obra de Silo e de outros autores inspirados nela. Reúne sentimento e forma de viver, com a Não-violência Ativa e a mudança pessoal em função da transformação social como metodologia comum. Não é uma instituição: é um âmbito de convergência e intercâmbio entre os membros dos diversos organismos.
+621	Surgiu em 4 de maio de 1969, com a exposição pública de Silo conhecida como “A Cura do Sofrimento”, em Punta de Vacas, na Cordilheira dos Andes, perto da fronteira entre Argentina e Chile.
+622	Organismos
+623	Partido Humanista, A Comunidade para o Desenvolvimento Humano, Convergência das Culturas, Mundo sem Guerras e sem Violência e Centro Mundial de Estudos Humanistas. As atividades de cada pessoa dependem de sua livre iniciativa.
+624	Documento do Movimento Humanista; Manual de Formação Pessoal (Parque Punta de Vacas, 2009); Obras Completas de Silo, vols. I e II; Apontamentos de Psicologia; O Humanismo (Comentários de Silo, 2008).
+625	Logo Movimento Humanista
+626	Movimento Humanista | Parque de Estudo e Reflexão Retiro
+627	Mundo sem Guerras e sem Violência
+628	Movimento social para criar uma consciência não-violenta mundial e pôr fim às guerras.
+629	Surgiu em 1994 e foi apresentado internacionalmente em 1995, no Encontro Aberto do Humanismo, na Universidade de Santiago do Chile. Atua em cerca de 40 países, com campanhas como “2000 sem guerra”, “Educação para a Não-violência”, a Marcha Mundial pela Paz e a Não-violência e o Fórum Mundial pela Paz e a Não-violência.
+630	Por que é necessário
+631	A história registra mais de 2.500 guerras, feitas para redistribuir bens sociais pela violência armada. Poderosas forças sociais têm interesse nelas, como o complexo militar-industrial e o comércio de armas, e a tecnologia produz armas cada vez mais devastadoras contra a população civil.
+632	Criar uma consciência não-violenta mundial. Lutar pelo fim das guerras e conflitos armados, pela eliminação total das armas nucleares, pelo desarmamento convencional proporcional e progressivo, pela retirada de tropas invasoras e pela renúncia à guerra como meio de resolver conflitos.
+633	Diálogo, ação e cooperação
+634	Busca somar-se ao movimento antiguerra, conectando ramos dispersos do pacifismo e da não-violência, e agir na base social com o olhar sempre global. Suas ferramentas: denúncia, desobediência, vazio, greves, mobilização de rua, boicote e ações coordenadas e simultâneas.
+635	Equipes de base (cerca de 10 membros) se articulam em Equipes de Coordenação Nacionais e em uma Equipe de Coordenação Mundial (12 membros, eleitos a cada dois anos por voto direto). Membros plenos, ativos e apoiadores participam sem discriminação.
+636	Documento do Movimento Humanista; Manual de Formação Pessoal; Obras Completas, de Silo; Desarmamento e Reconciliação para um mundo sem guerras, de Rafael de la Rubia (2007); Autoliberação.
+637	Logo Mundo sem Guerras e sem Violência
+638	Mundo sem Guerras e sem Violência | Parque de Estudo e Reflexão Retiro
+639	Receba o Comunicado do Parque
+640	Cadastre seu e-mail para receber o Comunicado por e-mail com novidades, atividades e convites do Parque de Estudo e Reflexão Retiro.
+641	Receba o Comunicado | Parque de Estudo e Reflexão Retiro
+642	Nivelação — Textos e áudios de apoio aos Trabalhos de Escola
+643	Textos
+644	<strong>Atenção:</strong> todos os arquivos de texto disponíveis para download estão no formato .doc ou zip. Para utilizá-los, clique em cima do nome do arquivo com o botão direito do mouse e escolha "salvar link como" numa pasta dentro do seu computador.
+645	Autoliberação – Luis Ammann (<a href="http://www.parqueretiro.org.br/wp-content/uploads/2011/11/02_livro_autoliberacao.doc" target="_blank" rel="noopener">Arquivo Word</a>)
+646	Experiências Guiadas (<a href="http://www.parqueretiro.org.br/wp-content/uploads/2011/11/03_Livro_Experiencias_Guiadas.doc" target="_blank" rel="noopener">Arquivo Word</a>)
+647	Psicologia I (<a href="http://www.parqueretiro.org.br/wp-content/uploads/2020/09/PSICOLOGIA_I_POR.doc" target="_blank" rel="noopener">Arquivo Word</a>)
+648	Psicologia II (<a href="http://www.parqueretiro.org.br/wp-content/uploads/2020/09/PSICOLOGIA_II_POR.doc" target="_blank" rel="noopener">Arquivo Word</a>)
+649	Psicologia III (<a href="http://www.parqueretiro.org.br/wp-content/uploads/2020/09/PSICOLOGIA_III_POR.doc" target="_blank" rel="noopener">Arquivo Word</a>)
+650	Conferência Psicologia IV (<a href="http://www.parqueretiro.org.br/wp-content/uploads/2020/09/PSICOLOGIA_IV_POR_Conferencia_Silo.doc" target="_blank" rel="noopener">Arquivo Word</a> / <a href="https://www.youtube.com/watch?v=yyM1Ds7qjoE&amp;ab_channel=ALVAROORUS" target="_blank" rel="noopener">Video legendado</a>)
+651	Conferência de Silo – Experiências Guiadas (<a href="http://www.parqueretiro.org.br/wp-content/uploads/2011/11/05_Conferencia_Silo_Experiencias_Guiadas.doc" target="_blank" rel="noopener">Arquivo Word</a> / <a href="https://www.youtube.com/watch?v=RDzdVoBl7h0&amp;ab_channel=silosmessagedotnet" target="_blank" rel="noopener">Video legendado</a>)
+652	Áudio
+653	<strong>Atenção:</strong> todos os arquivos de áudio disponíveis para download estão no formato MP3. Para utilizá-los, clique em cima do nome do arquivo com o botão direito do mouse e escolha "salvar link como" numa pasta dentro do seu computador.
+654	Introdução
+655	Relaxamento físico externo
+656	Relaxamento interno
+657	Relaxamento mental
+658	Relaxamento completo
+659	Experiência de paz
+660	Conferência de Silo – Experiências Guiadas (Video legendado)
+661	Os Disfarces
+662	O Limpador de Chaminês
+663	A Repetição
+664	Livros, fones de ouvido e um caderno sobre uma mesa de madeira, com ícones de texto e áudio, sobre o texto Nivelação — Textos e áudios de apoio aos Trabalhos de Escola.
+665	Nivelação | Parque de Estudo e Reflexão Retiro
+666	O Parque — O que são e para que servem os Parques de Estudo e Reflexão
+667	O que são e para que servem
+668	Os Parques de Estudo e Reflexão são portas de entrada ao mundo mental do Profundo. Neles são realizados trabalhos de Escola, um conjunto de estudos e práticas que possibilitam experiências de contato com dimensões internas profundas. Essa profundidade não pode ser captada pela linguagem nem pelas categorias de espaço e tempo nas quais acreditamos viver. Essas experiências podem nos proporcionar sentido, alegria e plenitude.
+669	Desde a antiguidade, o ser humano busca compreender sua origem, seu destino e o sentido da própria existência, ao mesmo tempo em que procura superar a dor e o sofrimento. Sempre que a consciência humana conseguiu aproximar-se da profundidade da mente, surgiram respostas inspiradas e grandes forças foram liberadas. O arrebatamento dos enamorados, a inspiração dos artistas e o êxtase dos místicos encontram sua fonte nessa profundidade comum. Dessas experiências do sagrado nasceram também grandes correntes religiosas e espirituais ao longo da história.
+670	Diferentes povos e culturas traduziram essa interioridade por meio de paisagens poéticas e míticas diversas. Contudo, todas têm no Profundo um centro de gravidade oculto. Os Parques de Estudo e Reflexão são lugares de encontro e de irradiação de uma nova espiritualidade que rejeita toda forma de violência e discriminação e busca, na dimensão sagrada da mente humana, caminhos de liberdade e sentido.
+671	Qualquer pessoa, sejam quais forem suas crenças, pode participar desse caminho afetivo, comovente e experiencial. Esses lugares tornam-se, para muitos, espaços-tempos carregados de significado, onde se busca estar mais conectado consigo mesmo e com os demais. Os Parques que surgem nos cinco continentes expressam a busca pelo sagrado e pelas melhores aspirações do ser humano. São lugares destinados ao estudo, à reflexão, à inspiração e à experiência interior.
+672	— Eduardo Gozalo
+673	Endereço, mapa e orientações de acesso ao Parque Retiro, em Maricá.
+674	Ver como chegar →
+675	Grupo de pessoas reunido em roda ao entardecer, com vista para o mar e as montanhas, sobre o texto O Parque — O que são e para que servem os Parques de Estudo e Reflexão.
+676	O Parque | Parque de Estudo e Reflexão Retiro
+677	Permanência, pulcritude e tom
+678	Busca uma aproximação com o mundo dos Ofícios onde se desenvolve características centrais de Permanência, Pulcritude e Tom.
+679	<strong>Permanência:</strong> está relacionada ao desenvolvimento de um plano, sem sair da atividade principal e do plano proposto, aprendendo a resolver os problemas que vão surgindo.
+680	<strong>Pulcritude:</strong> é uma forma organizada de fazer as coisas…, com a cabeça organizada, o ambiente organizado e sempre as melhores condições para se trabalhar, sem cair em excessos e faltas de…
+681	<strong>Tom:</strong> é o modo de fazer as coisas de modo reflexivo, com gosto e interesse, de modo a complementar e sem compulsão.<br>Um Ofício ensina a proporcionar internamente, a fazer equilibradamente. Se vai adquirindo proporção interna graças a esse trabalho externo embora apareçam problemas de precisão, de detalhes. Há um tom que associa estados internos com externos.
+682	Temas de trabalho propostos
+683	Conservação do Fogo. Produção do Fogo.
+684	Trabalho com materiais frios: borracha, gesso, cimento, resina, elaboração de moldes com gesso e peças feitas de peltre.
+685	Trabalhos com argila e cerâmica.
+686	Trabalhos com o metal bronze.
+687	Trabalhos com o vidro.
+688	Os materiais serão providenciados pela Oficina. Excepcionalmente, a borracha deverá ser trazida pelo participante que quiser fazer cópias de novas figuras; nesses casos, sugerem-se figuras de tamanhos pequenos.
+689	Lembramos também que a oficina está sempre disponível para os amigos que já estão nestes temas levarem adiante os trabalhos relacionados com o Ofício. Não se requer autorização, apenas recomendamos que nos avisem por questão de calendário. Estaremos disponíveis para colaborar caso se necessite.
+690	O uso das instalações da Oficina é livre para quem se aloja no Parque. Para quem visita pelo dia, solicita-se uma colaboração de R$ 5,00.
+691	Finalmente, solicitamos colaborações de ferramentas, materiais, sapato de segurança etc. Essas colaborações serão muito úteis, pois assim teremos elementos básicos de trabalho para qualquer pessoa que visite o Parque e se anime a trabalhar na Oficina.
+692	Material para download
+693	O material completo sobre o Ofício do Fogo está disponível para download.
+694	Download do material sobre o Ofício do Fogo (PDF)
+695	Ofícios | Parque de Estudo e Reflexão Retiro
+696	Os organismos surgidos do Movimento Humanista
+697	Os organismos do Movimento Humanista
+698	A partir da corrente de pensamento do Humanismo Universalista, surgiram ao longo dos anos diferentes organismos e frentes de ação, cada um aplicado a um campo específico de atividade, mas todos com o mesmo objetivo comum: humanizar a Terra. Conheça, a seguir, cada um desses organismos.
+699	A origem de tudo: a corrente de pensamento do Humanismo Universalista, surgida em 1969 com Silo.
+700	Partido Humanista
+701	A expressão política do Humanismo, atuante em dezenas de países desde 1984.
+702	A Comunidade
+703	O organismo social e cultural dedicado à difusão de uma nova cultura não violenta.
+704	Pesquisa e difusão do pensamento do Humanismo Universalista em diversas culturas.
+705	O diálogo entre culturas e a luta contra toda forma de discriminação.
+706	Mundo Sem Guerras
+707	Uma consciência mundial não violenta e o fim das guerras e dos armamentos.
+708	Logo do Partido Humanista
+709	Logo de A Comunidade
+710	Organismos | Parque de Estudo e Reflexão Retiro
+711	Doe, compre ou pague ao Parque com PIX, cartão de crédito, cartão de débito ou boleto
+712	Escolha o que deseja pagar e o valor. Você será levado à tela segura do <strong>Asaas</strong>, onde escolhe como pagar: PIX, cartão de crédito, cartão de débito ou boleto. O valor chega ao Instituto Pangeia e é registrado na prestação de contas do Parque.
+713	O pagamento online ainda não está disponível neste endereço. Enquanto isso, use as formas de contribuição da página <a href="doacao.html">Doação</a>. Se estiver no Parque, a Comissão aceita pagamento na <strong>maquininha</strong> (cartão de crédito e débito).
+714	O que você deseja pagar? *
+715	Referência
+716	Valor (R$) *
+717	Valor mínimo R$ 5,00.
+718	Nome completo *
+719	CPF ou CNPJ *
+720	Exigido pelo Asaas para emitir o pagamento.
+721	Celular (opcional)
+722	Não preencha
+723	Ir para o pagamento seguro
+724	Dúvidas sobre o pagamento? Fale com a Comissão do Parque pelo e-mail <a href="mailto:parqueretirorio@gmail.com">parqueretirorio@gmail.com</a>.
+725	Pagar online | Parque de Estudo e Reflexão Retiro
+726	Parques no Mundo — A rede mundial de Parques de Estudo e Reflexão
+727	Abaixo, os Parques de Estudo e Reflexão que compõem nossa rede mundial, conforme o diretório do Parque Punta de Vacas. Toque em cada um para conhecer o site oficial.
+728	América do Sul
+729	Parque La Reja
+730	La Reja, Moreno, Buenos Aires, Argentina.
+731	Site oficial
+732	Parque Manantiales
+733	Santiago, Quinta Região, Chile.
+734	Parque Carcarañá
+735	Lucio V. López, Santa Fé, Argentina.
+736	Parque Caucaia
+737	Caucaia do Alto, Cotia/SP, Brasil.
+738	Parque Chaco
+739	Resistência, Chaco, Argentina.
+740	Parque La União
+741	La Unión, Bogotá, Colômbia.
+742	Parque Montecillo
+743	Montecillo Bajo, Quillacollo, Cochabamba, Bolívia.
+744	Parque Patagônia Norte
+745	China Muerta, Plottier, Neuquén, Argentina.
+746	Parque Piribebuy
+747	Piribebuy, Paraguai.
+748	Parque Ihuanco
+749	Cerro Azul, Cañete, Lima, Peru.
+750	Parque Aloasí
+751	Aloasí, Equador.
+752	Parque Paravachasca
+753	Paravachasca, Córdoba, Argentina.
+754	Nosso Parque
+755	Parque Retiro
+756	Retiro, Rio de Janeiro, Brasil.
+757	Parque Bosques
+758	Bosques, Florencio Varela, Buenos Aires, Argentina.
+759	Parque El Remanso
+760	Km 200 da rodovia 5 Sul, Sagrada Familia, Curicó, Chile.
+761	Parque do Deserto (Tamarugal)
+762	Rota a Pica Km 23,5, Pampa del Tamarugal, Tarapacá, Chile.
+763	Parque Cinco Saltos
+764	Rota Provincial 70, Lago Pellegrini, Rio Negro, Patagônia Argentina.
+765	Parque Chapadmalal
+766	Estação Chapadmalal, Batán, Buenos Aires, Argentina.
+767	Parque La Pampa
+768	Rodovia Nacional nº 5, Km 582, La Pampa, Argentina.
+769	Parque Kolibrí
+770	Vereda Ciénaga Brava, área rural de Barrancabermeja, Santander, Colômbia.
+771	Parque Chaka
+772	Rota A-5 da Pan-Americana, a 45 km de Arica, Chile.
+773	América Central
+774	Parque Las Nubes
+775	Los Ángeles Norte, San Ramón de Alajuela, Costa Rica.
+776	América do Norte
+777	Red Bluff Park
+778	Red Bluff, Califórnia, Estados Unidos.
+779	Hudson Valley Park
+780	Nova York, Estados Unidos.
+781	Parque Aldama
+782	Comunidade de Aldama, Jilotepec, Estado do México.
+783	Parque Joquicingo
+784	Saída da cidade de Joquicingo, rumo a Malinalco, Estado do México.
+785	Europa
+786	Parco Casa Giorgi
+787	Roncaglie, Milão, Itália.
+788	Mikebuda Park
+789	Mikebuda, Budapeste, Hungria.
+790	Parc La Belle Idée
+791	Bassevelle, Paris, França.
+792	Parco Attigliano
+793	Attigliano, Roma, Itália.
+794	Parque Toledo
+795	Toledo, Espanha.
+796	Park Schlamau
+797	Schlamau, Wiesenburg, Berlim.
+798	Parque Minho
+799	Póvoa de Lanhoso, Portugal.
+800	Parc Òdena
+801	Òdena, Barcelona, Catalunha, Espanha.
+802	Park Pravikov
+803	Pravikov, Kamenice Nad Lipou, República Tcheca.
+804	Parque Navas del Rey
+805	Navas del Rey, Madri, Espanha.
+806	Ásia
+807	Asian Ashram
+808	Kandhroli, distrito de Raigarh, estado de Maharashtra, Índia.
+809	Mapa-múndi com marcadores nos cinco continentes, sobre o texto Parques no Mundo — A rede mundial de Parques de Estudo e Reflexão.
+810	Parques no Mundo | Parque de Estudo e Reflexão Retiro
+811	Silo ▾
+812	Organismos ▾
+813	Proposta política de transformação social e superação da violência, com democracia real e não-violência ativa.
+814	Criado em meados de 1984 pela Secretaria de Assuntos Sociais da Comunidade para o Desenvolvimento Humano. Seu primeiro Congresso Internacional ocorreu em Florença, em 1989.
+815	Ideias básicas
+816	Parte da necessidade de liberdade que todo ser humano experimenta e busca a transformação social e a superação da violência, que gera sofrimento e contradição. A apropriação do todo social por uma parte é violência, e o sofrimento pessoal e social se supera modificando essas situações de apropriação ilegítima.
+817	Propostas de ação política
+818	Democracia real, com separação de poderes, respeito às minorias e democracia direta; rejeição da violência e da concentração de poder; desarmamento nuclear e redução progressiva das armas convencionais; retirada de tropas de territórios ocupados; distribuição progressiva da riqueza e banco público sem juros; descentralização do poder; educação e saúde universais, gratuitas e de qualidade.
+819	Federação Internacional de Partidos Humanistas, com autonomia nacional. Base: equipes de base em bairros, escolas e locais de trabalho. Democracia direta em todos os níveis, filiados plenos que contribuem com anuidade, e cargos eleitos e renováveis (a cada 2 anos nos âmbitos nacional e internacional, e a cada ano nas equipes de base).
+820	Declaração de Princípios, Tese e Bases para a Ação Política (Florença, 1989); Declaração Universal dos Direitos Humanos; O Documento Humanista (Moscou, 1993); Cartas a meus amigos, de Silo.
+821	Site oficial →
+822	Fonte: humanistmovement.net
+823	Logo Partido Humanista
+824	Partido Humanista · Parque Retiro
+825	Produções dos Mestres e de outros Parques
+826	Monografias
+827	<strong>Anexos de "Quando o ser humano descobre a si mesmo"</strong> (Paulo Genovese – Parque Caucaia):
+828	Relatos de Experiência
+829	Outros aportes
+830	Produções de outros Parques traduzidas ao português
+831	Produções de Escola | Parque de Estudo e Reflexão Retiro
+832	Reservas — Solicitação de reserva do Centro de Estudo
+833	O Centro de Estudo é utilizado mediante reserva, sempre com antecedência. Veja como fazer a solicitação e consulte as datas disponíveis.
+834	Recomendações de uso, regras e o formulário de solicitação de reserva.
+835	Solicitar reserva →
+836	Consulte quais datas estão ocupadas e quais estão desocupadas.
+837	Casa do Centro de Estudo entre árvores, com vista para o mar ao fundo, sobre o texto Reservas — Solicitação de reserva do Centro de Estudo.
+838	Reservas | Parque de Estudo e Reflexão Retiro
+839	Participe e ajude a manter o Parque
+840	As rifas solidárias são uma forma leve e coletiva de arrecadar recursos para o Parque Retiro. Toda a renda é destinada às necessidades do Parque.
+841	Como participar
+842	Escolha a rifa em andamento, pague pela forma indicada, preencha seus dados e anexe o comprovante. Você recebe seu número na hora e concorre pela <strong>Loteria Federal</strong> no dia do sorteio.
+843	Os valores arrecadados são registrados na prestação de contas, o resultado e o uso do recurso serão publicados dentro de cada rifa finalizada.
+844	<strong>Modo de demonstração:</strong> as inscrições ficam gravadas só neste navegador e ainda não chegam à Comissão. Para participar de verdade, fale com a Comissão do Parque.
+845	Quer participar ou organizar uma rifa? Fale com a Comissão do Parque pelo e-mail <a href="mailto:parqueretirorio@gmail.com">parqueretirorio@gmail.com</a>.
+846	Rifa Solidária | Parque de Estudo e Reflexão Retiro
+847	Silo — Mario Luis Rodríguez Cobos e o Humanismo Universalista
+848	Mario Luis Rodríguez Cobos (Silo), inspirador do Humanismo Universalista e da Mensagem de Silo.
+849	Saiba mais
+850	Obras Completas
+851	O corpo doutrinário que fundamenta o Novo Humanismo e os trabalhos da Escola.
+852	Acessar silo.net
+853	Silo discursando ao microfone diante de uma multidão nas montanhas, sobre o texto Silo — Mario Luis Rodríguez Cobos e o Humanismo Universalista.
+854	Silo | Parque de Estudo e Reflexão Retiro
+855	Cada contribuição, somada às outras, realiza uma necessidade do Parque
+856	Na vaquinha coletiva, várias pessoas contribuem juntas para custear algo específico, como a manutenção da grama, o piso do alojamento ou o rateio de uma refeição de encontro.
+857	Escolha a vaquinha em andamento, leia o objetivo, faça o pagamento do valor que quiser (qualquer valor ajuda), preencha seus dados e anexe o comprovante. O valor entra no gráfico da campanha quando a Comissão conferir o comprovante.
+858	Os valores arrecadados são registrados na prestação de contas do Instituto Pangeia.
+859	<strong>Modo de demonstração:</strong> as contribuições ficam gravadas só neste navegador e ainda não chegam à Comissão. Para contribuir de verdade, fale com a Comissão do Parque.
+860	No momento não há vaquinha aberta. Acompanhe as redes e a Comunidade do WhatsApp do Parque.
+861	Quer propor uma vaquinha? Fale com a Comissão do Parque pelo e-mail <a href="mailto:parqueretirorio@gmail.com">parqueretirorio@gmail.com</a>.
+862	Vaquinha Coletiva | Parque de Estudo e Reflexão Retiro
+863	Ajude com o seu tempo e o seu trabalho, sem precisar de dinheiro
+864	Nem toda ajuda é em dinheiro. Se você não tem condições de contribuir financeiramente, pode cooperar com o Parque participando das atividades: o Parque é cuidado, dia após dia, por pessoas que oferecem o seu tempo de forma voluntária e desinteressada.
+865	Jardinagem e área externa
+866	Cuidado das plantas, poda, plantio e manutenção dos espaços abertos do Parque, e participação nos planos de reflorestamento. <a href="comissao-jardinagem.html">Conheça a comissão</a>.
+867	Comunicação, redes sociais e site
+868	Divulgação das atividades do Parque nas redes sociais e cuidado do conteúdo do site. <a href="comissao-comunicacao.html">Conheça a comissão</a>.
+869	Apoio à agenda, aos cuidados e aos planejamentos do espaço multiuso do Parque. <a href="comissao-multiuso.html">Conheça a comissão</a>.
+870	Limpeza e manutenção
+871	Zelo dos espaços do Parque e pequenos cuidados que mantêm tudo em ordem para quem vem estudar e refletir.
+872	Encontros e atividades
+873	Apoio na organização, no acolhimento e na estrutura dos encontros e atividades.
+874	Como funciona
+875	Preencha o formulário abaixo. A Comissão do Parque entra em contato para conversar e combinar uma atividade que combine com o seu tempo e a sua vontade. Não há cobrança de nenhum tipo.
+876	<strong>Modo de demonstração:</strong> as inscrições ficam gravadas só neste navegador e ainda não chegam à Comissão. Para se inscrever de verdade, escreva para a Comissão do Parque.
+877	Quero ser voluntário(a)
+878	Celular / WhatsApp *
+879	Como você gostaria de colaborar? * <small>(marque quantas quiser)</small>
+880	Quando você pode ajudar?
+881	Quer contar algo? <small>(experiência, limitações, ideias)</small>
+882	Enviar minha inscrição
+883	Prefere conversar antes? Escreva para a Comissão do Parque pelo e-mail <a href="mailto:parqueretirorio@gmail.com">parqueretirorio@gmail.com</a>.
+884	Voluntário | Parque de Estudo e Reflexão Retiro

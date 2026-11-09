@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blogger | Parque de Estudo e Reflexão Retiro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .blog-filtros { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 20px; }
+        .blog-filtro { font: inherit; font-size: 0.85rem; font-weight: 600; padding: 7px 14px; border: 1px solid var(--border-color); border-radius: 20px; background: #fff; color: var(--primary-color); cursor: pointer; transition: background 0.2s, color 0.2s; }
+        .blog-filtro:hover, .blog-filtro:focus-visible { border-color: var(--accent-color); outline: none; }
+        .blog-filtro.on { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+        .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .blog-card { display: flex; flex-direction: column; gap: 8px; padding: 18px 20px; background: #fff; border: 1px solid var(--border-color); border-top: 4px solid var(--accent-color); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .blog-card[hidden] { display: none; }
+        .blog-card h3 { margin: 0; font-size: 1.05rem; line-height: 1.35; color: var(--primary-color); }
+        .blog-card p { margin: 0; font-size: 0.92rem; line-height: 1.55; }
+        .blog-meta { font-size: 0.78rem !important; color: #667; text-transform: uppercase; letter-spacing: 0.03em; }
+        .blog-fonte { font-size: 0.8rem !important; color: #667; font-style: italic; }
+        .blog-card .btn-visit { align-self: flex-start; margin-top: auto; font-size: 0.85rem; }
+        .blog-fonte-geral { margin-top: 28px; padding: 16px 20px; background: #f4f7fa; border-left: 4px solid var(--accent-color); border-radius: 6px; font-size: 0.88rem; line-height: 1.6; color: #445; }
+        .blog-fonte-geral p { margin: 0; }
+    </style>
+</head>
+<body>
+
+<a href="https://wa.me/552128881830" class="whatsapp-float" target="_blank" rel="noopener" title="Fale com o Parque Retiro pelo WhatsApp"><i class="fab fa-whatsapp"></i></a>
+
+<header>
+    <a href="index.html" class="brand">
+        <img src="placaparqueretiro.png" alt="Mandala da Escola" class="brand-logo">
+        <span class="brand-name">Parque de Estudo e Reflexão Retiro</span>
+    </a>
+    <nav>
+        <a href="comece-aqui.html">Quem somos</a>
+        <a href="index.html">Início</a>
+        <div class="nav-dropdown">
+            <a href="o-parque.html">O Parque</a>
+            <div class="nav-sub">
+                <a href="o-parque.html">Sobre o Parque</a>
+                <a href="elementos.html">Elementos</a>
+                <a href="como-chegar.html">Como Chegar</a>
+                <div class="nav-item-sub">
+                    <a href="atividades.html">Atividades</a>
+                    <div class="nav-sub2">
+                        <a href="atividades.html?cat=evento">Eventos</a>
+                        <a href="atividades.html?cat=encontro">Encontros</a>
+                        <a href="atividades.html?cat=retiro">Retiros</a>
+                        <a href="atividades.html?cat=reuniao">Reuniões</a>
+                        <a href="fotos.html">Álbum de fotos</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="nav-dropdown">
+            <a href="reservas.html">Reservas</a>
+            <div class="nav-sub">
+                <a href="como-fazer.html">Como Fazer</a>
+                <a href="calendario.html">Calendário de uso</a>
+            </div>
+        </div>
+        <div class="nav-dropdown">
+            <a href="silo.html">Silo</a>
+            <div class="nav-sub">
+                <div class="nav-item-sub">
+                    <a href="mensagem-de-silo.html">Mensagem de Silo</a>
+                    <div class="nav-sub2"><a href="comunidades-da-mensagem.html">Comunidades da Mensagem</a></div>
+                </div>
+                <a href="organismos.html">Organismos do Movimento</a>
+                <a href="biblioteca-silo.html">Biblioteca de Silo</a>
+            </div>
+        </div>
+        <div class="nav-dropdown">
+            <a href="centro-estudo.html">Centro de Estudo</a>
+            <div class="nav-sub">
+                <div class="nav-item-sub">
+                    <a href="escola.html">Escola</a>
+                    <div class="nav-sub2"><a href="nivelamento.html">Nivelação</a></div>
+                </div>
+                <a href="biblioteca.html">Biblioteca do Parque</a>
+                <a href="producoes-de-escola.html">Produções de Escola</a>
+                <a href="livros-audios-app.html">Livros, Áudios e App</a>
+                <a href="oficios.html">Ofícios</a>
+            </div>
+        </div>
+        <div class="nav-dropdown">
+            <a href="ajude-o-parque.html">Ajude o Parque</a>
+            <div class="nav-sub">
+                <a href="doacao.html">Doação</a>
+                <a href="pagar.html">Pagar online</a>
+                <a href="livraria.html">Livraria</a>
+                <a href="lojinha.html">Lojinha</a>
+                <a href="rifa-solidaria.html">Rifa Solidária</a>
+                <a href="vaquinha-coletiva.html">Vaquinha Coletiva</a>
+                <a href="voluntario.html">Voluntário</a>
+                <div class="nav-item-sub">
+                    <a href="comissoes.html">Comissões</a>
+                    <div class="nav-sub2">
+                        <a href="comissao-jardinagem.html">Jardinagem / Área Externa</a>
+                        <a href="comissao-comunicacao.html">Comunicação, Redes Sociais e Site</a>
+                        <a href="comissao-multiuso.html">Multiuso</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a href="parques-mundo.html">Parques no Mundo</a>
+        <a href="blogger.html">Blog</a>
+    </nav>
+    <a href="login.html" class="btn-entrar"><i class="fas fa-user-lock"></i> Entrar</a>
+</header>
+
+<div class="container">
+    <section>
+        <h1>Blogger</h1>
+        <p class="lead-text">Textos e novidades do Parque de Estudo e Reflexão Retiro.</p>
+
+        <div class="callout"><i class="fas fa-newspaper"></i><p>Seleção de matérias da agência Pressenza sobre o Brasil, reunidas aqui para a leitura de quem acompanha o Parque Retiro. Os textos e as imagens pertencem aos autores e à Pressenza: use o botão de cada matéria para ler a íntegra na fonte original.</p></div>
+
+        <h2 class="section-title"><i class="fas fa-book-open" aria-hidden="true"></i> Últimas da Pressenza</h2>
+        <div id="pressenza-ao-vivo" hidden>
+            <p class="blog-fonte" style="margin:0 0 12px">Atualizadas automaticamente a partir da Pressenza.</p>
+            <div class="blog-grid" id="pressenza-lista"></div>
+            <div style="height:28px"></div>
+        </div>
+        <div class="blog-filtros" role="group" aria-label="Filtrar por tema">
+            <button type="button" class="blog-filtro on" data-f="" aria-pressed="true">Todas</button>
+            <button type="button" class="blog-filtro" data-f="clima" aria-pressed="false">Clima e meio ambiente</button>
+            <button type="button" class="blog-filtro" data-f="humanismo" aria-pressed="false">Humanismo e educação</button>
+            <button type="button" class="blog-filtro" data-f="paz" aria-pressed="false">Paz e solidariedade</button>
+            <button type="button" class="blog-filtro" data-f="sociedade" aria-pressed="false">Sociedade e política</button>
+        </div>
+        <div class="blog-grid" id="blog-lista">
+            <article class="blog-card" data-tema="sociedade">
+                <p class="blog-meta"><time datetime="2026-01-07">07/01/2026</time> · <span class="blog-tema">Sociedade e política</span></p>
+                <h3 lang="pt-BR" translate="no">Maduro lutou por “Lula livre”. Lula tem agora o dever de retribuir e exigir liberdade para Maduro</h3>
+                <p lang="pt-BR" translate="no">Artigo de opinião que lembra a solidariedade do presidente venezuelano com Dilma Rousseff no dia do impeachment, em 2016, e defende que Lula retribua pedindo a liberdade de Maduro.</p>
+                <p class="blog-fonte">Fonte: Pressenza</p>
+                <a class="btn-visit" href="https://www.pressenza.com/pt-pt/2026/01/maduro-lutou-por-lula-livre-lula-tem-agora-o-dever-de-retribuir-e-exigir-liberdade-para-maduro/" target="_blank" rel="noopener noreferrer">Ler a matéria completa na Pressenza <i class="fas fa-external-link-alt" aria-hidden="true"></i></a>
+            </article>
+            <article class="blog-card" data-tema="clima">
+                <p class="blog-meta"><time datetime="2025-11-24">24/11/2025</time> · <span class="blog-tema">Clima e meio ambiente</span></p>
+                <h3 lang="pt-BR" translate="no">COP30: Grupos ambientalistas denunciam o fracasso da cúpula</h3>
+                <p lang="pt-BR" translate="no">Balanço feito por organizações ambientalistas: a conferência começou com muita expectativa e terminou sem planos concretos para frear o desmatamento e o uso de combustíveis fósseis.</p>
+                <p class="blog-fonte">Fonte: Pressenza</p>
+                <a class="btn-visit" href="https://www.pressenza.com/pt-pt/2025/11/cop30-grupos-ambientalistas-denunciam-o-fracasso-da-cupula/" target="_blank" rel="noopener noreferrer">Ler a matéria completa na Pressenza <i class="fas fa-external-link-alt" aria-hidden="true"></i></a>
+            </article>
+            <article class="blog-card" data-tema="clima">
+                <p class="blog-meta"><time datetime="2025-11-12">12/11/2025</time> · <span class="blog-tema">Clima e meio ambiente</span></p>
+                <h3 lang="pt-BR" translate="no">Na Cúpula dos Povos, o prato é político</h3>
+                <p lang="pt-BR" translate="no">Reportagem de Belém (PA) sobre como movimentos sociais usam a mesa agroecológica como forma de resistência e de justiça climática durante a Cúpula dos Povos.</p>
+                <p class="blog-fonte">Fonte: Pressenza</p>
+                <a class="btn-visit" href="https://www.pressenza.com/pt-pt/2025/11/na-cupula-dos-povos-o-prato-e-politico/" target="_blank" rel="noopener noreferrer">Ler a matéria completa na Pressenza <i class="fas fa-external-link-alt" aria-hidden="true"></i></a>
+            </article>
+            <article class="blog-card" data-tema="sociedade">
+                <p class="blog-meta"><time datetime="2025-10-18">18/10/2025</time> · <span class="blog-tema">Sociedade e política</span></p>
+                <h3 lang="pt-BR" translate="no">Enquanto seu lobo não vem…</h3>
+                <p lang="pt-BR" translate="no">Crônica de opinião sobre manter viva a criança interior para envelhecer com bom humor e abertura ao novo.</p>
+                <p class="blog-fonte">Fonte: Pressenza</p>
+                <a class="btn-visit" href="https://www.pressenza.com/pt-pt/2025/10/enquanto-seu-lobo-nao-vem/" target="_blank" rel="noopener noreferrer">Ler a matéria completa na Pressenza <i class="fas fa-external-link-alt" aria-hidden="true"></i></a>
+            </article>
+            <article class="blog-card" data-tema="paz">
+                <p class="blog-meta"><time datetime="2025-10-16">16/10/2025</time> · <span class="blog-tema">Paz e solidariedade</span></p>
+                <h3 lang="pt-BR" translate="no">Acabou a ordem internacional. E agora, Brasil?</h3>
+                <p lang="pt-BR" translate="no">Texto a partir da entrevista de um ex-ministro das Relações Exteriores a uma TV brasileira, que discute a chance de uma nova política externa do Brasil diante do cenário internacional atual.</p>
+                <p class="blog-fonte">Fonte: Pressenza</p>
+                <a class="btn-visit" href="https://www.pressenza.com/pt-pt/2025/10/acabou-a-ordem-internacional-e-agora-brasil/" target="_blank" rel="noopener noreferrer">Ler a matéria completa na Pressenza <i class="fas fa-external-link-alt" aria-hidden="true"></i></a>
+            </article>
+            <article class="blog-card" data-tema="humanismo">
+                <p class="blog-meta"><time datetime="2025-10-12">12/10/2025</time> · <span class="blog-tema">Humanismo e educação</span></p>
+                <h3 lang="pt-BR" translate="no">Inspirada no Humanismo, a Escola Estadual Parque dos Sonhos, em Cubatão (SP), é reconhecida como a melhor escola do mundo em 2025</h3>
+                <p lang="pt-BR" translate="no">A escola estadual do Bolsão 9, em Cubatão, no litoral paulista, recebeu o Prêmio Internacional de Melhor Escola do Mundo 2025, em uma trajetória inspirada no Humanismo.</p>
+                <p class="blog-fonte">Fonte: Pressenza</p>
+                <a class="btn-visit" href="blogger-escola-parque-dos-sonhos.html">Ler a matéria <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            </article>
+            <article class="blog-card" data-tema="paz">
+                <p class="blog-meta"><time datetime="2025-09-07">07/09/2025</time> · <span class="blog-tema">Paz e solidariedade</span></p>
+                <h3 lang="pt-BR" translate="no">Do Brasil com amor e solidariedade. Diário de bordo da Global Sumud Flotilla</h3>
+                <p lang="pt-BR" translate="no">Capítulo do diário de bordo da flotilha dedicado aos capitães que vieram de longe, entre eles Karina, que vem da região de São Paulo.</p>
+                <p class="blog-fonte">Fonte: Pressenza</p>
+                <a class="btn-visit" href="https://www.pressenza.com/pt-pt/2025/09/do-brasil-com-amor-e-solidariedade-diario-de-bordo-da-global-sumud-flotilla/" target="_blank" rel="noopener noreferrer">Ler a matéria completa na Pressenza <i class="fas fa-external-link-alt" aria-hidden="true"></i></a>
+            </article>
+            <article class="blog-card" data-tema="sociedade">
+                <p class="blog-meta"><time datetime="2025-09-04">04/09/2025</time> · <span class="blog-tema">Sociedade e política</span></p>
+                <h3 lang="pt-BR" translate="no">Teologia da prosperidade: Como igrejas neopentecostais brasileiras se proliferam em Portugal e Alemanha</h3>
+                <p lang="pt-BR" translate="no">Reportagem sobre como igrejas brasileiras oferecem rede de apoio a imigrantes na Europa, embora sua presença no debate público e político europeu ainda seja limitada.</p>
+                <p class="blog-fonte">Fonte: Pressenza</p>
+                <a class="btn-visit" href="https://www.pressenza.com/pt-pt/2025/09/teologia-da-prosperidade-como-igrejas-neopentecostais-brasileiras-se-proliferam-em-portugal-e-alemanha/" target="_blank" rel="noopener noreferrer">Ler a matéria completa na Pressenza <i class="fas fa-external-link-alt" aria-hidden="true"></i></a>
+            </article>
+            <article class="blog-card" data-tema="sociedade">
+                <p class="blog-meta"><time datetime="2025-08-31">31/08/2025</time> · <span class="blog-tema">Sociedade e política</span></p>
+                <h3 lang="pt-BR" translate="no">Universalidade da renda básica, solidariedade econômica e mudança cultural</h3>
+                <p lang="pt-BR" translate="no">Registro de um painel de 28 de agosto, promovido pela Rede Humanista pela Renda Básica Universal e Incondicional durante o congresso mundial da rede BIEN, realizado no Brasil.</p>
+                <p class="blog-fonte">Fonte: Pressenza</p>
+                <a class="btn-visit" href="https://www.pressenza.com/pt-pt/2025/08/universalidade-da-renda-basica-solidariedade-economica-e-mudanca-cultural/" target="_blank" rel="noopener noreferrer">Ler a matéria completa na Pressenza <i class="fas fa-external-link-alt" aria-hidden="true"></i></a>
+            </article>
+            <article class="blog-card" data-tema="sociedade">
+                <p class="blog-meta"><time datetime="2025-08-02">02/08/2025</time> · <span class="blog-tema">Sociedade e política</span></p>
+                <h3 lang="pt-BR" translate="no">Tristes recordações da Aneel</h3>
+                <p lang="pt-BR" translate="no">Artigo de opinião de um professor aposentado da Universidade Federal de Pernambuco sobre a atuação da Aneel, a agência reguladora de energia elétrica.</p>
+                <p class="blog-fonte">Fonte: Pressenza</p>
+                <a class="btn-visit" href="https://www.pressenza.com/pt-pt/2025/08/tristes-recordacoes-da-aneel/" target="_blank" rel="noopener noreferrer">Ler a matéria completa na Pressenza <i class="fas fa-external-link-alt" aria-hidden="true"></i></a>
+            </article>
+        </div>
+        <aside class="blog-fonte-geral" aria-label="Fonte das matérias">
+            <p><strong>Fonte:</strong> Pressenza é uma agência de imprensa internacional especializada em notícias sobre paz e não-violência com escritórios em Atenas, Barcelona, Berlim, Bogotá, Bordéus, Bruxelas, Budapeste, Buenos Aires, Cidade do México, Córdova (Argentina), Florença, Lima, Londres, Madrid, Manila, Mar del Plata, Milão, Montreal, Moscovo, Munique, Nova Deli, Nova York, Palermo, Paris, Porto, Quito, Roma, São José da Costa Rica, São Paulo, Santiago do Chile, Turim, Valência e Viena.</p>
+        </aside>
+    </section>
+</div>
+
+<footer>
+    <div class="social-links">
+        <a href="https://www.facebook.com/parqueretiro/" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>
+        <a href="https://www.instagram.com/parqueretirorio/" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="https://www.youtube.com/@parquedeestudoereflexaoret6772" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
+        <a href="blogger.html" title="Blog"><i class="fab fa-blogger-b"></i></a>
+        <a href="https://whatsapp.com/channel/0029VbDmMh9ElagzPYbsg22t" target="_blank" rel="noopener" title="Canal do Parque Retiro no WhatsApp" aria-label="Canal do Parque Retiro no WhatsApp" data-wz="canal"><i class="fab fa-whatsapp"></i></a>
+    </div>
+    <p class="rodape-news"><a href="newsletter.html"><i class="fas fa-envelope"></i> Receba o Comunicado do Parque por e-mail</a></p>
+    <p>&copy; 2026 Parque de Estudo e Reflexão Retiro - Maricá, Rio de Janeiro, Brasil</p>
+</footer>
+
+<script>
+// Filtro por tema das matérias (só mostra/esconde os cartões; nada é carregado de fora)
+(function () {
+    var botoes = document.querySelectorAll('.blog-filtro'), cartoes = document.querySelectorAll('.blog-card');
+    botoes.forEach(function (b) {
+        b.addEventListener('click', function () {
+            botoes.forEach(function (x) { var on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); });
+            cartoes.forEach(function (c) { c.hidden = !!b.dataset.f && c.dataset.tema !== b.dataset.f; });
+        });
+    });
+})();
+</script>
+<script>
+// "Últimas da Pressenza": só aparece quando o site estiver num servidor com PHP (arquivo pressenza-feed.php).
+// Sem o servidor, nada acontece e a página segue só com as matérias abaixo.
+(function () {
+    var caixa = document.getElementById('pressenza-ao-vivo'), lista = document.getElementById('pressenza-lista');
+    if (!caixa || !lista || !window.fetch) return;
+    var norm = function (t) { return (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim(); };
+    var jaTem = {};
+    document.querySelectorAll('#blog-lista .blog-card h3').forEach(function (h) { jaTem[norm(h.textContent)] = 1; });
+    fetch('pressenza-feed.php', { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+            if (!d || !d.itens) return;
+            d.itens.forEach(function (m) {
+                if (!m.titulo || !/^https:\/\/www\.pressenza\.com\//.test(m.link) || jaTem[norm(m.titulo)]) return;
+                var c = document.createElement('article'); c.className = 'blog-card';
+                var meta = document.createElement('p'); meta.className = 'blog-meta';
+                var partes = [];
+                if (m.data) { var dt = m.data.split('-'); partes.push(dt[2] + '/' + dt[1] + '/' + dt[0]); }
+                if (m.tema) partes.push(m.tema);
+                meta.textContent = partes.join(' · ');
+                var h = document.createElement('h3'); h.lang = 'pt-BR'; h.setAttribute('translate', 'no'); h.textContent = m.titulo;
+                var p = document.createElement('p'); p.lang = 'pt-BR'; p.setAttribute('translate', 'no'); p.textContent = m.resumo || '';
+                var f = document.createElement('p'); f.className = 'blog-fonte'; f.textContent = 'Fonte: Pressenza';
+                var a = document.createElement('a'); a.className = 'btn-visit'; a.href = m.link; a.target = '_blank'; a.rel = 'noopener noreferrer';
+                a.textContent = 'Ler a matéria completa na Pressenza ';
+                var i = document.createElement('i'); i.className = 'fas fa-external-link-alt'; i.setAttribute('aria-hidden', 'true'); a.appendChild(i);
+                [meta, h, p, f, a].forEach(function (x) { c.appendChild(x); });
+                lista.appendChild(c);
+            });
+            if (lista.children.length) caixa.hidden = false;
+        })
+        .catch(function () {});
+})();
+</script>
+<script src="script.js"></script>
+<script src="banners.js"></script>
+<script src="idioma.js"></script>
+<script src="ajuda-conteudo.js"></script>
+<script src="ajuda.js"></script>
+</body>
+</html>

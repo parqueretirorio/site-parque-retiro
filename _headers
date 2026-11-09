@@ -1,0 +1,17 @@
+/*
+  Content-Type: text/html; charset=UTF-8
+
+/*.css
+  Content-Type: text/css; charset=UTF-8
+
+/*.js
+  Content-Type: application/javascript; charset=UTF-8
+
+# Segurança (Netlify / Cloudflare Pages). Não quebra o site atual: o CSP completo (script-src) fica para a fase 2,
+# quando os "onclick" embutidos forem removidos.
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(self), microphone=(), geolocation=()
+  Content-Security-Policy: base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'
