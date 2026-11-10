@@ -109,7 +109,7 @@ window.PR_COM_BRIEFING = {
       if (i >= 0) l[i] = atual; else l.unshift(atual);
       salvarLista(l);
     };
-    const nomeProj = id => { const p = (projs ? projs() : []).find(x => x.id === id); return p ? p.nome : ''; };
+    const nomeProj = id => { const p = (projs ? projs() : []).find(x => x.id === id); return p ? p.nome + (p.pai ? ' (' + p.pai + ')' : '') : ''; };
     const draw = () => {
       if (aba === 'lista') {
         const l = lista();
@@ -129,7 +129,7 @@ window.PR_COM_BRIEFING = {
           <h3>Briefing: ${esc(atual.titulo)}</h3>
           <p class="tip-box"><i class="fas fa-lightbulb" aria-hidden="true"></i> Responda só o que souber. O que faltar, o Claude vai perguntar. Tudo é salvo automaticamente.</p>
           <form id="bf-form" class="form-reserva" novalidate>
-          ${ps.length ? `<div class="form-row"><label for="bf-proj">Qual projeto ou data do Parque? (opcional)</label><select id="bf-proj"><option value="">- Nenhum -</option>${ps.map(p => `<option value="${p.id}"${p.id === atual.projeto ? ' selected' : ''}>${esc(p.nome)}</option>`).join('')}</select><small>Ao escolher, o tipo, o nome e a data já conhecida são preenchidos sozinhos.</small></div>` : ''}
+          ${ps.length ? `<div class="form-row"><label for="bf-proj">Qual projeto ou data do Parque? (opcional)</label><select id="bf-proj"><option value="">- Nenhum -</option>${(() => { const op = p => `<option value="${p.id}"${p.id === atual.projeto ? ' selected' : ''}>${esc(p.nome)}</option>`; const pais = [...new Set(ps.filter(p => p.pai).map(p => p.pai))]; return ps.filter(p => !p.pai && !pais.includes(p.nome)).map(op).join('') + pais.map(n => `<optgroup label="${esc(n)}">${ps.filter(p => p.nome === n).map(p => op(Object.assign({}, p, { nome: n + ' (os quatro festivais)' }))).join('')}${ps.filter(p => p.pai === n).map(op).join('')}</optgroup>`).join(''); })()}</select><small>Ao escolher, o tipo, o nome e a data já conhecida são preenchidos sozinhos.</small></div>` : ''}
           <div class="form-row"><label for="bf-tipo">Que tipo de campanha é?</label><select id="bf-tipo">${TIPOS.map(t => `<option value="${t[0]}"${t[0] === atual.tipo ? ' selected' : ''}>${esc(t[1])}</option>`).join('')}</select></div>
           ${this.perguntas(atual.tipo).map(([t, l]) => `<h4 class="bf-bloco">${esc(t)}</h4>${l.map(([c, p, d, tp]) => campo(c, p, d, tp, atual.r[c])).join('')}`).join('')}
           <button type="button" class="btn-visit btn-large" id="bf-gerar"><i class="fas fa-magic"></i> Gerar texto para o Claude</button>
