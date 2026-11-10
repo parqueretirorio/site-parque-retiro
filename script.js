@@ -3,7 +3,8 @@
 // Não há botão nem aviso na página: só sabe quem for informado por Leonidas França Junior.
 // PARA DESLIGAR quando o site entrar no ar: troque  ativo: true  por  ativo: false  (a mandala volta a só levar ao Início).
 // nivel: o que a pessoa pode fazer lá dentro: 'leitor', 'comentador', 'editor' ou 'administrador'.
-window.PR_ACESSO_TEMPORARIO = { ativo: true, nivel: 'administrador' };
+// DESLIGADO em 10/11/2026: a área restrita agora tem login de verdade (e-mail e senha).
+window.PR_ACESSO_TEMPORARIO = { ativo: false, nivel: 'administrador' };
 // WHATSAPP DO BOTÃO FLUTUANTE: único lugar para trocar o número. Formato internacional, só dígitos: 55 + DDD + número.
 // O script abaixo aplica este número em todas as páginas; o endereço gravado em cada página é só reserva (sem JavaScript).
 // WhatsApp oficial do Parque. Um lugar só para o número (botão flutuante), o Canal e a Comunidade.

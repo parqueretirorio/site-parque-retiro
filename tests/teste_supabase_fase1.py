@@ -68,6 +68,18 @@ async def main():
         aud = banco("select count(*) from auditoria where colecao='livros'")
         ok(int(aud[0]) >= 1, "auditoria no servidor registra a gravação")
 
+        # 3b) dados antigos guardados neste navegador sobem para o servidor (sem apagar nada do servidor)
+        await pg.evaluate("""()=>{localStorage.setItem('pr_livros', JSON.stringify([{id:'l1',titulo:'Velho'},{id:'l9',titulo:'O Olhar Interno'}]));
+          localStorage.setItem('pr_ativ', JSON.stringify([{id:'a1',titulo:'Encontro',data:'2026-12-20'}])); localStorage.setItem('pr_users', JSON.stringify([{email:'x@x.com',nivel:'administrador'}]));}""")
+        await pg.evaluate("document.querySelectorAll('.area-col').forEach(c=>{ if(c.querySelector('[data-tab=backup]') && !c.querySelector('[data-tab=backup]').offsetParent) c.querySelector('.area-titulo').click(); })")
+        await pg.click('[data-tab="backup"]')
+        ok('servidor do Parque' in await pg.inner_text('#tab') and await pg.locator('#bk-trazer').count() == 1, "Backup mostra 'Trazer os dados deste navegador'")
+        await pg.click('#bk-trazer'); await pg.wait_for_selector('#tab .tip-box[role=status]', timeout=10000)
+        await espera_salvo(pg)
+        ok(banco("select string_agg(x->>'titulo', ',' order by x->>'id') from registros, jsonb_array_elements(dados) x where colecao='livros'") == ['Humanizar a Terra,O Olhar Interno'], "livro que faltava entrou; o do servidor não foi trocado")
+        ok(banco("select dados->0->>'titulo' from registros where colecao='ativ'") == ['Encontro'], "atividades do navegador entraram no servidor")
+        ok(banco("select count(*) from perfis where email='x@x.com'") == ['0'], "pessoas do navegador não entram (são as contas do login)")
+
         # 4) Gestão de Responsáveis: aprovar Cida como editora com função; formulário de criar conta some
         await pg.evaluate("document.querySelector('[data-tab=users]').closest('.area-col') && document.querySelector('[data-tab=users]').closest('.area-col').querySelector('.area-titulo') && !document.querySelector('[data-tab=users]').offsetParent && document.querySelector('[data-tab=users]').closest('.area-col').querySelector('.area-titulo').click()")
         await pg.click('[data-tab="users"]')
@@ -81,7 +93,7 @@ async def main():
         # 5) outra pessoa (Beto, leitor) vê o livro; não consegue se promover
         ctx2, pg2, erros2 = await nova_pagina(br, sb)
         await entrar(pg2, 'beto@x.com', 'senhaBeto123'); await pg2.wait_for_url('**/area-restrita.html', timeout=8000)
-        ok(await pg2.evaluate("PR_DADOS.db.get('livros',[]).length") == 1, "Beto vê o livro gravado pelo Leonidas")
+        ok(await pg2.evaluate("PR_DADOS.db.get('livros',[]).length") == 2, "Beto vê os livros gravados pelo Leonidas")
         ok(await pg2.evaluate("PR_DADOS.db.get('users',[]).length") == 1, "leitor só vê o próprio perfil")
         await pg2.evaluate("(()=>{const l=PR_DADOS.db.get('users',[]); l[0].nivel='administrador'; PR_DADOS.db.set('users', l)})()")
         await pg2.wait_for_function("() => PR_DADOS.estadoSync().pendentes === 0", timeout=8000)
@@ -90,15 +102,15 @@ async def main():
         ok(await pg2.evaluate("PR_DADOS.db.get('mapa', null)") is None, "Mapa de Contas não chega a quem não é administrador")
 
         # 6) conflito: Beto grava primeiro; Leonidas (versão velha) não sobrescreve
-        await pg2.evaluate("PR_DADOS.db.set('livros', [{id:'l1', titulo:'Humanizar a Terra'}, {id:'l2', titulo:'Cartas a meus amigos'}])")
+        await pg2.evaluate("PR_DADOS.db.set('livros', PR_DADOS.db.get('livros',[]).concat([{id:'l2', titulo:'Cartas a meus amigos'}]))")
         await pg2.wait_for_function("() => PR_DADOS.estadoSync().pendentes === 0", timeout=8000)
         await pg.evaluate("PR_DADOS.db.set('livros', [{id:'l1', titulo:'Humanizar a Terra (2ª ed.)'}])")
         await pg.wait_for_function("() => PR_DADOS.estadoSync().conflitos === 1", timeout=8000)
-        ok(banco("select jsonb_array_length(dados) from registros where colecao='livros'") == ['2'], "versão do Beto preservada (nada sobrescrito)")
+        ok(banco("select jsonb_array_length(dados) from registros where colecao='livros'") == ['3'], "versão do Beto preservada (nada sobrescrito)")
         await pg.wait_for_selector('#sync-ind [data-cf="livros"]')
         await pg.screenshot(path=OUT + '/fase1-conflito.png')
         await pg.click('#sync-ind [data-esc="servidor"]'); await pg.wait_for_load_state('load'); await pg.wait_for_timeout(500)
-        ok(await pg.evaluate("PR_DADOS.db.get('livros',[]).length") == 2, "escolher a versão do servidor recarrega os dados do Beto")
+        ok(await pg.evaluate("PR_DADOS.db.get('livros',[]).length") == 3, "escolher a versão do servidor recarrega os dados do Beto")
 
         # 7) cadastro novo pelo site
         ctx3, pg3, erros3 = await nova_pagina(br, sb)

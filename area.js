@@ -1286,11 +1286,41 @@ V.backup = (me, root) => {
   if (!D) { root.innerHTML = '<p class="vazio">Não foi possível carregar dados.js.</p>'; return; }
   let baixou = false, lido = null, msg = '';
   const fmtB = n => n > 1048576 ? (n / 1048576).toFixed(2) + ' MB' : Math.round(n / 1024) + ' KB';
+  // Modo servidor: dados que ficaram guardados NESTE navegador (do tempo do modo antigo) podem subir para o servidor.
+  const NAO_LEVA = new Set(['users', 'meta']);
+  const doNavegador = () => { const o = []; try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith('pr_') && !NAO_LEVA.has(k.slice(3))) { let v; try { v = JSON.parse(localStorage.getItem(k)); } catch (e) { continue; } o.push([k.slice(3), v]); } } } catch (e) { /* sem acesso */ } return o.sort((a, b) => a[0].localeCompare(b[0])); };
+  const qtd = v => Array.isArray(v) ? v.length + ' item(ns)' : v && typeof v === 'object' ? Object.keys(v).length + ' campo(s)' : '1 valor';
+  function blocoTrazer() {
+    const l = doNavegador(); let feito = null; try { feito = localStorage.getItem('pr-migrado'); } catch (e) { /* ignora */ }
+    if (!l.length) return '';
+    return `<details class="tip-box" ${feito ? '' : 'open'}><summary><strong>Trazer os dados deste navegador para o servidor</strong> (${l.length} conjunto(s) de dados)${feito ? ' · já enviados em ' + esc(feito.slice(0, 10)) : ''}</summary>
+      <p>Encontrei dados guardados <strong>neste navegador</strong>, do tempo em que a área restrita funcionava só no navegador. Ao enviar: o que ainda não existe no servidor entra inteiro; nas listas que já existem, entram só os itens que faltam (nada do servidor é apagado ou trocado). As pessoas não entram por aqui: são as contas do login.</p>
+      <div style="overflow-x:auto;max-height:240px"><table class="doc-table"><thead><tr><th>Dados</th><th>Neste navegador</th><th>No servidor</th></tr></thead><tbody>${l.map(([k, v]) => { const sv = db.get(k, null); return `<tr><td>${esc(k)}</td><td>${qtd(v)}</td><td>${sv == null ? '—' : qtd(sv)}</td></tr>`; }).join('')}</tbody></table></div>
+      <p><button type="button" class="btn-visit btn-large" id="bk-trazer"><i class="fas fa-cloud-upload-alt"></i> Enviar para o servidor</button></p></details>`;
+  }
+  async function trazer() {
+    if (!confirm('Enviar os dados deste navegador para o servidor do Parque? Nada do que já está no servidor será apagado.')) return;
+    let novos = 0, somados = 0, mantidos = 0;
+    doNavegador().forEach(([k, v]) => {
+      const sv = db.get(k, null);
+      if (sv == null || (Array.isArray(sv) && !sv.length) || (sv && typeof sv === 'object' && !Array.isArray(sv) && !Object.keys(sv).length)) { db.set(k, v); novos++; return; }
+      if (Array.isArray(sv) && Array.isArray(v)) {
+        const chave = x => x && typeof x === 'object' && x.id != null ? 'id:' + x.id : JSON.stringify(x);
+        const tem = new Set(sv.map(chave)), falta = v.filter(x => !tem.has(chave(x)));
+        if (falta.length) { db.set(k, sv.concat(falta)); somados++; } else mantidos++;
+        return;
+      }
+      mantidos++;
+    });
+    try { await D.sincronizar(); } catch (e) { msg = 'Parte dos dados ainda está sendo enviada (' + e.message + '). Deixe a página aberta e confira o aviso no alto.'; draw(); return; }
+    try { localStorage.setItem('pr-migrado', new Date().toISOString()); } catch (e) { /* ignora */ }
+    msg = `Pronto! ${novos} conjunto(s) entraram no servidor, ${somados} receberam itens que faltavam e ${mantidos} já estavam iguais (ou foram mantidos como estavam no servidor).`; draw();
+  }
   const draw = () => {
     const u = D.uso(), d = D.diasDesdeBackup(), aud = D.auditoria().slice(-25).reverse(), lx = D.lixeira();
     const alerta = d === null ? 'Nenhum backup foi baixado ainda.' : d > 7 ? `O último backup foi há ${d} dias.` : '';
     root.innerHTML = `<h3><i class="fas fa-database"></i> Backup e Segurança</h3>
-    <p class="tip-box" role="note">Hoje os dados ficam <strong>neste navegador</strong>. Baixe o backup com frequência e guarde o arquivo em outro lugar (e-mail, nuvem, pen drive). Para uso em vários computadores e no aplicativo, o site precisa do servidor (veja docs/PLANO.md).</p>
+    ${D.modo === 'supabase' ? `<p class="tip-box" role="note">Os dados ficam no <strong>servidor do Parque</strong> (Supabase, São Paulo) e aparecem para todos os responsáveis. Mesmo assim, baixe o backup de vez em quando e guarde o arquivo em outro lugar.</p>${blocoTrazer()}` : '<p class="tip-box" role="note">Hoje os dados ficam <strong>neste navegador</strong>. Baixe o backup com frequência e guarde o arquivo em outro lugar (e-mail, nuvem, pen drive). Para uso em vários computadores e no aplicativo, o site precisa do servidor (veja docs/PLANO.md).</p>'}
     ${alerta ? `<p class="form-erro" role="alert">${esc(alerta)}</p>` : `<p class="vazio">Último backup há ${d} dia(s).</p>`}
     ${msg ? `<p class="tip-box" role="status">${esc(msg)}</p>` : ''}
     <p>Espaço usado no navegador: <strong>${fmtB(u.bytes)}</strong> de ~${fmtB(u.limiteAprox)} ${u.bytes > u.limiteAprox * 0.8 ? '<span class="form-erro">(quase cheio)</span>' : ''}</p>
@@ -1301,6 +1331,7 @@ V.backup = (me, root) => {
     <h4>Registro de alterações (últimas 25)</h4>
     ${aud.length ? `<div style="overflow-x:auto"><table class="doc-table"><thead><tr><th>Quando</th><th>Quem</th><th>Coleção</th><th>O que mudou</th></tr></thead><tbody>${aud.map(a => `<tr><td>${esc(a.t.slice(0, 19).replace('T', ' '))}</td><td>${esc(a.por)}</td><td>${esc(a.colecao)}</td><td>${a.restauradoDe ? 'Restauração de backup de ' + esc(a.restauradoDe.slice(0, 10)) : a.total === undefined ? 'alterado' : `+${a.novos} / ~${a.alterados} / −${a.removidos}`}</td></tr>`).join('')}</tbody></table></div>` : '<p class="vazio">Sem registros ainda.</p>'}
     <p class="vazio">Itens excluídos recuperáveis na lixeira: ${lx.length}. <button class="btn-visit" id="bk-lixo" ${lx.length ? '' : 'disabled'}>Baixar lixeira (JSON)</button></p>`;
+    const bt = $('#bk-trazer', root); if (bt) bt.onclick = trazer;
     $('#bk-baixar', root).onclick = async () => { await D.baixarBackup(); baixou = true; msg = 'Backup baixado. Confira o arquivo na pasta de downloads.'; draw(); };
     $('#bk-lixo', root).onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(D.lixeira(), null, 1)], { type: 'application/json' })); a.download = 'lixeira-parque-retiro.json'; a.click(); };
     $('#bk-arq', root).onchange = async ev => {
