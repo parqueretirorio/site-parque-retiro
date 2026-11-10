@@ -449,6 +449,12 @@ V.users = (me, root) => {
     root.querySelectorAll('[data-nv]').forEach(s => s.onchange = () => { const l = db.get('users', []); l.find(u => u.email === s.dataset.nv).nivel = s.value; db.set('users', l); draw(); });
     root.querySelectorAll('[data-fn]').forEach(c => c.onchange = () => { const l = db.get('users', []), u = l.find(x => x.email === c.dataset.em), f = new Set(u.funcoes || []); c.checked ? f.add(c.dataset.fn) : f.delete(c.dataset.fn); u.funcoes = [...f]; db.set('users', l); });
     root.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if (confirm('Remover este responsável?')) { db.set('users', db.get('users', []).filter(u => u.email !== b.dataset.del)); draw(); } });
+    if (window.PR_DADOS && PR_DADOS.modo === 'supabase') { // no servidor, a senha é de cada pessoa: ninguém cria conta pelos outros
+      const fu = $('#fu', root), t = fu && fu.previousElementSibling;
+      if (t) t.innerHTML = 'Cada pessoa cria a própria conta em <strong>Entrar › Criar conta</strong>, com a senha dela. O pedido aparece acima, em Solicitações de cadastro, para você aprovar e escolher o nível e as funções.';
+      if (fu) fu.remove();
+      return;
+    }
     $('#fu', root).onsubmit = async e => {
       e.preventDefault();
       const n = $('#u-n').value.trim(), em = $('#u-e').value.trim().toLowerCase(), s = $('#u-s').value, er = $('#u-er');
@@ -1379,6 +1385,13 @@ ELEMENTOS.forEach(([id, nome, ic]) => {
 
 /* ---------- Páginas ---------- */
 function painel() {
+  const SRV = window.PR_DADOS && PR_DADOS.modo === 'supabase', SB = window.PR_SUPABASE;
+  if (SRV) {
+    const s = SB.sessao(), est = PR_DADOS.estadoSync();
+    if (!s || est.estado === 'sem-sessao') { sessionStorage.removeItem('pr_sess'); location.replace('login.html'); return; }
+    sessionStorage.setItem('pr_sess', s.user.email);
+    if (est.estado === 'offline' && !db.get('users', []).length) { $('#app').innerHTML = `<p class="tip-box" role="alert"><strong>Não foi possível falar com o servidor.</strong> Confira a internet e <a href="area-restrita.html">tente de novo</a>. ${esc(est.erro || '')}</p>`; return; }
+  }
   const pendN = () => db.get('users', []).filter(u => statusDe(u) === 'pendente').length;
   let me = db.get('users', []).find(u => u.email === sessionStorage.getItem('pr_sess'));
   // Acesso temporário (script.js): enquanto estiver ativo, quem clicou na mandala entra sem login.
@@ -1472,7 +1485,25 @@ function painel() {
       painel();
     };
   }
-  $('#sair').onclick = () => { sessionStorage.removeItem('pr_sess'); sessionStorage.removeItem('pr_temp'); location.href = temp ? 'index.html' : 'login.html'; };
+  $('#sair').onclick = async () => {
+    if (SRV) { const e = PR_DADOS.estadoSync(); if (e.pendentes) { try { await PR_DADOS.sincronizar(); } catch (x) { if (!confirm('Ainda há alterações que não chegaram ao servidor (' + (x.message || 'sem conexão') + '). Sair mesmo assim? Elas serão perdidas.')) return; } } await SB.sair(); }
+    sessionStorage.removeItem('pr_sess'); sessionStorage.removeItem('pr_temp'); location.href = temp ? 'index.html' : 'login.html';
+  };
+  if (SRV) { // indicador de gravação no servidor
+    const top = $('.painel-top'), ind = document.createElement('p'); ind.id = 'sync-ind'; ind.setAttribute('role', 'status'); ind.style.margin = '6px 0 0'; ind.style.fontSize = '.85rem';
+    const mostra = e => {
+      const t = e.conflitos ? ['fa-exclamation-triangle', 'Outra pessoa alterou os mesmos dados ao mesmo tempo. Escolha abaixo qual versão fica.', 'st-pendente']
+        : e.estado === 'sem-sessao' ? ['fa-sign-in-alt', 'Sua sessão terminou: entre de novo para continuar salvando.', 'st-recusado']
+        : e.estado === 'sem-permissao' ? ['fa-lock', 'O servidor recusou uma gravação: ' + (e.erro || 'sem permissão') + '.', 'st-recusado']
+        : e.estado === 'offline' ? ['fa-wifi', 'Sem conexão: ' + e.pendentes + ' alteração(ões) aguardando para salvar.', 'st-pendente']
+        : e.pendentes ? ['fa-sync', 'Salvando no servidor...', 'st-pendente'] : ['fa-cloud', 'Tudo salvo no servidor do Parque.', 'st-aprovado'];
+      ind.innerHTML = `<span class="badge ${t[2]}"><i class="fas ${t[0]}"></i> ${esc(t[1])}</span>` + (e.conflitos ? PR_DADOS.conflitos().map(c => `<span class="sync-conf" style="display:block;margin-top:6px">Dados "${esc(c.colecao)}": <button type="button" class="btn-visit" data-cf="${esc(c.colecao)}" data-esc="servidor">Ficar com a versão do servidor (recarrega)</button> <button type="button" class="btn-visit" data-cf="${esc(c.colecao)}" data-esc="meu">Manter a minha alteração</button></span>`).join('') : '');
+      ind.style.cssText = e.conflitos || e.estado === 'sem-sessao' ? 'position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;margin:0;padding:12px;background:#fff;border:2px solid #c0392b;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.2);font-size:.9rem' : 'margin:6px 0 0;font-size:.85rem';
+      ind.querySelectorAll('[data-cf]').forEach(b => b.onclick = async () => { await PR_DADOS.resolverConflito(b.dataset.cf, b.dataset.esc); if (b.dataset.esc === 'servidor') location.reload(); });
+    };
+    mostra(PR_DADOS.estadoSync()); window.addEventListener('pr-sync', ev => mostra(ev.detail));
+    if (top && top.firstElementChild) top.firstElementChild.appendChild(ind);
+  }
 }
 
 const STATUS_MSG = {
@@ -1482,7 +1513,82 @@ const STATUS_MSG = {
 };
 const statusDe = u => u.status || 'aprovado'; // contas antigas, sem status, contam como aprovadas
 
+// Login com o servidor do Parque (Supabase Auth): entrar, criar conta, esqueci minha senha e nova senha.
+function loginServidor() {
+  const SB = window.PR_SUPABASE;
+  const ret = SB.lerRetornoDoEmail();
+  if (ret && ret.tipo !== 'recovery' && !ret.erro) { history.replaceState(null, '', location.pathname); } // volta da confirmação de e-mail
+  const s = SB.sessao(), eu = s && db.get('users', []).find(u => u.email === s.user.email);
+  if (!ret && eu && statusDe(eu) === 'aprovado') { sessionStorage.setItem('pr_sess', eu.email); location.replace('area-restrita.html'); return; }
+  let modo = ret && ret.tipo === 'recovery' ? 'nova' : 'entrar', aviso = '', ocupado = false;
+  if (ret && ret.erro) aviso = 'O link do e-mail não funcionou (' + ret.erro + '). Se for de senha, peça outro em "Esqueci minha senha".';
+  else if (ret && ret.tipo === 'signup') aviso = 'E-mail confirmado! Agora aguarde: o administrador vai aprovar ou não o seu acesso. Você pode tentar entrar depois da aprovação.';
+  else if (ret && ret.tipo !== 'recovery') aviso = 'E-mail confirmado.';
+  const TIT = { entrar: 'Entrar', cadastro: 'Criar conta', esqueci: 'Esqueci minha senha', nova: 'Criar nova senha' };
+  const desenha = () => {
+    const cad = modo === 'cadastro';
+    $('#loginBox').innerHTML = `${modo === 'nova' ? '' : `<div class="tabs sub login-tabs" role="tablist">
+      <button type="button" class="tab-btn${modo === 'entrar' || modo === 'esqueci' ? ' active' : ''}" data-m="entrar">Entrar</button>
+      <button type="button" class="tab-btn${cad ? ' active' : ''}" data-m="cadastro">Criar conta</button></div>`}
+    <h2>${TIT[modo]}</h2>
+    <p>${cad ? 'Preencha os dados abaixo. Vamos mandar um e-mail para você confirmar o endereço; depois, a comissão do Parque Retiro aprova ou não o seu acesso.' : modo === 'esqueci' ? 'Digite o e-mail do seu cadastro. Vamos mandar um link para você criar uma senha nova.' : modo === 'nova' ? 'Digite a nova senha duas vezes.' : 'Acesso para Mestres'}</p>
+    ${aviso ? `<p class="tip-box" role="status">${esc(aviso)}</p>` : ''}
+    <form id="f" novalidate>${cad ? '<div class="form-row"><label for="n">Nome completo *</label><input id="n" autocomplete="name" maxlength="80"></div>' : ''}
+    ${modo === 'nova' ? '' : '<div class="form-row"><label for="e">E-mail *</label><input id="e" type="email" autocomplete="username"></div>'}
+    ${cad ? '<div class="form-row"><label for="w">WhatsApp (com DDD) *</label><input id="w" type="tel" autocomplete="tel" maxlength="20" placeholder="(21) 99999-9999"></div>' : ''}
+    ${modo === 'esqueci' ? '' : `<div class="form-row"><label for="s">${modo === 'nova' ? 'Nova senha (mín. 8 caracteres)' : 'Senha' + (cad ? ' (mín. 8 caracteres)' : '')}</label><input id="s" type="password" autocomplete="${modo === 'entrar' ? 'current-password' : 'new-password'}"></div>`}
+    ${cad || modo === 'nova' ? '<div class="form-row"><label for="s2">Repita a senha</label><input id="s2" type="password" autocomplete="new-password"></div>' : ''}
+    ${modo === 'entrar' || modo === 'nova' || modo === 'esqueci' ? '' : '<p class="tip-box" role="note"><strong>Antes de continuar:</strong> o cadastro na área restrita está sujeito à aprovação da comissão do Parque Retiro. O acesso só é liberado quando o cadastro for aprovado.</p>' + lgpdBloco('cc')}
+    <p class="form-erro" id="er" role="alert" hidden></p><button class="btn-visit btn-large">${{ entrar: 'Entrar', cadastro: 'Enviar cadastro', esqueci: 'Enviar o link', nova: 'Salvar a nova senha' }[modo]}</button>
+    ${modo === 'entrar' ? '<p style="margin-top:12px"><button type="button" class="link-btn" id="esq" style="background:none;border:0;color:inherit;text-decoration:underline;cursor:pointer;padding:0">Esqueci minha senha</button></p>' : modo === 'esqueci' ? '<p style="margin-top:12px"><button type="button" class="link-btn" id="volt" style="background:none;border:0;color:inherit;text-decoration:underline;cursor:pointer;padding:0">Voltar para Entrar</button></p>' : ''}</form>`;
+    document.querySelectorAll('.login-tabs [data-m]').forEach(b => b.onclick = () => { modo = b.dataset.m; aviso = ''; desenha(); });
+    const esq = $('#esq'); if (esq) esq.onclick = () => { modo = 'esqueci'; aviso = ''; desenha(); };
+    const vol = $('#volt'); if (vol) vol.onclick = () => { modo = 'entrar'; aviso = ''; desenha(); };
+    $('#f').onsubmit = ev => { ev.preventDefault(); if (ocupado) return; ({ entrar: entra, cadastro: cadastra, esqueci: esquece, nova: troca }[modo])(); };
+  };
+  const falha = m => { const er = $('#er'); er.textContent = m; er.hidden = false; };
+  const espera = async (fn) => { ocupado = true; const b = $('#f button.btn-large'); const t = b.textContent; b.disabled = true; b.textContent = 'Aguarde...'; try { await fn(); } finally { ocupado = false; if (document.body.contains(b)) { b.disabled = false; b.textContent = t; } } };
+  const entra = () => espera(async () => {
+    const em = $('#e').value.trim().toLowerCase(), sn = $('#s').value;
+    if (!/^\S+@\S+\.\S+$/.test(em) || !sn) return falha('Informe e-mail e senha.');
+    const r = await SB.entrar(em, sn);
+    if (r.erro) return falha(r.erro);
+    if (r.pendente) return falha(STATUS_MSG[r.perfil.status] || STATUS_MSG.pendente);
+    sessionStorage.setItem('pr_sess', r.perfil.email); location.href = 'area-restrita.html';
+  });
+  const cadastra = () => espera(async () => {
+    const n = $('#n').value.trim().replace(/\s+/g, ' '), em = $('#e').value.trim().toLowerCase(), sn = $('#s').value, s2 = $('#s2').value, w = $('#w').value.trim();
+    if (!nomeCompletoOk(n)) return falha('Informe seu nome completo (nome e sobrenome).');
+    if (!/^\S+@\S+\.\S+$/.test(em)) return falha('Informe um e-mail válido.');
+    if (!zapOk(w)) return falha('Informe um WhatsApp válido, com DDD.');
+    if (!$('#cc-lgpd-ok').checked) return falha('Para criar a conta é preciso aceitar a autorização LGPD.');
+    if (sn.length < 8) return falha('A senha precisa ter ao menos 8 caracteres.');
+    if (sn !== s2) return falha('As senhas não conferem.');
+    const r = await SB.cadastrar({ nome: n, email: em, senha: sn, whatsapp: zapDigitos(w), lgpd: lgpdLe('cc') });
+    if (r.erro) return falha(r.erro);
+    modo = 'entrar'; aviso = 'Cadastro enviado! Abra o e-mail que mandamos para ' + em + ' e toque no link de confirmação (veja também a caixa de spam). Depois, aguarde a aprovação do administrador.'; desenha();
+  });
+  const esquece = () => espera(async () => {
+    const em = $('#e').value.trim().toLowerCase();
+    if (!/^\S+@\S+\.\S+$/.test(em)) return falha('Informe um e-mail válido.');
+    const r = await SB.recuperar(em);
+    if (r.erro) return falha(r.erro);
+    modo = 'entrar'; aviso = 'Se este e-mail tiver cadastro, enviamos um link para criar uma senha nova. Veja também a caixa de spam.'; desenha();
+  });
+  const troca = () => espera(async () => {
+    const sn = $('#s').value, s2 = $('#s2').value;
+    if (sn.length < 8) return falha('A senha precisa ter ao menos 8 caracteres.');
+    if (sn !== s2) return falha('As senhas não conferem.');
+    const r = await SB.novaSenha(ret.token, sn);
+    if (r.erro) return falha(r.erro);
+    history.replaceState(null, '', location.pathname);
+    modo = 'entrar'; aviso = 'Senha nova salva! Agora entre com ela.'; desenha();
+  });
+  desenha();
+}
+
 function login() {
+  if (window.PR_DADOS && PR_DADOS.modo === 'supabase') return loginServidor();
   const users = db.get('users', []);
   const logado = users.find(u => u.email === sessionStorage.getItem('pr_sess'));
   if (logado && statusDe(logado) === 'aprovado') { location.replace('area-restrita.html'); return; }

@@ -1,0 +1,179 @@
+# Supabase "falso" para os testes da Fase 1: imita as rotas que o site usa (Auth e REST), mas as regras de dados
+# rodam no PostgreSQL DE VERDADE (local), com as mesmas migrações do Supabase (0001–0009 + 0010).
+# Assim o teste confere o banco real: RLS, gatilhos (perfis_protege), versões e conflitos.
+# Requer PostgreSQL 16 local (usuário postgres). Usado por tests/teste_supabase_fase1.py.
+import json, os, re, subprocess, uuid, itertools
+from urllib.parse import urlparse, parse_qs
+
+AQUI = os.path.dirname(os.path.abspath(__file__))
+SITE = os.path.dirname(AQUI)
+STUB = """
+do $$ begin
+  if not exists (select 1 from pg_roles where rolname='anon') then create role anon nologin; end if;
+  if not exists (select 1 from pg_roles where rolname='authenticated') then create role authenticated nologin; end if;
+end $$;
+create schema if not exists auth;
+create table if not exists auth.users (id uuid primary key, email text unique, raw_user_meta_data jsonb default '{}'::jsonb, created_at timestamptz default now());
+create or replace function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.uid', true), '')::uuid $$;
+grant usage on schema public, auth to anon, authenticated;
+create extension if not exists pgcrypto;
+"""
+GRANTS = "grant select, insert, update on all tables in schema public to authenticated; grant usage, select on all sequences in schema public to authenticated;"
+
+
+def psql(sql, db='prt_teste', papel=None, uid=None):
+    pre = ''
+    if papel: pre += f"set local role {papel};"
+    if uid: pre += f"select set_config('request.uid', '{uid}', true);"
+    corpo = f"begin; {pre} {sql}; commit;"
+    r = subprocess.run(['su', 'postgres', '-c', f'psql -X -q -At -v ON_ERROR_STOP=1 -d {db}'], input=corpo, capture_output=True, text=True)
+    if r.returncode != 0:
+        m = re.search(r'ERROR:\s+(.*)', r.stderr)
+        raise ErroBanco(m.group(1).strip() if m else r.stderr.strip())
+    linhas = [l for l in r.stdout.splitlines() if l.strip() and l.strip() not in ('BEGIN', 'COMMIT', 'SET')]
+    return linhas
+
+
+class ErroBanco(Exception):
+    pass
+
+
+def lit(v):  # literal SQL seguro por dollar-quoting
+    s = json.dumps(v) if not isinstance(v, str) else v
+    tag = '$q' + uuid.uuid4().hex[:8] + '$'
+    return f"{tag}{s}{tag}"
+
+
+def preparar_banco(db='prt_teste'):
+    subprocess.run(['su', 'postgres', '-c', f'dropdb --if-exists {db} && createdb {db}'], check=True, capture_output=True)
+    arquivos = sorted(os.listdir(os.path.join(SITE, 'supabase', 'migrations')))
+    sql = STUB + '\n'.join(open(os.path.join(SITE, 'supabase', 'migrations', a)).read() for a in arquivos if a.endswith('.sql')) + GRANTS
+    r = subprocess.run(['su', 'postgres', '-c', f'psql -X -q -v ON_ERROR_STOP=1 -d {db}'], input=sql, capture_output=True, text=True)
+    if r.returncode != 0:
+        raise RuntimeError(r.stderr)
+
+
+class SupabaseFalso:
+    def __init__(self, url, db='prt_teste'):
+        self.url = url.rstrip('/')
+        self.db = db
+        self.contas = {}        # email -> {id, senha, confirmado}
+        self.tokens = {}        # access_token -> uid
+        self.refresh = {}       # refresh_token -> uid
+        self.seq = itertools.count(1)
+        self.log = []
+        self.enviados = []      # e-mails "enviados" (confirmação, recuperação)
+
+    # ---------- dados de teste ----------
+    def criar_conta(self, email, senha, nome, confirmado=True, nivel=None, status=None, funcoes=None, whatsapp=''):
+        uid = str(uuid.uuid4())
+        self.contas[email.lower()] = {'id': uid, 'senha': senha, 'confirmado': confirmado}
+        meta = {'nome': nome, 'whatsapp': whatsapp, 'lgpd': {'aceite': True, 'versao': 1}}
+        psql(f"insert into auth.users(id,email,raw_user_meta_data) values ('{uid}', {lit(email)}, {lit(meta)}::jsonb)", self.db)
+        if nivel or status or funcoes:
+            sets = []
+            if nivel: sets.append(f"nivel={lit(nivel)}")
+            if status: sets.append(f"status={lit(status)}")
+            if funcoes is not None: sets.append(f"funcoes={lit('{' + ','.join(funcoes) + '}')}::text[]")
+            psql(f"alter table perfis disable trigger perfis_protege; update perfis set {', '.join(sets)} where id='{uid}'; alter table perfis enable trigger perfis_protege", self.db)
+        return uid
+
+    def sessao_para(self, uid, expira_em=3600):
+        n = next(self.seq)
+        at, rt = f'tok-{n}-{uid}', f'ref-{n}-{uid}'
+        self.tokens[at] = uid; self.refresh[rt] = uid
+        email = next(e for e, c in self.contas.items() if c['id'] == uid)
+        import time
+        return {'access_token': at, 'refresh_token': rt, 'expires_in': expira_em, 'expires_at': int(time.time()) + expira_em, 'token_type': 'bearer', 'user': {'id': uid, 'email': email}}
+
+    # ---------- roteamento ----------
+    async def tratar(self, route):
+        req = route.request
+        u = urlparse(req.url)
+        caminho, q = u.path, parse_qs(u.query)
+        corpo = None
+        try:
+            corpo = json.loads(req.post_data) if req.post_data else None
+        except Exception:
+            corpo = None
+        tok = (req.headers.get('authorization') or '').replace('Bearer ', '')
+        uid = self.tokens.get(tok)
+        self.log.append((req.method, caminho + ('?' + u.query if u.query else '')))
+        st, res = self.rotear(req.method, caminho, q, corpo, uid, tok)
+        await route.fulfill(status=st, content_type='application/json', headers={'Access-Control-Allow-Origin': '*'}, body='' if res is None else json.dumps(res))
+
+    def rotear(self, m, caminho, q, corpo, uid, tok):
+        if m == 'OPTIONS':
+            return 200, None
+        if caminho == '/auth/v1/token' and q.get('grant_type') == ['password']:
+            c = self.contas.get(str(corpo.get('email', '')).lower())
+            if not c or c['senha'] != corpo.get('password'):
+                return 400, {'error_code': 'invalid_credentials', 'msg': 'Invalid login credentials'}
+            if not c['confirmado']:
+                return 400, {'error_code': 'email_not_confirmed', 'msg': 'Email not confirmed'}
+            return 200, self.sessao_para(c['id'])
+        if caminho == '/auth/v1/token' and q.get('grant_type') == ['refresh_token']:
+            r = self.refresh.pop(corpo.get('refresh_token'), None)
+            return (200, self.sessao_para(r)) if r else (400, {'msg': 'Invalid Refresh Token'})
+        if caminho == '/auth/v1/signup':
+            em = str(corpo.get('email', '')).lower()
+            if em in self.contas:
+                return 422, {'error_code': 'user_already_exists', 'msg': 'User already registered'}
+            d = corpo.get('data') or {}
+            self.criar_conta(em, corpo.get('password'), d.get('nome', ''), confirmado=False, whatsapp=d.get('whatsapp', ''))
+            psql(f"update auth.users set raw_user_meta_data = raw_user_meta_data where email={lit(em)}", self.db)
+            self.enviados.append(('confirmacao', em, q.get('redirect_to', [''])[0]))
+            return 200, {'id': self.contas[em]['id'], 'email': em}
+        if caminho == '/auth/v1/recover':
+            self.enviados.append(('recuperacao', str(corpo.get('email', '')).lower(), q.get('redirect_to', [''])[0]))
+            return 200, {}
+        if caminho == '/auth/v1/user' and m == 'PUT':
+            if not uid:
+                return 401, {'msg': 'invalid JWT'}
+            email = next(e for e, c in self.contas.items() if c['id'] == uid)
+            if self.contas[email]['senha'] == corpo.get('password'):
+                return 422, {'msg': 'New password should be different from the old password.'}
+            self.contas[email]['senha'] = corpo.get('password')
+            return 200, {'id': uid, 'email': email}
+        if caminho == '/auth/v1/logout':
+            self.tokens.pop(tok, None)
+            return 204, None
+        if caminho.startswith('/rest/v1/'):
+            if not uid:
+                return 401, {'message': 'JWT expired'}
+            try:
+                return self.rest(m, caminho[len('/rest/v1/'):], q, corpo, uid)
+            except ErroBanco as e:
+                msg = str(e)
+                st = 403 if ('aprovados' in msg or 'Só o administrador' in msg or 'permission denied' in msg) else 400
+                return st, {'message': msg}
+        return 404, {'message': 'rota desconhecida no Supabase falso: ' + caminho}
+
+    def rest(self, m, rota, q, corpo, uid):
+        if rota == 'perfis' and m == 'GET':
+            filtro = ''
+            if 'id' in q:
+                filtro = f"where id = {lit(q['id'][0].replace('eq.', ''))}::uuid"
+            r = psql(f"select coalesce(json_agg(x order by x.criado_em), '[]')::jsonb::text from (select id,nome,email,whatsapp,lgpd,nivel,status,funcoes,criado_em from perfis {filtro}) x", self.db, 'authenticated', uid)
+            return 200, json.loads(r[-1])
+        if rota == 'perfis' and m == 'PATCH':
+            alvo = q['id'][0].replace('eq.', '')
+            sets = []
+            for k, v in corpo.items():
+                if k == 'funcoes': sets.append(f"funcoes = {lit('{' + ','.join(v) + '}')}::text[]")
+                elif k == 'lgpd': sets.append(f"lgpd = {lit(v)}::jsonb")
+                else: sets.append(f"{k} = {lit(v if v is not None else '')}")
+            psql(f"update perfis set {', '.join(sets)} where id = '{alvo}'", self.db, 'authenticated', uid)
+            return 204, None
+        if rota.startswith('rpc/'):
+            fn = rota[4:]
+            if fn == 'pr_ler_colecoes':
+                r = psql("select pr_ler_colecoes()", self.db, 'authenticated', uid)
+            elif fn == 'pr_gravar_colecao':
+                r = psql(f"select pr_gravar_colecao({lit(corpo['p_nome'])}, {int(corpo['p_versao_base'])}, {lit(corpo['p_dados'])}::jsonb)", self.db, 'authenticated', uid)
+            elif fn == 'pr_excluir_colecao':
+                r = psql(f"select pr_excluir_colecao({lit(corpo['p_nome'])}, {int(corpo['p_versao_base'])})", self.db, 'authenticated', uid)
+            else:
+                return 404, {'message': 'função desconhecida'}
+            return 200, json.loads(r[-1])
+        return 404, {'message': 'rota REST desconhecida: ' + rota}

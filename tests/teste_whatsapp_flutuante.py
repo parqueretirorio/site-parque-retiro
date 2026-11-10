@@ -8,7 +8,7 @@ def ok(c,m):
     print(("OK  " if c else "FALHOU ")+m); assert c,m
 async def main():
     pgs=sorted(os.path.basename(f) for f in glob.glob(SITE+'/*.html') if 'whatsapp-float' in open(f,encoding='utf-8').read())
-    ok(len(pgs)==51,f"51 páginas (inclui a Central de Ajuda) têm o botão flutuante ({len(pgs)})")
+    ok(len(pgs)>=53,f"53 páginas ou mais (inclui a Central de Ajuda) têm o botão flutuante ({len(pgs)})")
     async with async_playwright() as p:
         b=await p.chromium.launch(); pg=await (await b.new_context()).new_page(); errs=[]; pg.on("pageerror",lambda e:errs.append(str(e)))
         ruins=[]

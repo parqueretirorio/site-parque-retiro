@@ -20,13 +20,16 @@ const armazenamentoLocal = {
 // Armazenamento escolhido em config-dados.js. Local (padrão) = navegador. Remoto = servidor pelo contrato de docs/API_CONTRATO.md.
 // Qualquer outro provedor entra aqui sem tocar nas telas: basta cumprir a interface get/set/del/keys.
 const CFG = window.PR_CONFIG_DADOS || { modo: 'local' };
-let ls = armazenamentoLocal;
-if (CFG.modo === 'remoto') {
+let ls = armazenamentoLocal, modo = CFG.modo || 'local';
+const SB = window.PR_SUPABASE;
+if (SB && SB.ligado() && SB.paginaRestrita()) { ls = SB.criarArmazenamento(); modo = 'supabase'; }   // Fase 1: login e dados no Supabase
+else if (modo === 'supabase') modo = 'local';  // páginas públicas continuam no navegador
+else if (CFG.modo === 'remoto') {
   if (!window.PR_ADAPTADOR_REMOTO) throw new Error('Modo remoto ligado, mas adaptador-remoto.js não foi carregado. Não vou gravar em silêncio no navegador.');
   ls = window.PR_ADAPTADOR_REMOTO.criar(CFG);
 }
 // Promessa que as telas devem aguardar antes de ler dados (no modo local já nasce resolvida).
-const pronto = ls.iniciar ? ls.iniciar() : Promise.resolve();
+const pronto = Promise.resolve(ls.iniciar ? ls.iniciar() : undefined);
 const lerJson = (k, d) => { const v = ls.get(PREFIXO + k); if (v == null) return d; try { return JSON.parse(v); } catch (e) { return d; } };
 const agora = () => new Date().toISOString();
 const quem = () => { try { return sessionStorage.getItem('pr_sess') || (sessionStorage.getItem('pr_temp') === '1' ? 'acesso-temporario' : 'anonimo'); } catch (e) { return 'anonimo'; } };
@@ -140,8 +143,9 @@ async function restaurarBackup(obj, { backupAtualBaixado } = {}) {
   const anterior = coletar();
   const chavesAtuais = Object.keys(anterior).filter(k => k !== 'meta');
   try {
-    chavesAtuais.forEach(k => { if (!(k in obj.dados)) ls.del(PREFIXO + k); });
-    Object.keys(obj.dados).forEach(k => {
+    const pula = k => modo === 'supabase' && k === 'users'; // no servidor, as pessoas são os perfis do login (não vêm do backup)
+    chavesAtuais.forEach(k => { if (!(k in obj.dados) && !pula(k)) ls.del(PREFIXO + k); });
+    Object.keys(obj.dados).filter(k => !pula(k)).forEach(k => {
       const val = obj.dados[k];
       const bruto = (val && typeof val === 'object' && '__texto' in val) ? val.__texto : JSON.stringify(val);
       if (!ls.set(PREFIXO + k, bruto)) throw new Error('Sem espaço no navegador para restaurar "' + k + '".');
@@ -165,5 +169,5 @@ function diasDesdeBackup() {
   return Math.floor((Date.now() - new Date(m.ultimoBackup).getTime()) / 86400000);
 }
 
-window.PR_DADOS = { db, pronto, modo: CFG.modo || 'local', sincronizar: () => (ls.sincronizar ? ls.sincronizar() : Promise.resolve()), estadoSync: () => (ls.estado ? ls.estado() : { estado: 'local', pendentes: 0, conflitos: 0 }), conflitos: () => (ls.conflitos ? ls.conflitos() : []), resolverConflito: (n, e) => (ls.resolverConflito ? ls.resolverConflito(n, e) : Promise.resolve()), ESQUEMA, montarBackup, baixarBackup, validarBackup, restaurarBackup, uso, diasDesdeBackup, auditoria: () => lerJson('audit', []), lixeira: () => lerJson('lixeira', []), sha256, coletar };
+window.PR_DADOS = { db, pronto, modo, sincronizar: () => (ls.sincronizar ? ls.sincronizar() : Promise.resolve()), estadoSync: () => (ls.estado ? ls.estado() : { estado: 'local', pendentes: 0, conflitos: 0 }), conflitos: () => (ls.conflitos ? ls.conflitos() : []), resolverConflito: (n, e) => (ls.resolverConflito ? ls.resolverConflito(n, e) : Promise.resolve()), ESQUEMA, montarBackup, baixarBackup, validarBackup, restaurarBackup, uso, diasDesdeBackup, auditoria: () => lerJson('audit', []), lixeira: () => lerJson('lixeira', []), sha256, coletar };
 })();

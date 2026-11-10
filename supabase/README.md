@@ -1,6 +1,6 @@
-# Supabase — Fase 2
+# Supabase
 
-Conteúdo: `migrations/0001_base.sql` (esquema, permissões e auditoria). Testado em PostgreSQL 16 local (executar duas vezes, cenários de permissão em `tests/teste_permissoes_banco.sql`); **ainda não aplicado a um projeto Supabase real**.
+Conteúdo: `migrations/0001`–`0010` (esquema, permissões, auditoria e, na 0010, login e coleções da Fase 1 — veja docs/FASE1_SUPABASE.md). Aplicadas ao projeto parque-retiro (São Paulo): 0001–0009 em 09/11/2026; a 0010 a partir de 10/11/2026.
 
 Regras: migrações novas só adicionam (arquivos `0002_...`); nunca editar a que já rodou em produção; nunca `drop`/`truncate`. Use um projeto separado para homologação, com dados fictícios.
 

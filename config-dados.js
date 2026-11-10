@@ -1,6 +1,8 @@
 // Onde os dados moram. Troque SOMENTE esta linha quando o servidor existir.
 //   modo: 'local'  -> navegador (localStorage). É o comportamento atual; nada muda.
-//   modo: 'remoto' -> servidor que fale o contrato de docs/API_CONTRATO.md (PHP+MySQL, Supabase, etc.).
+//   modo: 'remoto' -> servidor que fale o contrato de docs/API_CONTRATO.md (PHP+MySQL etc.).
+//   modo: 'supabase' -> login real e dados da área restrita no Supabase (Fase 1, adaptador-supabase.js).
+//   Para TESTAR o Supabase só neste navegador, sem mudar esta linha: abra login.html?servidor=1 (volta com ?servidor=0).
 // Não coloque senhas nem chaves secretas aqui: este arquivo é público.
 window.PR_CONFIG_DADOS = {
   modo: 'local',
@@ -8,7 +10,7 @@ window.PR_CONFIG_DADOS = {
   token: null,
   // Banco do Parque no Supabase (São Paulo). A chave "publishable" é PÚBLICA por natureza: a proteção dos dados
   // vem das regras RLS do banco. NUNCA coloque aqui a "secret key" (sb_secret_...) nem a service_role.
-  // Enquanto modo for 'local', estes dados ainda não são usados (o adaptador Supabase está em desenvolvimento).
+  // Usados quando modo for 'supabase' (ou no teste com login.html?servidor=1). Exige a migração 0010 no banco.
   supabase: {
     url: 'https://yhzsuokwglznehvbclwd.supabase.co',
     chavePublica: 'sb_publishable_0ctrZKumwET1OtLe7jVMKw_AxyzJAuR'
