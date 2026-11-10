@@ -55,7 +55,7 @@ const MEDIDAS_BASE = {
 // Checklist de materiais de cada ação (guardado na própria ação).
 const MATS = [['briefing', 'Briefing e ideia definidos'], ['texto', 'Texto e legenda aprovados'], ['arte', 'Arte ou vídeo pronto'], ['autorizacao', 'Autorização de uso de imagem confirmada (ou não se aplica)']];
 const ICONES = [['fab fa-instagram', 'Instagram'], ['fab fa-facebook', 'Facebook'], ['fab fa-youtube', 'YouTube'], ['fab fa-whatsapp', 'WhatsApp'], ['fab fa-tiktok', 'TikTok'], ['fab fa-telegram', 'Telegram'], ['fab fa-linkedin', 'LinkedIn'], ['fab fa-spotify', 'Spotify / podcast'], ['fas fa-envelope', 'E-mail / newsletter'], ['fas fa-globe', 'Site / blog'], ['fas fa-bullhorn', 'Outro']];
-const SUBS = [['cal', 'Calendário de Comunicação'], ['pub', 'Publicações'], ['gerar', 'Criar a partir do calendário'], ['redes', 'Redes sociais'], ['proj', 'Projetos e campanhas'], ['tipos', 'Tipos de publicação'], ['fixas', 'Datas fixas anuais'], ['site', 'Site']];
+const SUBS = [['cal', 'Calendário de Comunicação'], ['pub', 'Publicações'], ['gerar', 'Criar a partir do calendário'], ['redes', 'Redes sociais'], ['proj', 'Projetos e campanhas'], ['tipos', 'Tipos de publicação'], ['fixas', 'Datas fixas anuais'], ['site', 'Site'], ['brief', 'Briefing para o Claude']];
 const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 const DIAS = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 const pad = n => String(n).padStart(2, '0');
@@ -622,10 +622,11 @@ window.PR_COMUNICACAO = { STATUS, abrir(me, root, H) {
   R.redes = el => catalogo(el, { chave: 'com_redes', get: redes, campo: 'rede', icone: 'fa-share-alt', visual: true, titulo: 'Redes sociais', novo: 'Nova rede social', intro: 'Redes usadas pelo Parque. Acrescente novas redes quando precisar; redes desativadas deixam de aparecer nas escolhas, mas as publicações antigas continuam salvas.' });
   R.proj = el => catalogo(el, { chave: 'com_projetos', get: projs, campo: 'projeto', icone: 'fa-flag', titulo: 'Projetos e campanhas', novo: 'Novo projeto ou campanha', intro: 'Cada publicação pode ser ligada a um projeto ou campanha (ex.: Celebração dos 15 anos, Marcha Mundial).' });
   R.tipos = el => catalogo(el, { chave: 'com_tipos', get: tipos, campo: 'tipo', icone: 'fa-photo-video', titulo: 'Tipos de publicação', novo: 'Novo tipo de publicação', intro: 'Formatos das publicações (post, carrossel, vídeo...). Acrescente outros quando surgirem.' });
+  R.brief = el => { if (!window.PR_COM_BRIEFING) { el.innerHTML = '<p class="vazio">Não foi possível carregar o briefing (arquivo com-briefing.js).</p>'; return; } window.PR_COM_BRIEFING.abrir(el, { db, esc, $, uid, me, projs }); };
   R.fixas = el => D.gerirFixas(el, H, true, m => { msg = m; draw(); });
 
   /* ---------- Estrutura da aba ---------- */
-  const SUBS_COLAB = [['colab', 'Minhas publicações']], SUBS_EXTRA = [['equipe', 'Equipe e convidados'], ['arq', 'Arquivos'], ['ind', 'Indicadores'], ['conect', 'Conectores']];
+  const SUBS_COLAB = [['colab', 'Minhas publicações'], ['brief', 'Briefing para o Claude']], SUBS_EXTRA = [['equipe', 'Equipe e convidados'], ['arq', 'Arquivos'], ['ind', 'Indicadores'], ['conect', 'Conectores']];
   const subsAtuais = () => !gestor ? SUBS_COLAB : (CB ? SUBS.concat(SUBS_EXTRA) : SUBS);
   const draw = () => {
     root.innerHTML = `<div class="tabs sub no-print" role="tablist">${subsAtuais().map(t => `<button class="tab-btn${t[0] === sub ? ' active' : ''}" data-s="${t[0]}">${esc(t[1])}${t[0] === 'pub' && devidas() ? ` <span class="badge-status" style="background:#a31d21;color:#fff" title="Publicações atrasadas ou para hoje">${devidas()}</span>` : ''}</button>`).join('')}</div><div id="com-sub"></div>`;

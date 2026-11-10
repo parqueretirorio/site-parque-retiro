@@ -1289,3 +1289,15 @@ details[open] .prod-cx-nome::before { content: '\25BE '; }
 .prod-lista-parque .prod-onde { margin-top: 3px; }
 #prod-titulo-vista { scroll-margin-top: 140px; }
 #prod-titulo-vista:focus { outline: none; }
+
+/* Briefing para o Claude (Comunicação) */
+.bf-bloco { margin: 22px 0 6px; padding-bottom: 4px; border-bottom: 2px solid #e3e9ee; }
+.bf-grupo { border: 1px solid #dfe6ec; border-radius: 8px; padding: 10px 14px; margin: 10px 0; }
+.bf-grupo legend { font-weight: 600; padding: 0 6px; }
+.bf-checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px 14px; }
+.bf-check { display: flex; align-items: center; gap: 8px; font-weight: 400; }
+.bf-check input { width: 20px; height: 20px; }
+.bf-passos { font-size: 1.05rem; line-height: 1.7; }
+.bf-botoes { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+.bf-rotulo { display: block; font-weight: 600; margin: 12px 0 4px; }
+.bf-saida { width: 100%; font-family: Consolas, 'Courier New', monospace; font-size: .9rem; line-height: 1.5; border: 1px solid #cfd8e0; border-radius: 8px; padding: 10px; }
