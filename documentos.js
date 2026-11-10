@@ -51,8 +51,11 @@ const diaDaRegra = (ano, mes, r) => {
   if (r.n === 5) { const u = new Date(ano, mes, 0); return u.getDate() - ((u.getDay() - r.sem + 7) % 7); }
   const p = new Date(ano, mes - 1, 1); return 1 + ((r.sem - p.getDay() + 7) % 7) + (r.n - 1) * 7;
 };
-const descFixa = f => f.regra ? `${ORDEM[f.regra.n]} ${SEMANA[f.regra.sem]} de ${MESES[+f.dia.slice(0, 2) - 1].toLowerCase()}` : f.dia.slice(3) + '/' + f.dia.slice(0, 2);
-const FIXAS_V3 = [{ id: 'fx-aniv-parque', dia: '10-08', regra: { n: 2, sem: 0 }, titulo: 'Aniversário Parque Retiro', descricao: 'Todo ano no 2º domingo de outubro.' }];
+const descFixa = f => f.ate ? `${f.dia.slice(3)}/${f.dia.slice(0, 2)} a ${f.ate.slice(3)}/${f.ate.slice(0, 2)}` : f.regra ? `${ORDEM[f.regra.n]} ${SEMANA[f.regra.sem]} de ${MESES[+f.dia.slice(0, 2) - 1].toLowerCase()}` : f.dia.slice(3) + '/' + f.dia.slice(0, 2);
+const FIXAS_V3 = [
+  { id: 'fx-aniv-parque', dia: '11-08', regra: { n: 2, sem: 0 }, titulo: 'Aniversário Parque Retiro', descricao: 'Todo ano no 2º domingo de novembro.' },
+  { id: 'fx-nv-marica', dia: '10-01', ate: '10-15', titulo: 'Dia Municipal da Não Violência de Maricá', descricao: 'Na 1ª quinzena de outubro. Marque o dia exato de cada ano no Calendário Anual.' }
+];
 const fixas = db => {
   let f = db.get('datas_fixas', null); if (!f) { f = FIXAS_BASE.map(x => ({ ...x })); db.set('datas_fixas', f); }
   if (!db.get('datas_fixas_v2', null)) { // uma vez só: renomeia as datas antigas e acrescenta as do Projeto 4 Estações
@@ -61,7 +64,7 @@ const fixas = db => {
     const at = db.get('ativ', []); ATIV_V2.forEach(a => { if (!at.some(x => x.id === a.id)) at.push({ ...a, criado: '2026-11-09', por: 'Sistema' }); });
     db.set('datas_fixas', f); db.set('ativ', at); db.set('datas_fixas_v2', { em: '2026-11-09' });
   }
-  if (!db.get('datas_fixas_v3', null)) { FIXAS_V3.forEach(n => { if (!f.some(x => x.id === n.id)) f.push({ ...n }); }); db.set('datas_fixas', f); db.set('datas_fixas_v3', { em: '2026-11-09' }); }
+  if (!db.get('datas_fixas_v4', null)) { FIXAS_V3.forEach(n => { const ex = f.find(x => x.id === n.id); if (ex) Object.assign(ex, n); else f.push({ ...n }); }); db.set('datas_fixas', f); db.set('datas_fixas_v4', { em: '2026-11-09' }); }
   return f;
 };
 // Atividades cadastradas + datas fixas repetidas em cada ano do intervalo [de, ate] (AAAA-MM-DD). Cada evento tem `key` estável.
@@ -71,7 +74,7 @@ const eventos = (db, de, ate) => {
     const dia = f.regra ? pad(diaDaRegra(a, +f.dia.slice(0, 2), f.regra)) : f.dia.slice(3);
     const iso = `${a}-${f.dia.slice(0, 2)}-${dia}`, d = new Date(a, +f.dia.slice(0, 2) - 1, +dia);
     if (d.getMonth() !== +f.dia.slice(0, 2) - 1) return; // ex.: 29/02 em ano não bissexto
-    fx.push({ id: `fx:${f.id}:${a}`, key: `f:${f.id}:${iso}`, fixa: true, titulo: f.titulo, descricao: f.descricao || '', data: iso, fim: '', hora: '', local: '', categoria: CAT_FIXA });
+    fx.push({ id: `fx:${f.id}:${a}`, key: `f:${f.id}:${iso}`, fixa: true, titulo: f.titulo, descricao: f.descricao || '', data: iso, fim: f.ate ? `${a}-${f.ate}` : '', hora: '', local: '', categoria: CAT_FIXA });
   }));
   // Toda atividade cadastrada em Comissões > Atividades (inclusive rascunho) também entra no calendário, para planejar a divulgação nas redes sociais.
   const MAPA = { evento: 'Celebração / Evento', encontro: 'Encontro Estacional', retiro: 'Retiro / Seminário', reuniao: 'Reunião de Escola' };

@@ -27,7 +27,7 @@ const REDES_BASE = [
 ];
 // Projetos e campanhas do Parque (lista ajustada em 09/11/2026). tipo = tipo sugerido no Briefing para o Claude; data = data já conhecida.
 const PROJ_BASE = [
-  { nome: 'Aniversário Parque Retiro', tipo: 'evento', data: '2º domingo de outubro' },
+  { nome: 'Aniversário Parque Retiro', tipo: 'evento', data: '2º domingo de novembro' },
   { nome: 'Projeto 4 Estações', tipo: 'evento' },
   { nome: 'Festival de Primavera', tipo: 'evento', pai: 'Projeto 4 Estações' },
   { nome: 'Festival de Verão', tipo: 'evento', data: '20/12/2026', pai: 'Projeto 4 Estações' },
@@ -36,7 +36,7 @@ const PROJ_BASE = [
   { nome: 'Marcha Mundial', tipo: 'evento' },
   { nome: 'Dia Internacional da Não Violência', tipo: 'data', data: '02/10' },
   { nome: 'Dia do Testemunho', tipo: 'data', data: '04/05' },
-  { nome: 'Dia Municipal da Não Violência de Maricá', tipo: 'data' }
+  { nome: 'Dia Municipal da Não Violência de Maricá', tipo: 'data', data: '1ª quinzena de outubro' }
 ];
 const PROJ_ANTIGOS = ['Celebração dos 15 anos', 'Marcha Mundial', 'Campanha da Sala', 'Construção do Parque'];
 const PROJ_SAEM = ['Celebração dos 15 anos', 'Campanha da Sala', 'Construção do Parque'];
@@ -90,12 +90,12 @@ window.PR_COMUNICACAO = { STATUS, abrir(me, root, H) {
   // Versão 2 da lista: os projetos antigos ficam desativados (publicações antigas continuam ligadas a eles) e entram os novos.
   const projs = () => {
     let l = db.get('com_projetos', null) || PROJ_ANTIGOS.map((n, i) => ({ id: 'p' + (i + 1), nome: n, ativa: true }));
-    if (!db.get('com_projetos_v4', null)) { // Marcha Mundial continua; os 4 festivais ficam dentro do Projeto 4 Estações
+    if (!db.get('com_projetos_v5', null)) { // Marcha Mundial continua; os 4 festivais ficam dentro do Projeto 4 Estações
       l.forEach(p => { if (PROJ_SAEM.includes(p.nome)) p.ativa = false; });
       PROJ_BASE.forEach(b => { const ex = l.find(p => norm(p.nome) === norm(b.nome)); if (ex) Object.assign(ex, b, { ativa: true }); else l.push({ id: uid(), ...b, ativa: true }); });
       const ordem = n => { const i = PROJ_BASE.findIndex(b => norm(b.nome) === norm(n)); return i < 0 ? 999 : i; };
       l.sort((x, y) => ordem(x.nome) - ordem(y.nome));
-      db.set('com_projetos', l); db.set('com_projetos_v4', { em: hoje() });
+      db.set('com_projetos', l); db.set('com_projetos_v5', { em: hoje() });
     }
     return l;
   };
