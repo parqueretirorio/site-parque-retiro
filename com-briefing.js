@@ -7,7 +7,7 @@
 //  - Nova pergunta: acrescente [campo, pergunta, dica, 'linha'|'texto'] no bloco certo de BLOCOS.
 //  - Novo tipo de campanha: acrescente em TIPOS e, se quiser perguntas próprias, em EXTRAS[tipo].
 (function () {
-const TIPOS = [['evento', 'Evento ou festival'], ['lancamento', 'Lançamento ou novidade'], ['arrecadacao', 'Arrecadação ou doação'], ['convite', 'Convite para atividade'], ['outro', 'Outro']];
+const TIPOS = [['evento', 'Evento ou festival'], ['lancamento', 'Lançamento ou novidade'], ['arrecadacao', 'Arrecadação ou doação'], ['convite', 'Convite para atividade'], ['data', 'Data comemorativa'], ['outro', 'Outro']];
 const CANAIS = ['Canal do WhatsApp', 'Comunidade do WhatsApp (Avisos)', 'Grupos do WhatsApp', 'Instagram', 'Facebook', 'YouTube', 'Site do Parque', 'Listas de e-mail', 'Cartaz impresso'];
 const PECAS = ['Textos para cada canal', 'Post quadrado/vertical (Instagram e Facebook)', 'Stories (vertical)', 'Arte para o Canal e a Comunidade do WhatsApp', 'Banner do site', 'Cartaz para imprimir (A4/A3)', 'Convite digital', 'E-mail', 'Roteiro de vídeo curto'];
 const BLOCOS = [
@@ -46,6 +46,7 @@ const EXTRAS = {
   evento: ['Informações práticas', [['alojamento', 'Tem alojamento para quem quiser dormir no Parque?', 'Ex.: sim, reservas pelo app até 15/12', 'linha']]],
   lancamento: ['A campanha', [['novidades', 'Quais são as novidades? O que já está pronto e o que é "em breve"?', 'Ex.: site novo (pronto); app (em testes); IA do acervo (em breve)', 'texto']]],
   arrecadacao: ['A campanha', [['destino', 'Para onde vai o dinheiro arrecadado?', 'Ex.: telhado do alojamento', 'texto']]],
+  data: ['A campanha', [['sentido', 'O que essa data significa para o Parque e o que queremos lembrar?', 'Ex.: a não violência ativa; o testemunho de Silo em Punta de Vacas (04/05/1969)', 'texto'], ['acao', 'Vai ter alguma ação no dia? (encontro, caminhada, cerimônia, só publicação)', 'Ex.: cerimônia às 17h no Parque e publicação nas redes', 'texto']]],
   convite: ['Informações práticas', [['vagas', 'Tem limite de vagas? Como se inscrever?', 'Ex.: 30 vagas, inscrição pelo app', 'texto']]]
 };
 const MEDIDAS = 'Post 1080×1350 px (4:5); Stories 1080×1920 px (9:16); banner do site conforme a página; cartaz A4 ou A3 para impressão';
@@ -128,14 +129,26 @@ window.PR_COM_BRIEFING = {
           <h3>Briefing: ${esc(atual.titulo)}</h3>
           <p class="tip-box"><i class="fas fa-lightbulb" aria-hidden="true"></i> Responda só o que souber. O que faltar, o Claude vai perguntar. Tudo é salvo automaticamente.</p>
           <form id="bf-form" class="form-reserva" novalidate>
+          ${ps.length ? `<div class="form-row"><label for="bf-proj">Qual projeto ou data do Parque? (opcional)</label><select id="bf-proj"><option value="">- Nenhum -</option>${ps.map(p => `<option value="${p.id}"${p.id === atual.projeto ? ' selected' : ''}>${esc(p.nome)}</option>`).join('')}</select><small>Ao escolher, o tipo, o nome e a data já conhecida são preenchidos sozinhos.</small></div>` : ''}
           <div class="form-row"><label for="bf-tipo">Que tipo de campanha é?</label><select id="bf-tipo">${TIPOS.map(t => `<option value="${t[0]}"${t[0] === atual.tipo ? ' selected' : ''}>${esc(t[1])}</option>`).join('')}</select></div>
-          ${ps.length ? `<div class="form-row"><label for="bf-proj">Ligar a um projeto ou campanha cadastrada (opcional)</label><select id="bf-proj"><option value="">- Nenhum -</option>${ps.map(p => `<option value="${p.id}"${p.id === atual.projeto ? ' selected' : ''}>${esc(p.nome)}</option>`).join('')}</select></div>` : ''}
           ${this.perguntas(atual.tipo).map(([t, l]) => `<h4 class="bf-bloco">${esc(t)}</h4>${l.map(([c, p, d, tp]) => campo(c, p, d, tp, atual.r[c])).join('')}`).join('')}
           <button type="button" class="btn-visit btn-large" id="bf-gerar"><i class="fas fa-magic"></i> Gerar texto para o Claude</button>
           </form>`;
         $('#bf-voltar', el).onclick = () => { guarda(); aba = 'lista'; aviso = 'Briefing salvo.'; draw(); };
         $('#bf-tipo', el).onchange = () => { guarda(); draw(); };
-        el.querySelectorAll('[data-c], #bf-proj').forEach(i => i.addEventListener('change', guarda));
+        el.querySelectorAll('[data-c]').forEach(i => i.addEventListener('change', guarda));
+        const pjSel = $('#bf-proj', el);
+        if (pjSel) pjSel.onchange = () => {
+          guarda(); const p = (projs ? projs() : []).find(x => x.id === pjSel.value);
+          if (p) {
+            if (p.tipo && TIPOS.some(t => t[0] === p.tipo)) atual.tipo = p.tipo;
+            if (!(atual.r.nome || '').trim()) atual.r.nome = p.nome;
+            if (p.data && !(atual.r.dataEvento || '').trim()) atual.r.dataEvento = p.data;
+            atual.titulo = (atual.r.nome || '').trim() || 'Campanha sem nome';
+            const l = lista(), i = l.findIndex(x => x.id === atual.id); if (i >= 0) l[i] = atual; else l.unshift(atual); salvarLista(l);
+          }
+          draw();
+        };
         $('#bf-gerar', el).onclick = () => { guarda(); aba = 'texto'; draw(); };
         return;
       }

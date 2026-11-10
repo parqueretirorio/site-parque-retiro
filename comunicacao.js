@@ -25,7 +25,19 @@ const REDES_BASE = [
   { id: 'youtube', nome: 'YouTube', icone: 'fab fa-youtube', cor: '#d32f2f' },
   { id: 'whatsapp', nome: 'WhatsApp / Canal', icone: 'fab fa-whatsapp', cor: '#2e7d32' }
 ];
-const PROJ_BASE = ['Celebração dos 15 anos', 'Marcha Mundial', 'Campanha da Sala', 'Construção do Parque'];
+// Projetos e campanhas do Parque (lista ajustada em 09/11/2026). tipo = tipo sugerido no Briefing para o Claude; data = data já conhecida.
+const PROJ_BASE = [
+  { nome: 'Aniversário Parque Retiro', tipo: 'evento' },
+  { nome: 'Festival de Verão', tipo: 'evento', data: '20/12/2026' },
+  { nome: 'Festival de Outono', tipo: 'evento' },
+  { nome: 'Festival de Inverno', tipo: 'evento' },
+  { nome: 'Festival de Primavera', tipo: 'evento' },
+  { nome: 'Projeto 4 Estações', tipo: 'evento' },
+  { nome: 'Dia Internacional da Não Violência', tipo: 'data', data: '02/10' },
+  { nome: 'Dia do Testemunho', tipo: 'data', data: '04/05' },
+  { nome: 'Dia Municipal da Não Violência de Maricá', tipo: 'data' }
+];
+const PROJ_ANTIGOS = ['Celebração dos 15 anos', 'Marcha Mundial', 'Campanha da Sala', 'Construção do Parque'];
 const TIPOS_BASE = ['Post com imagem', 'Carrossel', 'Vídeo curto / Reels', 'Stories', 'Mensagem de canal', 'Vídeo longo (YouTube)'];
 // Acrescentados SEM alterar o que já existe (só entram se ainda não existirem; nada é removido nem renomeado).
 const REDES_NOVAS = [
@@ -73,7 +85,16 @@ window.PR_COMUNICACAO = { STATUS, abrir(me, root, H) {
 
   const seed = (k, base) => { let l = db.get(k, null); if (!l) { l = base; db.set(k, l); } return l; };
   const redes = () => seed('com_redes', REDES_BASE.map(r => ({ ...r, ativa: true })));
-  const projs = () => seed('com_projetos', PROJ_BASE.map((n, i) => ({ id: 'p' + (i + 1), nome: n, ativa: true })));
+  // Versão 2 da lista: os projetos antigos ficam desativados (publicações antigas continuam ligadas a eles) e entram os novos.
+  const projs = () => {
+    let l = db.get('com_projetos', null) || PROJ_ANTIGOS.map((n, i) => ({ id: 'p' + (i + 1), nome: n, ativa: true }));
+    if (!db.get('com_projetos_v2', null)) {
+      l.forEach(p => { if (PROJ_ANTIGOS.includes(p.nome)) p.ativa = false; });
+      PROJ_BASE.forEach(b => { const ex = l.find(p => norm(p.nome) === norm(b.nome)); if (ex) Object.assign(ex, b, { ativa: true }); else l.push({ id: uid(), ...b, ativa: true }); });
+      db.set('com_projetos', l); db.set('com_projetos_v2', { em: hoje() });
+    }
+    return l;
+  };
   const tipos = () => seed('com_tipos', TIPOS_BASE.map((n, i) => ({ id: 't' + (i + 1), nome: n, ativa: true })));
   const posts = () => db.get('com_posts', []);
   // Primeira abertura depois da atualização: acrescenta canais e formatos novos (aditivo) e guarda a marca para não repetir.
@@ -620,7 +641,7 @@ window.PR_COMUNICACAO = { STATUS, abrir(me, root, H) {
   };
   R.site = el => { if (!window.PR_BANNERS_ADMIN) { el.innerHTML = '<p class="vazio">Não foi possível carregar o módulo de banners (arquivos banners.js e banners-admin.js).</p>'; return; } window.PR_BANNERS_ADMIN.abrir(el, H); };
   R.redes = el => catalogo(el, { chave: 'com_redes', get: redes, campo: 'rede', icone: 'fa-share-alt', visual: true, titulo: 'Redes sociais', novo: 'Nova rede social', intro: 'Redes usadas pelo Parque. Acrescente novas redes quando precisar; redes desativadas deixam de aparecer nas escolhas, mas as publicações antigas continuam salvas.' });
-  R.proj = el => catalogo(el, { chave: 'com_projetos', get: projs, campo: 'projeto', icone: 'fa-flag', titulo: 'Projetos e campanhas', novo: 'Novo projeto ou campanha', intro: 'Cada publicação pode ser ligada a um projeto ou campanha (ex.: Celebração dos 15 anos, Marcha Mundial).' });
+  R.proj = el => catalogo(el, { chave: 'com_projetos', get: projs, campo: 'projeto', icone: 'fa-flag', titulo: 'Projetos e campanhas', novo: 'Novo projeto ou campanha', intro: 'Cada publicação pode ser ligada a um projeto ou campanha (ex.: Festival de Verão, Dia Internacional da Não Violência).' });
   R.tipos = el => catalogo(el, { chave: 'com_tipos', get: tipos, campo: 'tipo', icone: 'fa-photo-video', titulo: 'Tipos de publicação', novo: 'Novo tipo de publicação', intro: 'Formatos das publicações (post, carrossel, vídeo...). Acrescente outros quando surgirem.' });
   R.emkt = el => { if (!window.PR_COM_EMKT) { el.innerHTML = '<p class="vazio">Não foi possível carregar o e-mail marketing (arquivo com-emailmkt.js).</p>'; return; } window.PR_COM_EMKT.abrir(el, { db, esc, uid, me }); };
   R.brief = el => { if (!window.PR_COM_BRIEFING) { el.innerHTML = '<p class="vazio">Não foi possível carregar o briefing (arquivo com-briefing.js).</p>'; return; } window.PR_COM_BRIEFING.abrir(el, { db, esc, $, uid, me, projs }); };

@@ -31,11 +31,29 @@ const addDia = (iso, k) => { const x = new Date(iso + 'T12:00:00'); x.setDate(x.
 const domingoDe = iso => addDia(iso, -new Date(iso + 'T12:00:00').getDay());
 const CAT_FIXA = 'Data fixa anual';
 const FIXAS_BASE = [
-  { id: 'fx-10-02', dia: '10-02', titulo: 'Dia Internacional da Não-Violência', descricao: '' },
-  { id: 'fx-05-04', dia: '05-04', titulo: '4 de maio', descricao: '' },
+  { id: 'fx-10-02', dia: '10-02', titulo: 'Dia Internacional da Não Violência', descricao: 'Nascimento de Gandhi; data da ONU.' },
+  { id: 'fx-05-04', dia: '05-04', titulo: 'Dia do Testemunho', descricao: 'A Cura do Sofrimento, Silo, Punta de Vacas, 1969.' },
   { id: 'fx-09-16', dia: '09-16', titulo: '16 de setembro', descricao: '' }
 ];
-const fixas = db => { let f = db.get('datas_fixas', null); if (!f) { f = FIXAS_BASE.map(x => ({ ...x })); db.set('datas_fixas', f); } return f; };
+// Projeto 4 Estações (acrescentado em 09/11/2026): o início de cada estação lembra o festival. A data do festival é marcada
+// a cada ano (em geral, no fim de semana mais próximo) e entra como atividade no Calendário Anual.
+const FIXAS_V2 = [
+  { id: 'fx-03-20', dia: '03-20', titulo: 'Início do outono · Festival de Outono', descricao: 'Projeto 4 Estações. Marque a data do festival deste ano no Calendário Anual.' },
+  { id: 'fx-06-21', dia: '06-21', titulo: 'Início do inverno · Festival de Inverno', descricao: 'Projeto 4 Estações. Marque a data do festival deste ano no Calendário Anual.' },
+  { id: 'fx-09-22', dia: '09-22', titulo: 'Início da primavera · Festival de Primavera', descricao: 'Projeto 4 Estações. Marque a data do festival deste ano no Calendário Anual.' },
+  { id: 'fx-12-21', dia: '12-21', titulo: 'Início do verão · Festival de Verão', descricao: 'Projeto 4 Estações. Marque a data do festival deste ano no Calendário Anual.' }
+];
+const ATIV_V2 = [{ id: 'fest-verao-2026', titulo: 'Festival de Verão', data: '2026-12-20', fim: '', hora: '', categoria: 'Encontro Estacional', local: 'Parque de Estudo e Reflexão Retiro', descricao: 'Projeto 4 Estações.' }];
+const fixas = db => {
+  let f = db.get('datas_fixas', null); if (!f) { f = FIXAS_BASE.map(x => ({ ...x })); db.set('datas_fixas', f); }
+  if (!db.get('datas_fixas_v2', null)) { // uma vez só: renomeia as datas antigas e acrescenta as do Projeto 4 Estações
+    FIXAS_BASE.forEach(b => { const ex = f.find(x => x.id === b.id); if (ex && (ex.titulo === '4 de maio' || ex.titulo === 'Dia Internacional da Não-Violência')) Object.assign(ex, { titulo: b.titulo, descricao: ex.descricao || b.descricao }); });
+    FIXAS_V2.forEach(n => { if (!f.some(x => x.id === n.id || x.dia === n.dia && x.titulo === n.titulo)) f.push({ ...n }); });
+    const at = db.get('ativ', []); ATIV_V2.forEach(a => { if (!at.some(x => x.id === a.id)) at.push({ ...a, criado: '2026-11-09', por: 'Sistema' }); });
+    db.set('datas_fixas', f); db.set('ativ', at); db.set('datas_fixas_v2', { em: '2026-11-09' });
+  }
+  return f;
+};
 // Atividades cadastradas + datas fixas repetidas em cada ano do intervalo [de, ate] (AAAA-MM-DD). Cada evento tem `key` estável.
 const eventos = (db, de, ate) => {
   const anos = []; for (let a = +de.slice(0, 4); a <= +ate.slice(0, 4); a++) anos.push(a);
