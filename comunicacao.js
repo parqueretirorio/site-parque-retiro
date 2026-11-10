@@ -55,7 +55,7 @@ const MEDIDAS_BASE = {
 // Checklist de materiais de cada ação (guardado na própria ação).
 const MATS = [['briefing', 'Briefing e ideia definidos'], ['texto', 'Texto e legenda aprovados'], ['arte', 'Arte ou vídeo pronto'], ['autorizacao', 'Autorização de uso de imagem confirmada (ou não se aplica)']];
 const ICONES = [['fab fa-instagram', 'Instagram'], ['fab fa-facebook', 'Facebook'], ['fab fa-youtube', 'YouTube'], ['fab fa-whatsapp', 'WhatsApp'], ['fab fa-tiktok', 'TikTok'], ['fab fa-telegram', 'Telegram'], ['fab fa-linkedin', 'LinkedIn'], ['fab fa-spotify', 'Spotify / podcast'], ['fas fa-envelope', 'E-mail / newsletter'], ['fas fa-globe', 'Site / blog'], ['fas fa-bullhorn', 'Outro']];
-const SUBS = [['cal', 'Calendário de Comunicação'], ['pub', 'Publicações'], ['gerar', 'Criar a partir do calendário'], ['redes', 'Redes sociais'], ['proj', 'Projetos e campanhas'], ['tipos', 'Tipos de publicação'], ['fixas', 'Datas fixas anuais'], ['site', 'Site'], ['brief', 'Briefing para o Claude']];
+const SUBS = [['cal', 'Calendário de Comunicação'], ['pub', 'Publicações'], ['gerar', 'Criar a partir do calendário'], ['redes', 'Redes sociais'], ['proj', 'Projetos e campanhas'], ['tipos', 'Tipos de publicação'], ['fixas', 'Datas fixas anuais'], ['site', 'Site'], ['emkt', 'E-mail marketing'], ['brief', 'Briefing para o Claude']];
 const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 const DIAS = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 const pad = n => String(n).padStart(2, '0');
@@ -622,6 +622,7 @@ window.PR_COMUNICACAO = { STATUS, abrir(me, root, H) {
   R.redes = el => catalogo(el, { chave: 'com_redes', get: redes, campo: 'rede', icone: 'fa-share-alt', visual: true, titulo: 'Redes sociais', novo: 'Nova rede social', intro: 'Redes usadas pelo Parque. Acrescente novas redes quando precisar; redes desativadas deixam de aparecer nas escolhas, mas as publicações antigas continuam salvas.' });
   R.proj = el => catalogo(el, { chave: 'com_projetos', get: projs, campo: 'projeto', icone: 'fa-flag', titulo: 'Projetos e campanhas', novo: 'Novo projeto ou campanha', intro: 'Cada publicação pode ser ligada a um projeto ou campanha (ex.: Celebração dos 15 anos, Marcha Mundial).' });
   R.tipos = el => catalogo(el, { chave: 'com_tipos', get: tipos, campo: 'tipo', icone: 'fa-photo-video', titulo: 'Tipos de publicação', novo: 'Novo tipo de publicação', intro: 'Formatos das publicações (post, carrossel, vídeo...). Acrescente outros quando surgirem.' });
+  R.emkt = el => { if (!window.PR_COM_EMKT) { el.innerHTML = '<p class="vazio">Não foi possível carregar o e-mail marketing (arquivo com-emailmkt.js).</p>'; return; } window.PR_COM_EMKT.abrir(el, { db, esc, uid, me }); };
   R.brief = el => { if (!window.PR_COM_BRIEFING) { el.innerHTML = '<p class="vazio">Não foi possível carregar o briefing (arquivo com-briefing.js).</p>'; return; } window.PR_COM_BRIEFING.abrir(el, { db, esc, $, uid, me, projs }); };
   R.fixas = el => D.gerirFixas(el, H, true, m => { msg = m; draw(); });
 
