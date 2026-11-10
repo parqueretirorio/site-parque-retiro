@@ -44,6 +44,15 @@ const FIXAS_V2 = [
   { id: 'fx-12-21', dia: '12-21', titulo: 'Início do verão · Festival de Verão', descricao: 'Projeto 4 Estações. Marque a data do festival deste ano no Calendário Anual.' }
 ];
 const ATIV_V2 = [{ id: 'fest-verao-2026', titulo: 'Festival de Verão', data: '2026-12-20', fim: '', hora: '', categoria: 'Encontro Estacional', local: 'Parque de Estudo e Reflexão Retiro', descricao: 'Projeto 4 Estações.' }];
+// Datas móveis: regra { n: 1..4 ou 5 (= último), sem: 0 (domingo) .. 6 } dentro do mês de `dia` (MM-..).
+const SEMANA = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
+const ORDEM = ['', '1º', '2º', '3º', '4º', 'último'];
+const diaDaRegra = (ano, mes, r) => {
+  if (r.n === 5) { const u = new Date(ano, mes, 0); return u.getDate() - ((u.getDay() - r.sem + 7) % 7); }
+  const p = new Date(ano, mes - 1, 1); return 1 + ((r.sem - p.getDay() + 7) % 7) + (r.n - 1) * 7;
+};
+const descFixa = f => f.regra ? `${ORDEM[f.regra.n]} ${SEMANA[f.regra.sem]} de ${MESES[+f.dia.slice(0, 2) - 1].toLowerCase()}` : f.dia.slice(3) + '/' + f.dia.slice(0, 2);
+const FIXAS_V3 = [{ id: 'fx-aniv-parque', dia: '10-08', regra: { n: 2, sem: 0 }, titulo: 'Aniversário Parque Retiro', descricao: 'Todo ano no 2º domingo de outubro.' }];
 const fixas = db => {
   let f = db.get('datas_fixas', null); if (!f) { f = FIXAS_BASE.map(x => ({ ...x })); db.set('datas_fixas', f); }
   if (!db.get('datas_fixas_v2', null)) { // uma vez só: renomeia as datas antigas e acrescenta as do Projeto 4 Estações
@@ -52,13 +61,15 @@ const fixas = db => {
     const at = db.get('ativ', []); ATIV_V2.forEach(a => { if (!at.some(x => x.id === a.id)) at.push({ ...a, criado: '2026-11-09', por: 'Sistema' }); });
     db.set('datas_fixas', f); db.set('ativ', at); db.set('datas_fixas_v2', { em: '2026-11-09' });
   }
+  if (!db.get('datas_fixas_v3', null)) { FIXAS_V3.forEach(n => { if (!f.some(x => x.id === n.id)) f.push({ ...n }); }); db.set('datas_fixas', f); db.set('datas_fixas_v3', { em: '2026-11-09' }); }
   return f;
 };
 // Atividades cadastradas + datas fixas repetidas em cada ano do intervalo [de, ate] (AAAA-MM-DD). Cada evento tem `key` estável.
 const eventos = (db, de, ate) => {
   const anos = []; for (let a = +de.slice(0, 4); a <= +ate.slice(0, 4); a++) anos.push(a);
   const fx = []; anos.forEach(a => fixas(db).forEach(f => {
-    const iso = `${a}-${f.dia}`, d = new Date(a, +f.dia.slice(0, 2) - 1, +f.dia.slice(3));
+    const dia = f.regra ? pad(diaDaRegra(a, +f.dia.slice(0, 2), f.regra)) : f.dia.slice(3);
+    const iso = `${a}-${f.dia.slice(0, 2)}-${dia}`, d = new Date(a, +f.dia.slice(0, 2) - 1, +dia);
     if (d.getMonth() !== +f.dia.slice(0, 2) - 1) return; // ex.: 29/02 em ano não bissexto
     fx.push({ id: `fx:${f.id}:${a}`, key: `f:${f.id}:${iso}`, fixa: true, titulo: f.titulo, descricao: f.descricao || '', data: iso, fim: '', hora: '', local: '', categoria: CAT_FIXA });
   }));
@@ -76,9 +87,11 @@ const gerirFixas = (el, H, pode, aoMudar) => {
     const l = fixas(db).slice().sort((a, b) => a.dia.localeCompare(b.dia)), e = ed && l.find(x => x.id === ed);
     el.innerHTML = `<h3><i class="fas fa-redo"></i> Datas fixas anuais</h3>
     <p>Datas que se repetem todos os anos e aparecem automaticamente nos calendários de qualquer ano (semanal, mensal, trimestral, semestral e anual).${pode ? '' : ' Seu acesso é de consulta.'}</p>
-    <div style="overflow-x:auto"><table class="doc-table"><thead><tr><th>Dia/mês</th><th>Data</th><th>Descrição</th><th></th></tr></thead><tbody>${l.map(f => `<tr><td>${dd(f.dia)}</td><td>${esc(f.titulo)}</td><td>${esc(f.descricao || '')}</td><td>${pode ? `<button class="icon-btn" data-fe="${f.id}" aria-label="Editar ${esc(f.titulo)}"><i class="fas fa-edit" style="color:var(--accent-color)"></i></button><button class="icon-btn" data-fd="${f.id}" aria-label="Excluir ${esc(f.titulo)}"><i class="fas fa-trash"></i></button>` : ''}</td></tr>`).join('') || '<tr><td colspan="4" class="vazio">Nenhuma data fixa.</td></tr>'}</tbody></table></div>
+    <div style="overflow-x:auto"><table class="doc-table"><thead><tr><th>Dia/mês</th><th>Data</th><th>Descrição</th><th></th></tr></thead><tbody>${l.map(f => `<tr><td>${esc(descFixa(f))}</td><td>${esc(f.titulo)}</td><td>${esc(f.descricao || '')}</td><td>${pode ? `<button class="icon-btn" data-fe="${f.id}" aria-label="Editar ${esc(f.titulo)}"><i class="fas fa-edit" style="color:var(--accent-color)"></i></button><button class="icon-btn" data-fd="${f.id}" aria-label="Excluir ${esc(f.titulo)}"><i class="fas fa-trash"></i></button>` : ''}</td></tr>`).join('') || '<tr><td colspan="4" class="vazio">Nenhuma data fixa.</td></tr>'}</tbody></table></div>
     ${pode ? `<form id="ff" class="form-reserva" novalidate style="margin-top:16px"><h4 style="margin-top:0">${e ? 'Editar data fixa' : 'Nova data fixa'}</h4>
-      <div class="form-row"><label for="f-d">Dia *</label><input id="f-d" type="number" min="1" max="31" value="${e ? +e.dia.slice(3) : ''}"></div>
+      <div class="form-row"><label for="f-tp">Repete como?</label><select id="f-tp"><option value="dia">Mesmo dia todo ano (ex.: 02/10)</option><option value="sem"${e && e.regra ? ' selected' : ''}>Dia da semana do mês (ex.: 2º domingo de outubro)</option></select></div>
+      <div class="form-row" id="f-dw"${e && e.regra ? ' hidden' : ''}><label for="f-d">Dia *</label><input id="f-d" type="number" min="1" max="31" value="${e && !e.regra ? +e.dia.slice(3) : ''}"></div>
+      <div class="form-row" id="f-sw"${e && e.regra ? '' : ' hidden'}><label for="f-n">Qual *</label><select id="f-n">${[1, 2, 3, 4, 5].map(n => `<option value="${n}"${e && e.regra && e.regra.n === n ? ' selected' : ''}>${ORDEM[n]}</option>`).join('')}</select> <select id="f-sd" aria-label="Dia da semana">${SEMANA.map((w, i) => `<option value="${i}"${e && e.regra && e.regra.sem === i ? ' selected' : ''}>${w}</option>`).join('')}</select></div>
       <div class="form-row"><label for="f-m">Mês *</label><select id="f-m">${MESES.map((m, i) => `<option value="${i + 1}"${e && +e.dia.slice(0, 2) === i + 1 ? ' selected' : ''}>${m}</option>`).join('')}</select></div>
       <div class="form-row"><label for="f-t">Nome da data *</label><input id="f-t" maxlength="120" value="${esc(e ? e.titulo : '')}"></div>
       <div class="form-row"><label for="f-s">Descrição (opcional)</label><input id="f-s" maxlength="200" value="${esc(e ? e.descricao || '' : '')}"></div>
@@ -88,14 +101,21 @@ const gerirFixas = (el, H, pode, aoMudar) => {
     el.querySelectorAll('[data-fe]').forEach(b => b.onclick = () => { ed = b.dataset.fe; erro = ''; draw(); });
     el.querySelectorAll('[data-fd]').forEach(b => b.onclick = () => { if (confirm('Excluir esta data fixa? Ela some de todos os anos (publicações já planejadas continuam salvas).')) { db.set('datas_fixas', fixas(db).filter(f => f.id !== b.dataset.fd)); aoMudar('Data fixa excluída.'); } });
     const x = $('#f-x', el); if (x) x.onclick = () => { ed = null; erro = ''; draw(); };
+    $('#f-tp', el).onchange = ev => { const sem = ev.target.value === 'sem'; $('#f-dw', el).hidden = sem; $('#f-sw', el).hidden = !sem; };
     $('#ff', el).onsubmit = ev => {
       ev.preventDefault(); const dia = parseInt($('#f-d', el).value, 10), mes = parseInt($('#f-m', el).value, 10), t = $('#f-t', el).value.trim(), ds = $('#f-s', el).value.trim();
       const falha = m => { erro = m; draw(); };
       if (!t) return falha('Informe o nome da data.');
-      const teste = new Date(2024, mes - 1, dia); // 2024 é bissexto: aceita 29/02
-      if (!(dia >= 1) || teste.getMonth() !== mes - 1) return falha('Dia inválido para o mês escolhido.');
-      const d = pad(mes) + '-' + pad(dia), l = fixas(db);
-      if (e) Object.assign(l.find(f => f.id === e.id), { dia: d, titulo: t, descricao: ds }); else l.push({ id: uid(), dia: d, titulo: t, descricao: ds });
+      const movel = $('#f-tp', el).value === 'sem';
+      let d, regra;
+      if (movel) { regra = { n: +$('#f-n', el).value, sem: +$('#f-sd', el).value }; d = pad(mes) + '-' + pad(regra.n === 5 ? 22 : (regra.n - 1) * 7 + 1); }
+      else {
+        const teste = new Date(2024, mes - 1, dia); // 2024 é bissexto: aceita 29/02
+        if (!(dia >= 1) || teste.getMonth() !== mes - 1) return falha('Dia inválido para o mês escolhido.');
+        d = pad(mes) + '-' + pad(dia);
+      }
+      const l = fixas(db), dados = { dia: d, titulo: t, descricao: ds };
+      if (e) { const alvo = l.find(f => f.id === e.id); Object.assign(alvo, dados); if (regra) alvo.regra = regra; else delete alvo.regra; } else l.push({ id: uid(), ...dados, ...(regra ? { regra } : {}) });
       db.set('datas_fixas', l); ed = null; erro = ''; aoMudar(e ? 'Data fixa atualizada.' : 'Data fixa cadastrada. Ela já aparece nos calendários de todos os anos.');
     };
   };
