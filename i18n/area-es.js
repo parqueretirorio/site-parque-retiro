@@ -1,4 +1,6 @@
 (function(){var d=(window.PR_I18N_DATA=window.PR_I18N_DATA||{}); d.es=Object.assign(d.es||{}, {
+"Voltar ao app": "Volver a la app",
+"Ajuda": "Ayuda",
 "# KB": "# KB",
 "# de #": "# de #",
 "# de # artigo(s).": "# de # artículo(s).",

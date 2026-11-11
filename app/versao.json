@@ -1,8 +1,8 @@
 {
-  "versao": "1.2.1",
+  "versao": "1.3.0",
   "data": "2026-11-11",
   "novidades": [
-    "Nomes das ferramentas também no idioma do celular",
-    "App em 6 idiomas (português, espanhol, italiano, francês, inglês e alemão)"
+    "Nova área Ajuda: guia do app passo a passo e explicação de cada ferramenta",
+    "Botão ? ao lado de cada ferramenta e busca por assunto"
   ]
 }

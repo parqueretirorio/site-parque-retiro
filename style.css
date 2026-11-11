@@ -1304,6 +1304,7 @@ details[open] .prod-cx-nome::before { content: '\25BE '; }
 
 /* Área restrita aberta pelo app CONecta Retiro (area-restrita.html?app=1) */
 body.modo-app > header, body.modo-app > footer { display: none; }
+body.modo-app #ajuda-app { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 16px 10px; font-size: 1.1rem; }
 body.modo-app #volta-app { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 16px; font-size: 1.1rem; }
 body.modo-app .page-hero { display: none; }
 

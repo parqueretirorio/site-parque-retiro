@@ -1544,7 +1544,11 @@ function painel() {
   const qApp = new URLSearchParams(location.search).get('app') === '1', alvo = new URLSearchParams(location.hash.slice(1)).get('t');
   if (qApp) {
     document.body.classList.add('modo-app');
-    if (!$('#volta-app')) { const v = document.createElement('a'); v.id = 'volta-app'; v.href = 'app/'; v.className = 'btn-visit btn-large'; v.innerHTML = '<i class="fas fa-arrow-left" aria-hidden="true"></i> Voltar ao app'; $('#app').prepend(v); }
+    if (!$('#volta-app')) { const v = document.createElement('a'); v.id = 'volta-app'; v.href = 'app/'; v.className = 'btn-visit btn-large'; v.innerHTML = '<i class="fas fa-arrow-left" aria-hidden="true"></i> Voltar ao app'; $('#app').prepend(v);
+      // "Ajuda": explicação da ferramenta aberta, na Ajuda do app (app/#ajuda-f/<ferramenta>)
+      const h = document.createElement('a'); h.id = 'ajuda-app'; h.href = 'app/#ajuda-f/' + encodeURIComponent(alvo || ''); h.className = 'btn-visit btn-large'; h.innerHTML = '<i class="fas fa-question-circle" aria-hidden="true"></i> Ajuda';
+      h.onclick = () => { const at = document.querySelector('.tab-btn[aria-selected="true"], .tab-btn.active'); h.href = 'app/#ajuda-f/' + encodeURIComponent((at && at.dataset.tab) || alvo || ''); };
+      v.after(h); }
   }
   if (alvo) irPara(alvo);
 }

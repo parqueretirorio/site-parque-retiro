@@ -1088,6 +1088,56 @@
    "atualizadoEm": "2026-11-02"
   },
   {
+   "id": "usar-o-app",
+   "categoria": "conecta",
+   "ordem": 2,
+   "titulo": "Usar o app CONecta Retiro no celular",
+   "resumo": "O app CONecta Retiro leva a área restrita para o celular: mesma conta, mesmos dados, letra grande e ajuda passo a passo.",
+   "publico": "todos",
+   "status": "publicado",
+   "palavras": [
+    "app",
+    "aplicativo",
+    "celular",
+    "instalar",
+    "baixar",
+    "android",
+    "iphone",
+    "atualizar",
+    "versão",
+    "ajuda"
+   ],
+   "onde": "",
+   "secoes": {
+    "oQueE": "O **CONecta Retiro** também existe como **app no celular**, para as comissões e a administração. Ele usa a **mesma conta e os mesmos dados** da área restrita do site: o que você salva no app aparece no computador e vice-versa.",
+    "finalidade": "Facilitar o dia a dia de quem cuida do Parque: ver avisos e agenda, consultar a biblioteca e abrir as ferramentas das suas responsabilidades direto do celular, com letra grande e um assunto por tela.",
+    "passos": [
+     "**Instale**: abra o endereço do app no celular (o botão **Baixar o app** aparece também na página Entrar do site). No Android, toque em **Baixar o app** ou nos três pontinhos ⋮ › **Instalar app**; no iPhone, toque em **Compartilhar** › **Adicionar à Tela de Início**.",
+     "**Entre** com o seu e-mail e a sua senha (a mesma conta do site; veja [[criar-conta-e-entrar|Criar conta e entrar]]).",
+     "Na tela **Início** aparecem: **Para toda a equipe** (Avisos e agenda, Biblioteca, Atividades, Reunião de Escola), **Minhas responsabilidades** (as ferramentas das suas funções) e **Ver todas as áreas**.",
+     "Toque no nome de uma ferramenta para abri-la; para voltar, toque em **Voltar ao app**.",
+     "Toque no **?** ao lado de uma ferramenta, ou em **Ajuda**, para ler a explicação. A Ajuda tem o guia do app e uma busca por assunto.",
+     "Quando houver versão nova, toque em **Atualizar agora** na faixa que aparece. A versão em uso fica no fim da tela Início."
+    ],
+    "exemplos": [
+     "Uma pessoa da comissão de Alojamento abre o app, toca em **Minhas responsabilidades › Alojamento** e confere os pedidos de reserva do fim de semana.",
+     "Quem está com um livro emprestado abre **Biblioteca** e vê a data para devolver em \"Livros comigo\"."
+    ],
+    "cuidados": [
+     "O app é só para as **comissões e a administração**; a área aberta do site continua para todos.",
+     "O idioma do app segue o do celular e pode ser trocado no fim da tela Início.",
+     "Sem internet, o app mostra o que já estava carregado e envia as alterações quando a conexão voltar."
+    ]
+   },
+   "imagens": [],
+   "relacionados": [
+    "painel-conecta",
+    "criar-conta-e-entrar",
+    "nao-consigo-entrar"
+   ],
+   "atualizadoEm": "2026-11-11"
+  },
+  {
    "id": "formularios-e-listas",
    "categoria": "conecta",
    "ordem": 2,
@@ -7038,7 +7088,8 @@
   "r.el_fonte": "elementos-descricoes",
   "r.el_centro-trabalho": "elementos-descricoes",
   "r.el_centro-estudos": "elementos-descricoes",
-  "r.el_oficinas": "elementos-descricoes"
+  "r.el_oficinas": "elementos-descricoes",
+  "p.app": "usar-o-app"
  },
  "esquema": {
   "artigo": "id, categoria, ordem, titulo, resumo, publico (todos|equipe), status (publicado|rascunho), palavras[], onde, secoes{oQueE, finalidade, passos[], exemplos[], cuidados[]}, imagens[{src, legenda, alt}], relacionados[], atualizadoEm",
