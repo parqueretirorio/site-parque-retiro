@@ -1301,3 +1301,8 @@ details[open] .prod-cx-nome::before { content: '\25BE '; }
 .bf-botoes { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
 .bf-rotulo { display: block; font-weight: 600; margin: 12px 0 4px; }
 .bf-saida { width: 100%; font-family: Consolas, 'Courier New', monospace; font-size: .9rem; line-height: 1.5; border: 1px solid #cfd8e0; border-radius: 8px; padding: 10px; }
+
+/* Área restrita aberta pelo app CONecta Retiro (area-restrita.html?app=1) */
+body.modo-app > header, body.modo-app > footer { display: none; }
+body.modo-app #volta-app { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 16px; font-size: 1.1rem; }
+body.modo-app .page-hero { display: none; }

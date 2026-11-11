@@ -37,7 +37,7 @@ function ligado() {
   if (/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || location.protocol === 'file:') return false;
   return c.modo === 'supabase';
 }
-const paginaRestrita = () => { const p = document.body && document.body.dataset.page; return p === 'painel' || p === 'login'; };
+const paginaRestrita = () => { const p = document.body && document.body.dataset.page; return p === 'painel' || p === 'login' || p === 'app'; };
 
 // ---------- sessão ----------
 function sessao() { try { const s = JSON.parse(localStorage.getItem(SESSAO) || 'null'); return s && s.access_token ? s : null; } catch (e) { return null; } }
@@ -95,7 +95,7 @@ const paraUser = p => ({ id: p.id, nome: p.nome, email: String(p.email || '').to
 const SELECT_PERFIS = '/rest/v1/perfis?select=id,nome,email,whatsapp,lgpd,nivel,status,funcoes,criado_em&order=criado_em.asc';
 
 // ---------- login, cadastro e senha ----------
-const linkVolta = () => location.href.split(/[?#]/)[0].replace(/[^/]*$/, '') + 'login.html';
+const linkVolta = () => location.href.split(/[?#]/)[0].replace(/[^/]*$/, '').replace(/app\/$/, '') + 'login.html'; // do app também volta à página Entrar do site
 async function entrar(email, senha) {
   const r = await http('POST', '/auth/v1/token?grant_type=password', { email, password: senha });
   if (r.status === 0) return { erro: 'Sem conexão com o servidor. Confira a internet e tente de novo.' };
