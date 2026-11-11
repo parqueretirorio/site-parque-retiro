@@ -1575,7 +1575,7 @@ function loginServidor() {
       <button type="button" class="tab-btn${modo === 'entrar' || modo === 'esqueci' ? ' active' : ''}" data-m="entrar">Entrar</button>
       <button type="button" class="tab-btn${cad ? ' active' : ''}" data-m="cadastro">Criar conta</button></div>`}
     <h2>${TIT[modo]}</h2>
-    <p>${cad ? 'Preencha os dados abaixo. Vamos mandar um e-mail para você confirmar o endereço; depois, a comissão do Parque Retiro aprova ou não o seu acesso.' : modo === 'esqueci' ? 'Digite o e-mail do seu cadastro. Vamos mandar um link para você criar uma senha nova.' : modo === 'nova' ? 'Digite a nova senha duas vezes.' : 'Acesso para Mestres'}</p>
+    <p>${cad ? 'Preencha os dados abaixo. Vamos mandar um e-mail para você confirmar o endereço; depois, a comissão do Parque Retiro aprova ou não o seu acesso.' : modo === 'esqueci' ? 'Digite o e-mail do seu cadastro. Vamos mandar um link para você criar uma senha nova.' : modo === 'nova' ? 'Digite a nova senha duas vezes.' : 'Acesso para as comissões e a administração do Parque'}</p>
     ${aviso ? `<p class="tip-box" role="status">${esc(aviso)}</p>` : ''}
     <form id="f" novalidate>${cad ? '<div class="form-row"><label for="n">Nome completo *</label><input id="n" autocomplete="name" maxlength="80"></div>' : ''}
     ${modo === 'nova' ? '' : '<div class="form-row"><label for="e">E-mail *</label><input id="e" type="email" autocomplete="username"></div>'}

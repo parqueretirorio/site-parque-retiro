@@ -1306,3 +1306,12 @@ details[open] .prod-cx-nome::before { content: '\25BE '; }
 body.modo-app > header, body.modo-app > footer { display: none; }
 body.modo-app #volta-app { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 16px; font-size: 1.1rem; }
 body.modo-app .page-hero { display: none; }
+
+/* Página Entrar: chamada para o app CONecta Retiro */
+.app-promo { display: grid; grid-template-columns: 80px 1fr; gap: 12px 16px; align-items: center; margin-top: 18px; }
+.app-promo img { border-radius: 18px; box-shadow: 0 2px 8px rgba(0,0,0,.15); background: #fff; }
+.app-promo h3 { margin: 0 0 4px; }
+.app-promo p { margin: 0 0 4px; }
+.app-promo .app-ver { font-size: .9rem; color: #555; }
+.app-promo .app-novo { grid-column: 1 / -1; font-size: .9rem; }
+.app-promo .btn-visit { grid-column: 1 / -1; justify-content: center; text-align: center; }

@@ -94,11 +94,25 @@
     <a href="login.html" class="btn-entrar"><i class="fas fa-user-lock"></i> Entrar</a>
 </header>
 
-<div class="page-hero"><h1>Entrar</h1><p>Acesso para Mestres</p></div>
+<div class="page-hero"><h1>Entrar</h1><p>Acesso para as comissões e a administração</p></div>
 
 <div class="container">
     <div class="login-wrap"><div class="panel" id="loginBox"></div>
-    <p class="aviso-local">Os dados da área restrita ficam salvos neste navegador. Para usar em vários computadores, o site precisa de um servidor.</p></div>
+    <aside class="panel app-promo" id="app-promo" aria-label="App CONecta Retiro">
+        <img src="app/icone-192.png" alt="Ícone do app CONecta Retiro" width="80" height="80">
+        <div><h3>App CONecta Retiro</h3><p>A área restrita no seu celular, com letra grande e botões simples.</p>
+        <p class="app-ver" id="app-ver">Versão 1.1.0</p></div>
+        <a class="btn-visit btn-large" href="app/"><i class="fas fa-download" aria-hidden="true"></i> Baixar o app</a>
+    </aside>
+    <script>
+    // Versão do app sempre atual (lida de app/versao.json) e aviso quando houver atualização desde a última visita.
+    fetch('app/versao.json?t=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(v => {
+      if (!v) return; const el = document.getElementById('app-ver'), d = String(v.data || '').split('-').reverse().join('/');
+      let vista = null; try { vista = localStorage.getItem('app-versao-vista'); localStorage.setItem('app-versao-vista', v.versao); } catch (e) {}
+      el.textContent = 'Versão ' + v.versao + (d ? ' · ' + d : '');
+      if (vista && vista !== v.versao) { el.innerHTML += ' <span class="badge st-aprovado">Atualizado</span>'; const n = document.createElement('p'); n.className = 'app-novo'; n.textContent = 'Novidades: ' + (v.novidades || []).join(' · '); el.after(n); }
+    }).catch(() => {});
+    </script></div>
 </div>
 
 <footer>

@@ -17,7 +17,46 @@ const tela = $('#tela');
 const ferramenta = id => '../area-restrita.html?app=1#t=' + encodeURIComponent(id);
 let me = null;
 
+const VERSAO = '1.1.0', DATA_VERSAO = '11/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+
+/* ---------- Instalar o app e atualizações ---------- */
+let pedidoInstalar = null, novaVersao = null;
+const instalado = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const ehIphone = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+let fechouInstalar = false; try { fechouInstalar = sessionStorage.getItem('app-instalar-fechado') === '1'; } catch (e) { /* ignora */ }
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); pedidoInstalar = e; desenhaAvisos(); });
+window.addEventListener('appinstalled', () => { pedidoInstalar = null; desenhaAvisos(); });
+const cmp = (a, b) => { const x = String(a).split('.').map(Number), y = String(b).split('.').map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) - (y[i] || 0); } return 0; };
+fetch('versao.json?t=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(v => { if (v && cmp(v.versao, VERSAO) > 0) { novaVersao = v; desenhaAvisos(); } }).catch(() => {});
+function cartaoInstalar() {
+  if (instalado() || fechouInstalar) return '';
+  const como = pedidoInstalar ? '<button type="button" class="bt bt-principal" id="bt-instalar"><i class="fas fa-download" aria-hidden="true"></i> Baixar o app</button>'
+    : ehIphone() ? '<ol class="passos"><li>Toque em <b>Compartilhar</b> <i class="fas fa-arrow-up-from-bracket" aria-hidden="true"></i> (embaixo, no Safari).</li><li>Toque em <b>Adicionar à Tela de Início</b>.</li><li>Toque em <b>Adicionar</b>.</li></ol>'
+    : '<ol class="passos"><li>Toque nos <b>três pontinhos ⋮</b> do navegador (em cima, à direita).</li><li>Toque em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li></ol>';
+  return `<section class="instalar" aria-label="Instalar o app"><img src="icone-192.png" alt="Ícone do app CONecta Retiro" width="72" height="72">
+    <div><h2>Tenha o app no celular</h2><p>O ícone do <b>CONecta Retiro</b> fica na tela do seu celular, como os outros apps.</p></div>
+    ${como}<button type="button" class="fechar" id="fecha-instalar" aria-label="Fechar o aviso de instalar">Agora não</button></section>`;
+}
+function faixaAtualizar() {
+  if (!novaVersao) return '';
+  return `<section class="atualizar" role="status"><p><i class="fas fa-sync-alt" aria-hidden="true"></i> <b>Nova versão ${esc(novaVersao.versao)} disponível.</b>${(novaVersao.novidades || []).length ? '<br><small>' + novaVersao.novidades.map(esc).join(' · ') + '</small>' : ''}</p>
+    <button type="button" class="bt bt-principal" id="bt-atualizar"><i class="fas fa-download" aria-hidden="true"></i> Atualizar agora</button></section>`;
+}
+const rodape = () => `<p class="versao">CONecta Retiro · versão ${VERSAO} (${DATA_VERSAO})</p>`;
+async function atualizar() {
+  const b = $('#bt-atualizar'); if (b) { b.disabled = true; b.textContent = 'Atualizando...'; }
+  try { if (navigator.serviceWorker) { const r = await navigator.serviceWorker.getRegistration(); if (r) { await r.update(); if (r.waiting) r.waiting.postMessage('atualizar'); } } } catch (e) { /* segue */ }
+  try { if (window.caches) { const ks = await caches.keys(); await Promise.all(ks.map(k => caches.delete(k))); } } catch (e) { /* segue */ }
+  location.reload();
+}
+function desenhaAvisos() {
+  const box = $('#avisos-app'); if (!box) return;
+  box.innerHTML = faixaAtualizar() + cartaoInstalar();
+  const bi = $('#bt-instalar'); if (bi) bi.onclick = async () => { pedidoInstalar.prompt(); try { await pedidoInstalar.userChoice; } catch (e) { /* ignora */ } pedidoInstalar = null; desenhaAvisos(); };
+  const fi = $('#fecha-instalar'); if (fi) fi.onclick = () => { fechouInstalar = true; try { sessionStorage.setItem('app-instalar-fechado', '1'); } catch (e) { /* ignora */ } desenhaAvisos(); };
+  const ba = $('#bt-atualizar'); if (ba) ba.onclick = atualizar;
+}
 
 const topo = (titulo, voltar) => `<header class="topo">${voltar ? '<a class="voltar" href="#inicio"><i class="fas fa-arrow-left" aria-hidden="true"></i> Início</a>' : ''}<h1>${titulo}</h1></header>`;
 const aviso = () => { const e = D.estadoSync(); return e.estado === 'offline' ? `<p class="faixa faixa-alerta" role="status"><i class="fas fa-wifi" aria-hidden="true"></i> Sem conexão. ${e.pendentes ? e.pendentes + ' alteração(ões) aguardando.' : 'Mostrando o que já estava carregado.'}</p>` : ''; };
@@ -28,6 +67,7 @@ function entrar(msg) {
   tela.innerHTML = `<main class="entrar">
     <img class="logo" src="icone-192.png" alt="" width="96" height="96">
     <h1>CONecta Retiro</h1><p class="sub">Parque de Estudo e Reflexão Retiro<br>Comissões e administração</p>
+    <div id="avisos-app"></div>
     ${msg ? `<p class="faixa faixa-alerta" role="alert">${esc(msg)}</p>` : ''}
     <form id="fe" novalidate>
       <label for="e">Seu e-mail</label><input id="e" type="email" autocomplete="username" inputmode="email">
@@ -37,7 +77,9 @@ function entrar(msg) {
       <button class="bt bt-principal" id="be">Entrar</button>
     </form>
     <p class="links"><a href="../login.html">Esqueci minha senha</a><br><a href="../login.html">Ainda não tenho acesso</a></p>
+    ${rodape()}
   </main>`;
+  desenhaAvisos();
   $('#ms').onchange = ev => { $('#s').type = ev.target.checked ? 'text' : 'password'; };
   $('#fe').onsubmit = async ev => {
     ev.preventDefault();
@@ -65,7 +107,7 @@ function inicio() {
   const pend = me.nivel === 'administrador' ? db.get('users', []).filter(u => (u.status || 'aprovado') === 'pendente').length : 0;
   const prox = DOC ? DOC.eventos(db, hoje(), somaDias(hoje(), 14)).length : 0;
   tela.innerHTML = `<header class="topo topo-ola"><p>Olá, ${esc(primeiro(me.nome))}!</p><h1>O que você quer fazer?</h1></header>${aviso()}
-  <main>
+  <main><div id="avisos-app"></div>
     <h2>Para toda a equipe</h2>
     <div class="grade">
       ${botao('#agenda', 'fa-calendar-alt', 'Avisos e agenda', prox ? `<b class="selo">${prox}</b>` : '')}
@@ -76,7 +118,9 @@ function inicio() {
     ${minhas.length ? `<h2>Minhas responsabilidades</h2><div class="lista">${minhas.map(t => `<a class="linha" href="${ferramenta(t[0])}"><i class="fas ${t[1]}" aria-hidden="true"></i><span>${esc(t[2])}</span>${t[0] === 'users' && pend ? `<b class="selo">${pend}</b>` : ''}<i class="fas fa-chevron-right seta" aria-hidden="true"></i></a>`).join('')}</div>` : ''}
     <a class="bt bt-claro" href="#areas"><i class="fas fa-th-large" aria-hidden="true"></i> Ver todas as áreas</a>
     <button type="button" class="bt bt-texto" id="sair">Sair do app</button>
+    ${rodape()}
   </main>`;
+  desenhaAvisos();
   $('#sair').onclick = async () => { try { if (D.estadoSync().pendentes) await D.sincronizar(); } catch (e) { /* segue */ } await SB.sair(); sessionStorage.removeItem('pr_sess'); history.replaceState(null, '', location.pathname + location.search); location.reload(); };
 }
 
