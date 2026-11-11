@@ -1,8 +1,8 @@
 {
-  "versao": "1.2.0",
+  "versao": "1.2.1",
   "data": "2026-11-11",
   "novidades": [
-    "App em 6 idiomas: abre sozinho na língua do celular (português, espanhol, italiano, francês, inglês e alemão)",
-    "Escolha do idioma no rodapé"
+    "Nomes das ferramentas também no idioma do celular",
+    "App em 6 idiomas (português, espanhol, italiano, francês, inglês e alemão)"
   ]
 }

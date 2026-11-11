@@ -117,8 +117,10 @@ function detectar() {
   return ls.find(l => T[l]) || 'pt';
 }
 let atual = detectar();
-const t = (k, vars) => { let s = (T[atual] && T[atual][k]) || T.pt[k] || k; if (vars) Object.keys(vars).forEach(v => { s = s.split('{' + v + '}').join(vars[v]); }); return s; };
+const ABAS = window.PR_APP_ABAS_I18N || {};
+const t = (k, vars) => { let s = (T[atual] && T[atual][k]) || (ABAS[atual] && ABAS[atual][k]) || T.pt[k] || k; if (vars) Object.keys(vars).forEach(v => { s = s.split('{' + v + '}').join(vars[v]); }); return s; };
 function mudar(l) { if (!T[l]) return; atual = l; try { localStorage.setItem('pr_idioma', l); } catch (e) { /* ignora */ } document.documentElement.lang = LOCALE[l]; }
 document.documentElement.lang = LOCALE[atual];
-window.PR_APP_I18N = { t, mudar, atual: () => atual, locale: () => LOCALE[atual], NOMES, LINGUAS: Object.keys(T) };
+const aba = (id, ptNome) => (atual !== 'pt' && ABAS[atual] && ABAS[atual]['tab_' + id]) || ptNome;
+window.PR_APP_I18N = { t, aba, mudar, atual: () => atual, locale: () => LOCALE[atual], NOMES, LINGUAS: Object.keys(T) };
 })();

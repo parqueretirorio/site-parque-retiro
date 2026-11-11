@@ -21,7 +21,7 @@ let me = null;
 // Mensagens do login vêm em português do adaptador; aqui viram o idioma do app.
 const traduzErro = m => /incorretos/.test(m) ? t('errCred') : /confirmar seu e-mail/.test(m) ? t('errConf') : /Sem conexão/.test(m) ? t('errRede') : /Muitas tentativas/.test(m) ? t('errMuitas') : m;
 
-const VERSAO = '1.2.0', DATA_VERSAO = '11/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
+const VERSAO = '1.2.1', DATA_VERSAO = '11/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 
 /* ---------- Instalar o app e atualizações ---------- */
@@ -123,7 +123,7 @@ function inicio() {
       ${tabs.some(t => t[0] === 'atividades') ? botao(ferramenta('atividades'), 'fa-calendar-check', t('atividades')) : ''}
       ${tabs.some(t => t[0] === 'reuniao') ? botao(ferramenta('reuniao'), 'fa-users', t('reuniao')) : ''}
     </div>
-    ${minhas.length ? `<h2>${t('minhas')}</h2><div class="lista">${minhas.map(t => `<a class="linha" href="${ferramenta(t[0])}"><i class="fas ${t[1]}" aria-hidden="true"></i><span>${esc(t[2])}</span>${t[0] === 'users' && pend ? `<b class="selo">${pend}</b>` : ''}<i class="fas fa-chevron-right seta" aria-hidden="true"></i></a>`).join('')}</div>` : ''}
+    ${minhas.length ? `<h2>${t('minhas')}</h2><div class="lista">${minhas.map(t => `<a class="linha" href="${ferramenta(t[0])}"><i class="fas ${t[1]}" aria-hidden="true"></i><span>${esc(I.aba(t[0], t[2]))}</span>${t[0] === 'users' && pend ? `<b class="selo">${pend}</b>` : ''}<i class="fas fa-chevron-right seta" aria-hidden="true"></i></a>`).join('')}</div>` : ''}
     <a class="bt bt-claro" href="#areas"><i class="fas fa-th-large" aria-hidden="true"></i> ${t('todas')}</a>
     <button type="button" class="bt bt-texto" id="sair">${t('sair')}</button>
     ${rodape()}
@@ -179,7 +179,7 @@ function areas() {
   document.title = t('todasTit') + ' · CONecta Retiro';
   const tabs = abas(), grupos = (A ? A.AREAS : []).map(a => [a, tabs.filter(t => t[5] === a.id)]).filter(g => g[1].length);
   tela.innerHTML = topo(t('todasTit'), true) + aviso() + `<main>
-    ${grupos.map(([a, l]) => `<h2><i class="fas ${a.icone}" aria-hidden="true"></i> ${esc(t('area_' + a.id) === 'area_' + a.id ? a.nome : t('area_' + a.id))}</h2><div class="lista">${l.map(t => `<a class="linha" href="${ferramenta(t[0])}"><i class="fas ${t[1]}" aria-hidden="true"></i><span>${esc(t[2])}</span><i class="fas fa-chevron-right seta" aria-hidden="true"></i></a>`).join('')}</div>`).join('')}
+    ${grupos.map(([a, l]) => `<h2><i class="fas ${a.icone}" aria-hidden="true"></i> ${esc(t('area_' + a.id) === 'area_' + a.id ? a.nome : t('area_' + a.id))}</h2><div class="lista">${l.map(t => `<a class="linha" href="${ferramenta(t[0])}"><i class="fas ${t[1]}" aria-hidden="true"></i><span>${esc(I.aba(t[0], t[2]))}</span><i class="fas fa-chevron-right seta" aria-hidden="true"></i></a>`).join('')}</div>`).join('')}
   </main>`;
 }
 
