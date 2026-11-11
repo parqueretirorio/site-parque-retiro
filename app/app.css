@@ -106,3 +106,7 @@ input[type=email], input[type=password], input[type=text], input[type=search] { 
   .instalar { grid-template-columns: 1fr; text-align: center; justify-items: center; padding: 0.7rem; }
   .instalar .passos { text-align: left; justify-self: stretch; padding-left: 1.2rem; }
 }
+.idioma { text-align: center; margin: 22px 0 0; font-size: 0.9rem; }
+.idioma label { font-weight: 400; margin: 0; }
+.idioma select { font: inherit; font-size: 0.9rem; padding: 6px 10px; border: 2px solid var(--borda); border-radius: 10px; background: #fff; color: var(--texto); min-height: 2.2rem; }
+.idioma + .versao { margin-top: 8px; }

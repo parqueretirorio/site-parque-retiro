@@ -112,8 +112,15 @@ async function entrar(email, senha) {
   if (perfil.status !== 'aprovado') { await sair(); return { perfil, pendente: true }; }
   return { perfil };
 }
+// Idioma da pessoa (o mesmo do site e do app): vai junto no cadastro para o e-mail de confirmação sair na língua dela.
+function idiomaAtual() {
+  const ok = ['pt', 'es', 'it', 'fr', 'en', 'de']; let s = null; try { s = localStorage.getItem('pr_idioma'); } catch (e) { /* ignora */ }
+  if (ok.includes(s)) return s;
+  const l = String((navigator.languages && navigator.languages[0]) || navigator.language || 'pt').slice(0, 2).toLowerCase();
+  return ok.includes(l) ? l : 'pt';
+}
 async function cadastrar(d) {
-  const r = await http('POST', '/auth/v1/signup?redirect_to=' + encodeURIComponent(linkVolta()), { email: d.email, password: d.senha, data: { nome: d.nome, whatsapp: d.whatsapp, lgpd: d.lgpd } });
+  const r = await http('POST', '/auth/v1/signup?redirect_to=' + encodeURIComponent(linkVolta()), { email: d.email, password: d.senha, data: { nome: d.nome, whatsapp: d.whatsapp, lgpd: d.lgpd, idioma: d.idioma || idiomaAtual() } });
   if (r.status === 0) return { erro: 'Sem conexão com o servidor. Confira a internet e tente de novo.' };
   if (r.status === 200 || r.status === 201) { if (r.corpo && r.corpo.access_token) await sair(); return { ok: true }; }
   const m = msgErro(r.corpo);
@@ -123,7 +130,7 @@ async function cadastrar(d) {
   return { erro: 'Não foi possível criar a conta agora (' + (m || r.status) + ').' };
 }
 async function recuperar(email) {
-  const r = await http('POST', '/auth/v1/recover?redirect_to=' + encodeURIComponent(linkVolta() + '?redefinir=1'), { email });
+  const r = await http('POST', '/auth/v1/recover?redirect_to=' + encodeURIComponent(linkVolta() + '?redefinir=1'), { email, data: { idioma: idiomaAtual() } });
   if (r.status === 0) return { erro: 'Sem conexão com o servidor. Confira a internet e tente de novo.' };
   if (r.status === 429) return { erro: 'Muitos pedidos seguidos. Espere alguns minutos e tente de novo.' };
   return { ok: true }; // por segurança, a resposta é a mesma exista ou não o e-mail

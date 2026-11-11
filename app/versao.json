@@ -1,8 +1,8 @@
 {
-  "versao": "1.1.2",
+  "versao": "1.2.0",
   "data": "2026-11-11",
   "novidades": [
-    "Letra e botões no tamanho certo em cada celular, mesmo com a letra do sistema aumentada",
-    "Aviso para instalar o app, versão e aviso de atualização"
+    "App em 6 idiomas: abre sozinho na língua do celular (português, espanhol, italiano, francês, inglês e alemão)",
+    "Escolha do idioma no rodapé"
   ]
 }
