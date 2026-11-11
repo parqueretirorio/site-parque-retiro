@@ -32,7 +32,10 @@ function ligado() {
   try { o = localStorage.getItem(MODO); } catch (e) { /* ignora */ }
   if (!base() || !conf().chavePublica) return false;
   if (o === 'local') return false;
-  return c.modo === 'supabase' || o === 'supabase';
+  if (o === 'supabase') return true;
+  // Testes no próprio computador (localhost) continuam no modo do navegador, a não ser com ?servidor=1.
+  if (/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || location.protocol === 'file:') return false;
+  return c.modo === 'supabase';
 }
 const paginaRestrita = () => { const p = document.body && document.body.dataset.page; return p === 'painel' || p === 'login'; };
 

@@ -5,7 +5,7 @@
 //   Para TESTAR o Supabase só neste navegador, sem mudar esta linha: abra login.html?servidor=1 (volta com ?servidor=0).
 // Não coloque senhas nem chaves secretas aqui: este arquivo é público.
 window.PR_CONFIG_DADOS = {
-  modo: 'local',
+  modo: 'supabase', // ligado para todos em 11/11/2026 (no localhost continua 'local' para testes)
   url: '',            // ex.: 'https://www.parqueretiro.org.br/conecta/api'
   token: null,
   // Banco do Parque no Supabase (São Paulo). A chave "publishable" é PÚBLICA por natureza: a proteção dos dados
