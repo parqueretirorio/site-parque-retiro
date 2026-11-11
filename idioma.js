@@ -11,6 +11,8 @@ var ROTULO = { pt: 'Idioma', es: 'Idioma', it: 'Lingua', fr: 'Langue', en: 'Lang
 var INLINE = { A: 1, STRONG: 1, EM: 1, B: 1, I: 1, SPAN: 1, SMALL: 1, BR: 1, MARK: 1, CODE: 1, SUP: 1, SUB: 1, U: 1, ABBR: 1, TIME: 1, LABEL: 0 };
 var PULA = { SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, IFRAME: 1, SVG: 1, CANVAS: 1, TEXTAREA: 1, SELECT: 1, OPTION: 1, CODE: 1, PRE: 1 };
 var ATTRS = ['title', 'alt', 'placeholder', 'aria-label'];
+// Área restrita, login e app carregam também a tabela própria (i18n/area-<idioma>.js) e traduzem por pedaços, listas de escolha e números.
+var EXTRA = window.PR_I18N_EXTRA || [], PEDACOS = EXTRA.length > 0;
 var atual = 'pt', dados = window.PR_I18N_DATA = window.PR_I18N_DATA || {}, orig = new WeakMap(), origAttr = new WeakMap(), ocupado = false, timer = null;
 
 function guarda(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* sem armazenamento: vale só nesta página */ } }
@@ -69,6 +71,10 @@ function coletar() { // usado pelo teste e pela extração: devolve todas as cha
   var ks = {}; restaura(document.body);
   varre(document.body, function (el) { var k = chaveDe(el); if (k && !ehData(k) && /[A-Za-zÀ-ÿ]/.test(k.replace(/<[^>]+>/g, ''))) ks[k] = 1; });
   atributos(document.body, function (el, a) { var k = norm(el.getAttribute(a)); if (k && !ehData(k) && /[A-Za-zÀ-ÿ]/.test(k)) ks[k] = 1; });
+  if (PEDACOS) { // área restrita: também cada pedaço de texto e as opções das listas
+    varre(document.body, function (el) { (function anda(n) { for (var c = n.firstChild; c; c = c.nextSibling) { if (c.nodeType === 3) { var k = norm(c.nodeValue); if (k && /[A-Za-zÀ-ÿ]/.test(k) && !ehData(k)) ks[k] = 1; } else if (c.nodeType === 1 && !ehIcone(c)) anda(c); } })(el); });
+    Array.prototype.slice.call(document.querySelectorAll('option')).forEach(function (o) { var k = norm(o.textContent); if (k && /[A-Za-zÀ-ÿ]/.test(k)) ks[k] = 1; });
+  }
   var t = parteTitulo(document.title)[0]; if (t) ks[t] = 1;
   var m = document.querySelector('meta[name="description"]'); if (m && m.content) ks[norm(m.content)] = 1;
   return Object.keys(ks);
@@ -80,20 +86,42 @@ function restaura(raiz) {
 }
 function varreOrig(raiz, fn) { var els = [raiz].concat(Array.prototype.slice.call(raiz.querySelectorAll('*'))); els.forEach(function (el) { if (orig.has(el)) { fn(el, orig.get(el)); orig.delete(el); } }); }
 
+// Procura na tabela: texto exato; senão, o mesmo texto com os números trocados por # (ex.: "Pedidos (3)" usa a chave "Pedidos (#)").
+var RE_NUM = /\d+(?:[.,]\d+)*/g;
+function busca(tab, k, lang) {
+  var t = tab[k] || regra(k, lang); if (t) return t;
+  if (!/\d/.test(k)) return null;
+  var nums = k.match(RE_NUM) || [], m = tab[k.replace(RE_NUM, '#')]; if (!m) return null;
+  var i = 0; return m.replace(/#/g, function () { return i < nums.length ? nums[i++] : '#'; });
+}
+// Quando o bloco inteiro não está na tabela (porque traz um nome, um valor...), traduz pedaço por pedaço o texto que estiver.
+function traduzPedacos(el, tab, lang) {
+  var mudou = false, html0 = el.innerHTML;
+  (function anda(n) {
+    for (var c = n.firstChild; c; c = c.nextSibling) {
+      if (c.nodeType === 3) { var raw = c.nodeValue, k = norm(raw); if (!k || !/[A-Za-zÀ-ÿ]/.test(k)) continue; var t = busca(tab, k, lang); if (t && t !== k) { var ini = raw.match(/^\s*/)[0], fim = raw.match(/\s*$/)[0]; c.nodeValue = ini + t.replace(/<[^>]+>/g, '') + fim; mudou = true; } }
+      else if (c.nodeType === 1 && !ehIcone(c) && !naoTraduzir(c)) anda(c);
+    }
+  })(el);
+  if (mudou && !orig.has(el)) orig.set(el, html0);
+}
 function traduz(raiz, lang) {
   var tab = dados[lang]; if (!tab) return;
   ocupado = true;
   try {
     varre(raiz, function (el) {
-      var k = chaveDe(el), t = tab[k] || regra(k, lang); if (!t) return;
+      var k = chaveDe(el), t = busca(tab, k, lang); if (!t) { if (PEDACOS) traduzPedacos(el, tab, lang); return; }
       var p = partes(el); if (!orig.has(el)) orig.set(el, el.innerHTML);
       var d = document.createElement('div'); d.innerHTML = t;
       p.meio.forEach(function (n) { el.removeChild(n); });
       var ref = p.fim.length ? p.fim[0] : null;
       while (d.firstChild) el.insertBefore(d.firstChild, ref);
     });
+    if (PEDACOS) Array.prototype.slice.call(raiz.querySelectorAll('option')).forEach(function (op) { // opções das listas de escolha
+      if (naoTraduzir(op)) return; var k = norm(op.textContent), t = k && busca(tab, k, lang); if (!t) return; if (!orig.has(op)) orig.set(op, op.innerHTML); op.textContent = t.replace(/<[^>]+>/g, '');
+    });
     atributos(raiz, function (el, a) {
-      var v = norm(el.getAttribute(a)), t = tab[v] || regra(v, lang); if (!t) return;
+      var v = norm(el.getAttribute(a)), t = busca(tab, v, lang); if (!t) return;
       var oa = origAttr.get(el) || {}; if (!(a in oa)) oa[a] = el.getAttribute(a); origAttr.set(el, oa); el.setAttribute(a, t);
     });
   } finally { ocupado = false; }
@@ -111,9 +139,12 @@ function cabecalho(lang) {
   var l = LANGS.filter(function (x) { return x[0] === lang; })[0]; document.documentElement.lang = l ? l[2] : 'pt-BR';
 }
 
+var BASE_I18N = window.PR_I18N_BASE || 'i18n/', carregados = {};
+function carregaArq(nome, ok) { if (carregados[nome]) return ok(); var s = document.createElement('script'); s.src = BASE_I18N + nome + '.js'; s.onload = s.onerror = function () { carregados[nome] = 1; ok(); }; document.head.appendChild(s); } // arquivo do próprio site
 function carrega(lang, ok) {
-  if (lang === 'pt' || dados[lang]) return ok();
-  var s = document.createElement('script'); s.src = 'i18n/' + lang + '.js'; s.onload = ok; s.onerror = ok; document.head.appendChild(s); // arquivo do próprio site
+  if (lang === 'pt') return ok();
+  var lista = [lang].concat(EXTRA.map(function (x) { return x + '-' + lang; })), i = 0;
+  (function prox() { if (i >= lista.length) return ok(); carregaArq(lista[i++], prox); })();
 }
 
 function aplica(lang, guardar) {

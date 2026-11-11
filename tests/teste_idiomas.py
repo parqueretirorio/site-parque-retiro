@@ -44,13 +44,16 @@ async def main():
         await pg.goto(U+"calendario.html?lang=en",wait_until="domcontentloaded"); await pg.wait_for_timeout(800)
         corpo=await pg.inner_text('body'); ok('October' in corpo or 'November' in corpo,"mês do calendário aparece em inglês")
         await pg.evaluate("localStorage.clear()")
-        # área restrita e login não têm o seletor
+        # área restrita e login: seletor presente e tabela própria em espanhol (i18n/area-es.js)
         for f in ('area-restrita.html','login.html'):
-            await pg.goto(U+f,wait_until="domcontentloaded"); ok(await pg.locator('#pr-idioma').count()==0,f"{f} sem seletor (área restrita fica em português)")
+            await pg.goto(U+f,wait_until="domcontentloaded"); ok(await pg.locator('#pr-idioma').count()==1,f"{f} com seletor de idioma")
+        await pg.goto(U+"login.html?lang=es",wait_until="domcontentloaded"); await pg.wait_for_timeout(800)
+        corpo=await pg.inner_text('body'); ok('Crear cuenta' in corpo and 'Contraseña' in corpo,"login abre em espanhol (tabela da área restrita)")
+        await pg.evaluate("localStorage.clear()")
         # cobertura: quantos textos de cada página pública têm tradução
         await pg.goto(U+"index.html",wait_until="domcontentloaded"); await pg.wait_for_selector('#pr-idioma')
         import glob
-        pgs=[f for f in sorted(os.listdir(SITE)) if f.endswith('.html') and 'idioma.js' in open(os.path.join(SITE,f),encoding='utf-8').read()]
+        pgs=[f for f in sorted(os.listdir(SITE)) if f.endswith('.html') and f not in ('area-restrita.html','login.html') and 'idioma.js' in open(os.path.join(SITE,f),encoding='utf-8').read()]
         falt={}
         for l in ('es','it','fr','en','de'):
             txt=open(os.path.join(SITE,'i18n',l+'.js'),encoding='utf-8').read(); tab=json.loads(txt[txt.index('||{}).'+l+'=')+len('||{}).'+l+'='):].rsplit(';',1)[0])
