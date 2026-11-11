@@ -21,7 +21,7 @@ let me = null;
 // Mensagens do login vêm em português do adaptador; aqui viram o idioma do app.
 const traduzErro = m => /incorretos/.test(m) ? t('errCred') : /confirmar seu e-mail/.test(m) ? t('errConf') : /Sem conexão/.test(m) ? t('errRede') : /Muitas tentativas/.test(m) ? t('errMuitas') : m;
 
-const VERSAO = '1.3.0', DATA_VERSAO = '11/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
+const VERSAO = '1.3.1', DATA_VERSAO = '11/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 
 /* ---------- Instalar o app e atualizações ---------- */
@@ -191,7 +191,19 @@ function areas() {
 // Funciona também sem entrar (para quem não consegue entrar); nesse caso mostra só os artigos abertos a todos.
 const AJ = window.PR_APP_AJUDA, H = (k, v) => AJ.ui(I.atual(), k, v);
 let base = null, basePromessa = null;
-const carregaBase = () => basePromessa || (basePromessa = fetch('../ajuda/conteudo.json').then(r => { if (!r.ok) throw new Error('ajuda'); return r.json(); }).then(j => { base = j; return j; }).catch(e => { basePromessa = null; throw e; }));
+// Artigos traduzidos: ../ajuda/conteudo-<idioma>.json (hoje: espanhol). Sem tradução, ficam em português com aviso.
+const TRAD_AJUDA = ['es'];
+const traduzBase = (j, t) => { if (!t) return j; const ta = t.artigos || {};
+  return { ...j, traduzido: true, artigos: j.artigos.map(a => { const x = ta[a.id]; if (!x) return a; const sec = { ...(a.secoes || {}) };
+    Object.keys(x.secoes || {}).forEach(k => { const v = x.secoes[k]; sec[k] = Array.isArray(v) ? (sec[k] || []).map((y, i) => v[i] || y) : (v || sec[k]); });
+    return { ...a, titulo: x.titulo || a.titulo, resumo: x.resumo || a.resumo, secoes: sec, imagens: (a.imagens || []).map((im, i) => ({ ...im, ...((x.imagens || [])[i] || {}) })), traduzido: true }; }) }; };
+let baseLang = '';
+const carregaBase = () => {
+  const L = I.atual(); if (basePromessa && baseLang === L) return basePromessa; baseLang = L;
+  const pega = u => fetch(u).then(r => { if (!r.ok) throw new Error('ajuda'); return r.json(); });
+  return (basePromessa = Promise.all([pega('../ajuda/conteudo.json'), TRAD_AJUDA.includes(L) ? pega('../ajuda/conteudo-' + L + '.json').catch(() => null) : Promise.resolve(null)])
+    .then(([j, t]) => { base = traduzBase(j, t); return base; }).catch(e => { basePromessa = null; throw e; }));
+};
 const artigosVisiveis = () => (base ? base.artigos : []).filter(a => (a.status || 'publicado') === 'publicado' && (me || a.publico !== 'equipe'));
 const marca = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\[\[([a-z0-9-]+)(?:\|([^\]]+))?\]\]/g, (m, id, txt) => `<a href="#artigo/${id}">${txt || id}</a>`);
 const rodapeAjuda = () => `<p class="nota ajuda-fim">${H('aindaDuvida')}</p>`;
@@ -250,7 +262,7 @@ function artigo(id, ferr) {
     const rel = (a.relacionados || []).map(r => artigosVisiveis().find(x => x.id === r)).filter(Boolean);
     document.title = a.titulo + ' · CONecta Retiro';
     tela.innerHTML = voltarAjuda() + `<h1>${esc(a.titulo)}</h1></header><main class="ajuda-tela artigo">
-      ${I.atual() !== 'pt' ? `<p class="nota">${H('soPt')}</p>` : ''}
+      ${I.atual() !== 'pt' && !a.traduzido ? `<p class="nota">${H('soPt')}</p>` : ''}
       ${a.resumo ? `<p class="intro">${marca(a.resumo)}</p>` : ''}
       ${ferr ? `<a class="bt bt-principal" href="${ferramenta(ferr)}"><i class="fas fa-external-link-alt" aria-hidden="true"></i> ${H('abrirFerr')}</a>` : ''}
       ${s.oQueE ? `<h2>${H('oQueE')}</h2><p>${marca(s.oQueE)}</p>` : ''}

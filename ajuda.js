@@ -61,7 +61,32 @@ function conteudo() {
   };
   return cache;
 }
-const invalida = () => { cache = null; resolvidos = new WeakMap(); };
+// Conteúdo para EXIBIR: no idioma escolhido, os textos publicados (origem "base") são trocados pela tradução
+// (i18n/ajuda-<idioma>.js, carregada pelo motor de idiomas). O editor da Central continua usando conteudo(), em português.
+const idiomaAtual = () => { try { return (window.PR_IDIOMA && window.PR_IDIOMA.atual()) || 'pt'; } catch (e) { return 'pt'; } };
+let cacheEx = null, cacheExChave = '';
+function exib() {
+  const c = conteudo(), L = idiomaAtual(), T = L !== 'pt' && window.PR_AJUDA_TRAD && window.PR_AJUDA_TRAD[L];
+  if (!T) return c;
+  if (cacheEx && cacheExChave === L && cacheEx._base === c) return cacheEx;
+  const ta = T.artigos || {}, tc = T.categorias || {}, td = T.dicas || {};
+  const artigos = c.artigos.map(a => { const t = a.origem === 'base' && ta[a.id]; if (!t) return a;
+    const sec = { ...(a.secoes || {}) }; Object.keys(t.secoes || {}).forEach(k => { const v = t.secoes[k]; sec[k] = Array.isArray(v) ? (sec[k] || []).map((x, i) => v[i] || x) : (v || sec[k]); });
+    return { ...a, titulo: t.titulo || a.titulo, resumo: t.resumo || a.resumo, onde: t.onde || a.onde, secoes: sec,
+      imagens: (a.imagens || []).map((im, i) => ({ ...im, ...((t.imagens || [])[i] || {}) })), traduzido: L }; });
+  const categorias = c.categorias.map(x => { const t = x.origem === 'base' && tc[x.id]; return t ? { ...x, nome: t.nome || x.nome, descricao: t.descricao || x.descricao } : x; });
+  const dicas = new Map([...c.dicas].map(([k, d]) => { const t = d.origem === 'base' && td[k]; return [k, t ? { ...d, titulo: t[0] || d.titulo, texto: t[1] || d.texto } : d]; }));
+  cacheEx = { ...c, artigos, categorias, dicas, _base: c }; cacheExChave = L;
+  return cacheEx;
+}
+// Dica automática no idioma escolhido: traduz frase a frase (tabela "auto" da tradução da ajuda); o que não tiver tradução fica como está.
+function trAuto(txt) {
+  const L = idiomaAtual(), A = L !== 'pt' && window.PR_AJUDA_TRAD && window.PR_AJUDA_TRAD[L] && window.PR_AJUDA_TRAD[L].auto;
+  if (!A || !txt) return txt;
+  const fr = A.frases || {}, pd = (A.padroes || []).map(([re, rep]) => [new RegExp(re), rep]);
+  return txt.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÂÊÔÃÕÇ])/).map(s => { if (fr[s]) return fr[s]; for (const [re, rep] of pd) if (re.test(s)) return s.replace(re, rep); return s; }).join(' ');
+}
+const invalida = () => { cache = null; cacheEx = null; resolvidos = new WeakMap(); };
 
 /* --------------------------------------------------------------- quem é você ---------------------------------------------------------------- */
 function usuario() {
@@ -81,9 +106,9 @@ const podeEditar = () => {
 // Artigos "para a equipe" (área restrita) só aparecem para quem entrou na área restrita; na área pública só há ajuda da área pública.
 const logado = () => !!usuario() || !!sess('pr_sess') || sess('pr_temp') === '1';
 const visivel = a => a && (a.status !== 'rascunho' || podeEditar()) && ((a.publico || 'todos') !== 'equipe' || logado());
-const artigos = () => conteudo().artigos.filter(visivel);
+const artigos = () => exib().artigos.filter(visivel);
 const artigo = id => artigos().find(a => a.id === id) || null;
-const categoria = id => conteudo().categorias.find(c => c.id === id) || null;
+const categoria = id => exib().categorias.find(c => c.id === id) || null;
 
 /* ---------------------------------------------------------------- contexto ---------------------------------------------------------------- */
 const pagina = () => ((location.pathname.split('/').pop() || 'index.html').replace(/\.html?$/i, '') || 'index');
@@ -252,10 +277,10 @@ function resolver(el) {
   if (el.closest('[aria-hidden="true"]') || (el.getAttribute('tabindex') === '-1' && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))) return null; // campos-armadilha contra robôs
   const c = ctx() + '|' + (el.labels && el.labels[0] ? el.labels[0].innerText.length : 0) + '|' + (el.textContent || '').length, r0 = resolvidos.get(el);
   if (r0 && r0.c === c) return r0.r;
-  const ks = chaves(el), D = conteudo().dicas;
+  const ks = chaves(el), D = exib().dicas;
   let r = null;
   for (const k of ks) { const d = D.get(k); if (d && d.texto) { r = { chave: k, titulo: d.titulo || textoDe(el) || 'Ajuda', texto: d.texto, artigo: d.artigo || artigoDaChave(k) || artigoDoContexto(), fonte: 'escrita', origem: d.origem }; break; } }
-  if (!r) { const a = automatica(el); if (a && ks.length) r = { chave: ks[0], titulo: a.titulo, texto: a.texto, artigo: artigoDaChave(ks[0]) || artigoDoContexto(), fonte: 'automatica' }; }
+  if (!r) { const a = automatica(el); if (a && ks.length) r = { chave: ks[0], titulo: a.titulo, texto: trAuto(a.texto), artigo: artigoDaChave(ks[0]) || artigoDoContexto(), fonte: 'automatica' }; }
   if (r && r.artigo && !artigo(r.artigo)) r.artigo = artigoDoContexto();
   resolvidos.set(el, { c, r });
   if (r) registraVisto(el, r);
@@ -486,6 +511,7 @@ function fechaCard() {
 function editaDica(r) {
   const c = ui.card, arts = conteudo().artigos.slice().sort((a, b) => a.titulo.localeCompare(b.titulo, 'pt-BR'));
   const ed = (dbx().get('ajuda_dicas', []) || []).find(x => x.id === r.chave);
+  { const o = conteudo().dicas.get(r.chave); if (o && o.texto) r = { ...r, titulo: o.titulo || r.titulo, texto: o.texto }; } // edita sempre o original em português
   c.innerHTML = `<div class="pr-aj-card-cab"><h2 id="pr-aj-card-t"><i class="fas fa-pen" aria-hidden="true"></i> Editar explicação</h2><button type="button" class="pr-aj-x" data-fecha aria-label="Fechar sem salvar"><i class="fas fa-times" aria-hidden="true"></i></button></div>
   <form class="pr-aj-form" novalidate><p class="pr-aj-chave">Chave: <code>${esc(r.chave)}</code></p>
   <label>Título curto<input name="t" maxlength="80" value="${esc(r.titulo)}"></label>
@@ -529,7 +555,7 @@ function vaiPara(est, voltar) {
   ui.painel.dataset.v = JSON.stringify(est); desenhaPainel(est);
 }
 function desenhaPainel(est) {
-  const p = ui.painel, ctxArt = artigoDoContexto(), cats = conteudo().categorias;
+  const p = ui.painel, ctxArt = artigoDoContexto(), cats = exib().categorias;
   let corpo = '', titulo = 'Central de Ajuda';
   if (est.v === 'artigo') { const a = artigo(est.id); titulo = a ? a.titulo : 'Artigo'; corpo = renderArtigo(a, 'painel'); }
   else if (est.v === 'cat') {
@@ -704,7 +730,7 @@ function paginaCentral(raiz) {
   const vai = (s, push) => { estado = s; if (push !== false) history.pushState(s, '', url(s)); desenha(); window.scrollTo(0, 0); };
   window.addEventListener('popstate', e => { estado = e.state || { a: '', c: '', q: '', p: '' }; desenha(); });
   function desenha() {
-    const cats = conteudo().categorias, todos = artigos().filter(a => !estado.p || (a.publico || 'todos') === estado.p);
+    const cats = exib().categorias, todos = artigos().filter(a => !estado.p || (a.publico || 'todos') === estado.p);
     const cab = `<div class="pr-aj-trilha" role="navigation" aria-label="Você está em"><a href="ajuda.html" data-ir="{}">Central de Ajuda</a>${estado.c || estado.a ? (() => { const a = estado.a && artigo(estado.a), c = categoria(estado.c || (a && a.categoria)); return (c ? ` <span aria-hidden="true">›</span> <a href="ajuda.html?c=${esc(c.id)}" data-ir='${esc(JSON.stringify({ c: c.id }))}'>${esc(c.nome)}</a>` : '') + (a ? ` <span aria-hidden="true">›</span> <span aria-current="page">${esc(a.titulo)}</span>` : ''); })() : estado.q ? ' <span aria-hidden="true">›</span> <span aria-current="page">Busca</span>' : ''}</div>
     <form class="pr-aj-busca pr-aj-busca-g" role="search"><label class="pr-aj-sr" for="pa-q">Buscar na Central de Ajuda</label><i class="fas fa-search" aria-hidden="true"></i><input id="pa-q" type="search" placeholder="O que você quer fazer? Ex.: pedir reserva, cadastrar livro, fazer backup" value="${esc(estado.q)}" autocomplete="off"><button class="btn-visit">Buscar</button></form>`;
     let corpo = '';
@@ -743,8 +769,15 @@ function paginaCentral(raiz) {
   const gradeCats = (cats, todos) => `<div class="pr-aj-grade pr-aj-grade-cats">${cats.map(c => { const l = todos.filter(a => a.categoria === c.id); return l.length ? `<a class="card pr-aj-cartao-cat" href="ajuda.html?c=${esc(c.id)}" data-pcat="${esc(c.id)}"><i class="fas ${esc(c.icone || 'fa-folder')}" aria-hidden="true"></i><h3>${esc(c.nome)}</h3>${c.descricao ? `<p>${esc(c.descricao)}</p>` : ''}<small>${l.length} artigo(s)</small></a>` : ''; }).join('')}</div>`;
   history.replaceState(estado, '', location.href);
   desenha();
+  document.addEventListener('pr-idioma', () => { cacheEx = null; desenha(); });
 }
 
+// A moldura da ajuda (botões, títulos, avisos) só é traduzida pelo motor de idiomas quando há tradução do conteúdo
+// para o idioma escolhido; nos outros idiomas fica toda em português, para não misturar.
+function marcaTraducao() {
+  const L = idiomaAtual(), ok = L !== 'pt' && !!(window.PR_AJUDA_TRAD && window.PR_AJUDA_TRAD[L]);
+  document.querySelectorAll('#central-ajuda, .pr-aj-ui').forEach(el => { el.classList.toggle('notranslate', !ok); if (ok) el.removeAttribute('translate'); else el.setAttribute('translate', 'no'); });
+}
 /* ------------------------------------------------------------------ início ------------------------------------------------------------------ */
 function inicia() {
   criaUI(); liga(); varrer();
@@ -753,9 +786,11 @@ function inicia() {
   // ?ajuda=artigo-id em qualquer página abre o painel direto no artigo (útil para links em mensagens e no app)
   const q = new URLSearchParams(location.search).get('ajuda'); if (q && !raiz) abrePainel(q);
   window.addEventListener('load', posBotao);
+  marcaTraducao();
+  document.addEventListener('pr-idioma', () => { cacheEx = null; resolvidos = new WeakMap(); marcaTraducao(); });
 }
 window.PR_AJUDA = {
-  conteudo, invalida, artigos, artigo, categoria, buscar, relacionados, renderArtigo, resolver, chaves, auditar, ctx,
+  conteudo, exibir: exib, invalida, artigos, artigo, categoria, buscar, relacionados, renderArtigo, resolver, chaves, auditar, ctx,
   abrir: abrePainel, fechar: fechaPainel, abrirExplicacao: (el) => abreCard(el, resolver(el)), modo: modoAjuda, emModo: () => modo,
   podeEditar, usuario, linkArtigo, fmt, normDica
 };

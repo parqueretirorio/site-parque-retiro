@@ -143,7 +143,8 @@ var BASE_I18N = window.PR_I18N_BASE || 'i18n/', carregados = {};
 function carregaArq(nome, ok) { if (carregados[nome]) return ok(); var s = document.createElement('script'); s.src = BASE_I18N + nome + '.js'; s.onload = s.onerror = function () { carregados[nome] = 1; ok(); }; document.head.appendChild(s); } // arquivo do próprio site
 function carrega(lang, ok) {
   if (lang === 'pt') return ok();
-  var lista = [lang].concat(EXTRA.map(function (x) { return x + '-' + lang; })), i = 0;
+  var ex = EXTRA.slice(); if (window.PR_AJUDA_CONTEUDO && ex.indexOf('ajuda') < 0) ex.push('ajuda'); // tradução da Central de Ajuda
+  var lista = [lang].concat(ex.map(function (x) { return x + '-' + lang; })), i = 0;
   (function prox() { if (i >= lista.length) return ok(); carregaArq(lista[i++], prox); })();
 }
 
@@ -153,6 +154,7 @@ function aplica(lang, guardar) {
     restaura(document.body); atual = lang;
     if (lang !== 'pt') traduz(document.body, lang);
     cabecalho(lang); if (guardar) guarda('pr_idioma', lang); marca(); ajustaTopo();
+    try { document.dispatchEvent(new CustomEvent('pr-idioma', { detail: lang })); } catch (e) { /* navegador antigo */ }
   });
 }
 

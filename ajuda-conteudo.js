@@ -118,7 +118,7 @@ window.PR_AJUDA_CONTEUDO = {
      "A Responsável pela Biblioteca registra o empréstimo de um livro na área restrita."
     ],
     "cuidados": [
-     "Enquanto o servidor não estiver ligado, os dados da área restrita ficam guardados no navegador de cada computador. Leia [[onde-ficam-os-dados|Onde ficam os dados]]."
+     "Os dados da área restrita ficam no servidor do Parque: o que uma pessoa salva aparece para a equipe em qualquer computador ou celular, inclusive no app CONecta Retiro. Leia [[onde-ficam-os-dados|Onde ficam os dados]]."
     ]
    },
    "imagens": [],
@@ -128,7 +128,7 @@ window.PR_AJUDA_CONTEUDO = {
     "painel-conecta",
     "onde-ficam-os-dados"
    ],
-   "atualizadoEm": "2026-11-02"
+   "atualizadoEm": "2026-11-11"
   },
   {
    "id": "como-usar-a-ajuda",
@@ -223,7 +223,7 @@ window.PR_AJUDA_CONTEUDO = {
     ],
     "cuidados": [
      "Nomes próprios e termos da Escola não são traduzidos.",
-     "A área restrita, o login e os textos desta ajuda estão apenas em português."
+     "A área restrita, o login, o app e esta Central de Ajuda estão em português e espanhol; nos outros idiomas, a área restrita e a ajuda continuam em português."
     ]
    },
    "imagens": [],
@@ -557,7 +557,7 @@ window.PR_AJUDA_CONTEUDO = {
     "cuidados": [
      "Ao enviar, você declara que as fotos são suas e autoriza o uso pelo Parque.",
      "Prefira fotos em que as pessoas autorizaram aparecer.",
-     "Enquanto o servidor não estiver ligado, o envio fica guardado no navegador de quem enviou (veja [[onde-ficam-os-dados|Onde ficam os dados]])."
+     "Por enquanto, as páginas abertas do site ainda não estão ligadas ao servidor: o envio feito por elas fica guardado no navegador de quem enviou (veja [[onde-ficam-os-dados|Onde ficam os dados]])."
     ]
    },
    "imagens": [
@@ -572,7 +572,7 @@ window.PR_AJUDA_CONTEUDO = {
     "atividades-publicas",
     "arquivo-ou-imagem-recusado"
    ],
-   "atualizadoEm": "2026-11-02"
+   "atualizadoEm": "2026-11-11"
   },
   {
    "id": "ser-voluntario",
@@ -870,7 +870,7 @@ window.PR_AJUDA_CONTEUDO = {
    "categoria": "acesso",
    "ordem": 1,
    "titulo": "Criar conta e entrar na área restrita",
-   "resumo": "Clique em Entrar, crie sua conta com nome completo, e-mail, WhatsApp e senha, e aguarde a aprovação do administrador.",
+   "resumo": "Clique em Entrar, crie sua conta com nome completo, e-mail, WhatsApp e senha, confirme o e-mail e aguarde a aprovação da administração.",
    "publico": "todos",
    "status": "publicado",
    "palavras": [
@@ -887,18 +887,19 @@ window.PR_AJUDA_CONTEUDO = {
     "oQueE": "A área restrita (CONecta Retiro) é para quem cuida do Parque. Cada pessoa tem a sua conta, com nível de acesso e responsabilidades definidos pelo administrador.",
     "finalidade": "",
     "passos": [
-     "Clique em **Entrar**.",
-     "Na aba **Criar conta**, informe nome completo, e-mail, senha (repetida), WhatsApp com DDD e marque a autorização LGPD.",
-     "Envie. O cadastro fica **aguardando aprovação** do administrador.",
-     "Depois de aprovado(a), volte em **Entrar**, aba **Entrar**, e use seu e-mail e senha.",
-     "Para sair, use o botão **Sair** no topo do painel."
+     "Clique em **Entrar** (no site) ou abra o app **CONecta Retiro**.",
+     "Toque em **Criar conta** e informe nome completo, e-mail, senha (repetida), WhatsApp com DDD e marque a autorização LGPD.",
+     "Abra o e-mail de confirmação que chega na sua caixa de entrada e clique no link (olhe também no spam).",
+     "O cadastro fica **aguardando aprovação** da administração.",
+     "Depois de aprovado(a), volte em **Entrar** e use seu e-mail e senha.",
+     "Para sair, use o botão **Sair** no topo do painel (ou **Sair do app**)."
     ],
     "exemplos": [
-     "O primeiro cadastro de uma instalação nova vira automaticamente o Administrador."
+     "A mesma conta vale no site e no app, em qualquer computador ou celular."
     ],
     "cuidados": [
      "Use uma senha só sua; não a compartilhe.",
-     "Enquanto o servidor não estiver ligado, as contas ficam só no navegador deste computador: baixe o backup com frequência (veja [[backup-e-restauracao|Backup e restauração]]).",
+     "Esqueceu a senha? Use **Esqueci minha senha** na tela Entrar: chega um e-mail para criar uma senha nova.",
      "Se o cadastro estiver pendente, recusado ou bloqueado, o sistema avisa na tela de login (veja [[nao-consigo-entrar|Não consigo entrar]])."
     ]
    },
@@ -914,7 +915,7 @@ window.PR_AJUDA_CONTEUDO = {
     "completar-cadastro-lgpd",
     "nao-consigo-entrar"
    ],
-   "atualizadoEm": "2026-11-02"
+   "atualizadoEm": "2026-11-11"
   },
   {
    "id": "niveis-e-responsabilidades",
@@ -964,7 +965,7 @@ window.PR_AJUDA_CONTEUDO = {
    "categoria": "acesso",
    "ordem": 3,
    "titulo": "Aprovar cadastros e gerenciar responsáveis",
-   "resumo": "Exclusivo do administrador: aprovar ou recusar pedidos de conta, cadastrar responsáveis, mudar níveis, responsabilidades e bloquear contas.",
+   "resumo": "Exclusivo do administrador: aprovar ou recusar pedidos de conta, mudar níveis e responsabilidades e bloquear contas.",
    "publico": "equipe",
    "status": "publicado",
    "palavras": [
@@ -981,15 +982,15 @@ window.PR_AJUDA_CONTEUDO = {
     "finalidade": "",
     "passos": [
      "Em **Solicitações de cadastro**, confira os dados e clique em **Aprovar** ou **Não aprovar**.",
-     "Para cadastrar alguém diretamente, preencha nome completo, e-mail, WhatsApp, nível, responsabilidades e uma **senha provisória** (mínimo 8 caracteres), e clique em **Cadastrar responsável**.",
-     "Combine com a pessoa uma forma segura de entregar a senha provisória.",
-     "Na lista **Responsáveis cadastrados**, ajuste nível e responsabilidades, ou use **Bloquear/Desbloquear**."
+     "Cada pessoa cria a própria conta em **Entrar › Criar conta** (com e-mail e senha dela). Para incluir alguém, envie o link da página Entrar ou do app e aprove o cadastro quando chegar.",
+     "Na lista **Responsáveis cadastrados**, ajuste nível e responsabilidades, ou use **Bloquear/Desbloquear**.",
+     "Quem esqueceu a senha resolve sozinho em **Esqueci minha senha**; o administrador não vê nem define senhas."
     ],
     "exemplos": [],
     "cuidados": [
      "A autorização LGPD é da própria pessoa: ela aceita no primeiro acesso. Não marque por ela.",
      "Bloquear impede o acesso sem apagar o histórico da pessoa.",
-     "Enquanto o servidor não estiver ligado, estes dados ficam só no navegador deste computador: baixe o backup com frequência (veja [[backup-e-restauracao|Backup e restauração]])."
+     "Estes dados ficam no servidor do Parque e aparecem para quem tem acesso, em qualquer computador ou celular. Mesmo assim, baixe o backup completo de vez em quando (veja [[backup-e-restauracao|Backup e restauração]])."
     ]
    },
    "imagens": [
@@ -1004,7 +1005,7 @@ window.PR_AJUDA_CONTEUDO = {
     "completar-cadastro-lgpd",
     "criar-conta-e-entrar"
    ],
-   "atualizadoEm": "2026-11-02"
+   "atualizadoEm": "2026-11-11"
   },
   {
    "id": "completar-cadastro-lgpd",
@@ -1178,8 +1179,8 @@ window.PR_AJUDA_CONTEUDO = {
      "Para mandar o inventário de uma sala por WhatsApp: filtre a localização, clique em Imprimir e salve como PDF."
     ],
     "cuidados": [
-     "Enquanto o servidor não estiver ligado, estes dados ficam só no navegador deste computador: baixe o backup com frequência (veja [[backup-e-restauracao|Backup e restauração]]).",
-     "Arquivos e fotos ocupam o espaço do navegador (cerca de 5 MB no total). Prefira links do Drive para materiais pesados."
+     "Estes dados ficam no servidor do Parque e aparecem para quem tem acesso, em qualquer computador ou celular. Mesmo assim, baixe o backup completo de vez em quando (veja [[backup-e-restauracao|Backup e restauração]]).",
+     "Arquivos e fotos têm limite de tamanho por envio. Prefira links do Drive para materiais pesados."
     ]
    },
    "imagens": [],
@@ -1189,7 +1190,7 @@ window.PR_AJUDA_CONTEUDO = {
     "lixeira-e-auditoria",
     "relatorios-consolidados"
    ],
-   "atualizadoEm": "2026-11-02"
+   "atualizadoEm": "2026-11-11"
   },
   {
    "id": "biblioteca-gestao",
@@ -1224,7 +1225,7 @@ window.PR_AJUDA_CONTEUDO = {
     "cuidados": [
      "A localização física aparece para o público; escreva de forma que qualquer pessoa encontre (ex.: Estante B, Prateleira 2).",
      "A capa é reduzida automaticamente, mas ocupa espaço no navegador.",
-     "Enquanto o servidor não estiver ligado, estes dados ficam só no navegador deste computador: baixe o backup com frequência (veja [[backup-e-restauracao|Backup e restauração]])."
+     "Estes dados ficam no servidor do Parque e aparecem para quem tem acesso, em qualquer computador ou celular. Mesmo assim, baixe o backup completo de vez em quando (veja [[backup-e-restauracao|Backup e restauração]])."
     ]
    },
    "imagens": [
@@ -1402,7 +1403,7 @@ window.PR_AJUDA_CONTEUDO = {
     "cuidados": [
      "Pedidos com recebimentos lançados não podem ser excluídos: exclua antes os recebimentos.",
      "O Calendário de uso público não é atualizado sozinho por esta ferramenta (veja [[atualizar-conteudos-do-site|Atualização do site]]).",
-     "Enquanto o servidor não estiver ligado, estes dados ficam só no navegador deste computador: baixe o backup com frequência (veja [[backup-e-restauracao|Backup e restauração]])."
+     "Estes dados ficam no servidor do Parque e aparecem para quem tem acesso, em qualquer computador ou celular. Mesmo assim, baixe o backup completo de vez em quando (veja [[backup-e-restauracao|Backup e restauração]])."
     ]
    },
    "imagens": [
@@ -1537,7 +1538,7 @@ window.PR_AJUDA_CONTEUDO = {
     "cuidados": [
      "As fotos são reduzidas para caber no navegador, mas ocupam espaço; publique as melhores.",
      "Prefira fotos com autorização de imagem das pessoas.",
-     "Enquanto o servidor não estiver ligado, estes dados ficam só no navegador deste computador: baixe o backup com frequência (veja [[backup-e-restauracao|Backup e restauração]])."
+     "Estes dados ficam no servidor do Parque e aparecem para quem tem acesso, em qualquer computador ou celular. Mesmo assim, baixe o backup completo de vez em quando (veja [[backup-e-restauracao|Backup e restauração]])."
     ]
    },
    "imagens": [
@@ -1757,7 +1758,7 @@ window.PR_AJUDA_CONTEUDO = {
     "exemplos": [],
     "cuidados": [
      "Quem não é responsável só consulta.",
-     "Enquanto o servidor não estiver ligado, estes dados ficam só no navegador deste computador: baixe o backup com frequência (veja [[backup-e-restauracao|Backup e restauração]])."
+     "Estes dados ficam no servidor do Parque e aparecem para quem tem acesso, em qualquer computador ou celular. Mesmo assim, baixe o backup completo de vez em quando (veja [[backup-e-restauracao|Backup e restauração]])."
     ]
    },
    "imagens": [
@@ -2023,7 +2024,7 @@ window.PR_AJUDA_CONTEUDO = {
     "exemplos": [],
     "cuidados": [
      "Os dados de voluntários são pessoais: use-os só para o contato sobre o voluntariado.",
-     "Enquanto o servidor não estiver ligado, a inscrição feita no site fica no navegador de quem se inscreveu."
+     "Por enquanto, as páginas abertas do site ainda não estão ligadas ao servidor: a inscrição feita no site fica no navegador de quem se inscreveu (veja [[onde-ficam-os-dados|Onde ficam os dados]])."
     ]
    },
    "imagens": [
@@ -2038,7 +2039,7 @@ window.PR_AJUDA_CONTEUDO = {
     "jardinagem-gestao",
     "ajude-visao-geral"
    ],
-   "atualizadoEm": "2026-11-02"
+   "atualizadoEm": "2026-11-11"
   },
   {
    "id": "ajude-visao-geral",
@@ -2453,7 +2454,7 @@ window.PR_AJUDA_CONTEUDO = {
     "cuidados": [
      "Lançamentos automáticos (rifa, vaquinha, alojamento) levam só o código, nunca o nome do participante.",
      "Excluir um recebimento na ferramenta de origem retira o lançamento correspondente.",
-     "Enquanto o servidor não estiver ligado, estes dados ficam só no navegador deste computador: baixe o backup com frequência (veja [[backup-e-restauracao|Backup e restauração]])."
+     "Estes dados ficam no servidor do Parque e aparecem para quem tem acesso, em qualquer computador ou celular. Mesmo assim, baixe o backup completo de vez em quando (veja [[backup-e-restauracao|Backup e restauração]])."
     ]
    },
    "imagens": [
@@ -2553,7 +2554,7 @@ window.PR_AJUDA_CONTEUDO = {
     "cuidados": [
      "Dar baixa não apaga o item: ele sai das listas \"em uso\" mas continua no histórico.",
      "Fotos ocupam espaço no navegador; use imagens leves.",
-     "Enquanto o servidor não estiver ligado, estes dados ficam só no navegador deste computador: baixe o backup com frequência (veja [[backup-e-restauracao|Backup e restauração]])."
+     "Estes dados ficam no servidor do Parque e aparecem para quem tem acesso, em qualquer computador ou celular. Mesmo assim, baixe o backup completo de vez em quando (veja [[backup-e-restauracao|Backup e restauração]])."
     ]
    },
    "imagens": [
@@ -2788,8 +2789,8 @@ window.PR_AJUDA_CONTEUDO = {
    "id": "onde-ficam-os-dados",
    "categoria": "dados",
    "ordem": 1,
-   "titulo": "Onde ficam os dados (navegador × servidor)",
-   "resumo": "Hoje os dados da área restrita ficam no navegador de cada computador. Com o servidor ligado, passam a ser compartilhados.",
+   "titulo": "Onde ficam os dados (servidor do Parque)",
+   "resumo": "Os dados da área restrita e do app ficam no servidor do Parque e são os mesmos em qualquer computador ou celular.",
    "publico": "equipe",
    "status": "publicado",
    "palavras": [
@@ -2803,18 +2804,19 @@ window.PR_AJUDA_CONTEUDO = {
    ],
    "onde": "",
    "secoes": {
-    "oQueE": "Enquanto o modo de dados for **local**, tudo o que é cadastrado na área restrita (atas, inventário, reservas, usuários, edições da ajuda...) é gravado no armazenamento do navegador que está sendo usado. Outro computador, outro navegador ou o celular não veem esses dados. O limite é de cerca de 5 MB.",
-    "finalidade": "Entender por que é preciso baixar backups e combinar quem edita, até o servidor ser ligado.",
+    "oQueE": "Tudo o que é cadastrado na área restrita e no app CONecta Retiro (atas, inventário, reservas, usuários, edições da ajuda...) é gravado no **servidor do Parque**. Quem tem acesso vê os mesmos dados no computador, no celular ou no app. O indicador no rodapé do painel mostra se está tudo **sincronizado**.",
+    "finalidade": "Saber que o trabalho fica guardado e compartilhado, e o que fazer nos raros casos de conflito ou falta de internet.",
     "passos": [
-     "Combine que **uma pessoa/computador edita por vez**.",
-     "Baixe o **backup completo** ao final de cada dia de trabalho e guarde em local seguro.",
-     "Para passar o trabalho a outra pessoa, ela restaura esse backup no computador dela.",
+     "Trabalhe normalmente: cada alteração é enviada ao servidor em poucos segundos.",
+     "Se duas pessoas mudarem a mesma lista ao mesmo tempo, o painel avisa e mostra botões para escolher qual versão fica.",
+     "Sem internet, o que você fizer fica guardado e é enviado quando a conexão voltar; não feche a página antes de aparecer \"sincronizado\".",
+     "Dados que ficaram num navegador da época anterior ao servidor podem ser trazidos em **Backup e Segurança › Trazer os dados deste navegador para o servidor**.",
      "Materiais pesados (artes, vídeos) ficam em pastas do Drive; o site guarda só o link."
     ],
     "exemplos": [],
     "cuidados": [
-     "Limpar os dados do navegador apaga tudo o que não estiver em backup.",
-     "Com o servidor (fase 2), login, dados e arquivos passam a ser compartilhados e o aplicativo usa a mesma base."
+     "Mesmo com o servidor, baixe o **backup completo** de vez em quando e guarde em local seguro.",
+     "As páginas abertas do site (inscrições, envio de fotos, formulários para o público) ainda não estão ligadas ao servidor: o que o visitante envia fica no navegador dele até essa ligação ser feita."
     ]
    },
    "imagens": [],
@@ -2823,7 +2825,7 @@ window.PR_AJUDA_CONTEUDO = {
     "nao-vejo-meus-dados",
     "atualizar-conteudos-do-site"
    ],
-   "atualizadoEm": "2026-11-02"
+   "atualizadoEm": "2026-11-11"
   },
   {
    "id": "backup-e-restauracao",
@@ -2847,7 +2849,7 @@ window.PR_AJUDA_CONTEUDO = {
     "finalidade": "",
     "passos": [
      "Clique em **Baixar backup completo**. O arquivo .json vai para a pasta de downloads; guarde-o em outro lugar (e-mail, nuvem, pen drive).",
-     "A tela avisa quando o último backup tem mais de 7 dias e mostra o espaço usado no navegador.",
+     "A tela avisa quando o último backup tem mais de 7 dias.",
      "Para restaurar: em **Arquivo de backup (.json)**, escolha o arquivo. O sistema confere a integridade e mostra a comparação por coleção.",
      "Baixe antes o backup do estado atual (o botão de restaurar só é liberado depois disso).",
      "Clique em **Restaurar este backup** e confirme."
@@ -2871,7 +2873,7 @@ window.PR_AJUDA_CONTEUDO = {
     "onde-ficam-os-dados",
     "nao-vejo-meus-dados"
    ],
-   "atualizadoEm": "2026-11-02"
+   "atualizadoEm": "2026-11-11"
   },
   {
    "id": "lixeira-e-auditoria",
@@ -2929,13 +2931,13 @@ window.PR_AJUDA_CONTEUDO = {
    ],
    "onde": "",
    "secoes": {
-    "oQueE": "Com o modo local, o que é cadastrado na área restrita só aparece para visitantes depois de publicado na hospedagem. Cada conteúdo tem o seu caminho.",
+    "oQueE": "O que é cadastrado na área restrita fica no servidor; para o público ver no site aberto, cada conteúdo tem o seu caminho.",
     "finalidade": "",
     "passos": [
      "**Banners do site:** Comunicação › Site › **Baixar pacote para publicar (.zip)** e copiar a pasta banners para a hospedagem.",
      "**Central de Ajuda:** Administração › Central de Ajuda › Publicar › **Baixar ajuda-conteudo.js** e substituir o arquivo na hospedagem.",
      "**Calendário de uso (público):** as datas ocupadas ficam na lista RESERVAS dentro do arquivo calendario.html; peça a quem cuida do site para atualizar.",
-     "**Atividades, Lojinha, Rifa, Vaquinha, Álbum e Biblioteca:** aparecem no site a partir do armazenamento de dados; para valerem para todos os visitantes, é preciso o servidor ligado."
+     "**Atividades, Lojinha, Rifa, Vaquinha, Álbum e Biblioteca:** o que a equipe cadastra fica no servidor; a ligação das páginas abertas do site ao servidor é a próxima etapa (até lá, o público vê o que foi publicado no site)."
     ],
     "exemplos": [],
     "cuidados": [
@@ -2948,7 +2950,7 @@ window.PR_AJUDA_CONTEUDO = {
     "publicar-ajuda",
     "onde-ficam-os-dados"
    ],
-   "atualizadoEm": "2026-11-02"
+   "atualizadoEm": "2026-11-11"
   },
   {
    "id": "administrar-central-ajuda",
@@ -2968,7 +2970,7 @@ window.PR_AJUDA_CONTEUDO = {
    ],
    "onde": "**Administração › Central de Ajuda** (administrador ou Responsável pela Central de Ajuda).",
    "secoes": {
-    "oQueE": "A ferramenta tem cinco partes: **Artigos**, **Categorias**, **Explicações rápidas**, **Cobertura** e **Publicar**. Tudo o que é editado aqui vale na hora neste navegador e entra no backup.",
+    "oQueE": "A ferramenta tem cinco partes: **Artigos**, **Categorias**, **Explicações rápidas**, **Cobertura** e **Publicar**. O que é editado aqui fica no servidor e vale na hora para a equipe na área restrita; para aparecer no site aberto e no app, use **Publicar**.",
     "finalidade": "",
     "passos": [
      "**Artigos:** clique em **Novo artigo** ou em **Editar**. Preencha título, categoria, público, resumo, o que é, para que serve, passo a passo (um passo por linha), exemplos, cuidados, imagens e conteúdos relacionados. Salve.",
@@ -2998,7 +3000,7 @@ window.PR_AJUDA_CONTEUDO = {
     "publicar-ajuda",
     "como-usar-a-ajuda"
    ],
-   "atualizadoEm": "2026-11-02"
+   "atualizadoEm": "2026-11-11"
   },
   {
    "id": "editar-explicacoes-rapidas",
@@ -3032,7 +3034,7 @@ window.PR_AJUDA_CONTEUDO = {
      "Evite: \"Campo de centro de custo.\""
     ],
     "cuidados": [
-     "As edições valem na hora neste navegador. Para todos verem, publique (veja [[publicar-ajuda|Publicar a ajuda]])."
+     "As edições valem na hora para a equipe na área restrita. Para aparecerem no site aberto e no app, publique (veja [[publicar-ajuda|Publicar a ajuda]])."
     ]
    },
    "imagens": [
@@ -3046,7 +3048,7 @@ window.PR_AJUDA_CONTEUDO = {
     "administrar-central-ajuda",
     "publicar-ajuda"
    ],
-   "atualizadoEm": "2026-11-02"
+   "atualizadoEm": "2026-11-11"
   },
   {
    "id": "publicar-ajuda",
@@ -3079,7 +3081,7 @@ window.PR_AJUDA_CONTEUDO = {
     "exemplos": [],
     "cuidados": [
      "Guarde uma cópia do ajuda-conteudo.js anterior antes de substituir.",
-     "Com o servidor ligado, as edições passam a valer para todos sem este passo."
+     "O app CONecta Retiro e o site aberto mostram a versão publicada: publique depois de revisar."
     ]
    },
    "imagens": [
@@ -3093,7 +3095,7 @@ window.PR_AJUDA_CONTEUDO = {
     "administrar-central-ajuda",
     "atualizar-conteudos-do-site"
    ],
-   "atualizadoEm": "2026-11-02"
+   "atualizadoEm": "2026-11-11"
   },
   {
    "id": "problemas-frequentes",
@@ -3118,7 +3120,7 @@ window.PR_AJUDA_CONTEUDO = {
     "passos": [
      "**Não vejo os dados em outro computador** → [[nao-vejo-meus-dados|Não vejo meus dados]].",
      "**Não consigo entrar** → [[nao-consigo-entrar|Não consigo entrar]].",
-     "**A imagem foi recusada / \"espaço do navegador cheio\"** → [[arquivo-ou-imagem-recusado|Imagem ou arquivo recusado]].",
+     "**A imagem ou o arquivo foi recusado** → [[arquivo-ou-imagem-recusado|Imagem ou arquivo recusado]].",
      "**Enviar solicitação abriu o e-mail e não enviou:** o formulário de reserva prepara a mensagem no seu programa de e-mail; você precisa clicar em Enviar nele.",
      "**Não encontro uma ferramenta na área restrita:** ela depende do seu nível e responsabilidades → [[niveis-e-responsabilidades|Níveis e responsabilidades]].",
      "**A dica está atrapalhando:** desligue \"Mostrar dicas ao passar o mouse\" no painel **? Ajuda**."
@@ -3135,14 +3137,14 @@ window.PR_AJUDA_CONTEUDO = {
     "arquivo-ou-imagem-recusado",
     "como-usar-a-ajuda"
    ],
-   "atualizadoEm": "2026-11-02"
+   "atualizadoEm": "2026-11-11"
   },
   {
    "id": "nao-vejo-meus-dados",
    "categoria": "problemas",
    "ordem": 2,
    "titulo": "Não vejo os dados em outro computador ou celular",
-   "resumo": "É esperado no modo local: cada navegador guarda a sua própria cópia. Use o backup para levar os dados.",
+   "resumo": "Com o servidor, os dados são os mesmos em todo lugar. Se algo não aparece, confira se entrou com a sua conta e se está sincronizado.",
    "publico": "equipe",
    "status": "publicado",
    "palavras": [
@@ -3158,13 +3160,14 @@ window.PR_AJUDA_CONTEUDO = {
     "oQueE": "",
     "finalidade": "",
     "passos": [
-     "No computador onde os dados foram cadastrados: **Backup e Segurança › Baixar backup completo**.",
-     "Leve o arquivo ao outro computador (e-mail, nuvem, pen drive).",
-     "No outro computador: entre na área restrita e restaure o backup em **Backup e Segurança**."
+     "Confira se você entrou com a sua conta (o seu nome aparece no topo).",
+     "Veja o indicador no rodapé do painel: se não estiver \"sincronizado\", confira a internet e espere alguns segundos.",
+     "Você só vê as ferramentas das suas responsabilidades: peça à administração para incluir a função, se faltar.",
+     "Dados cadastrados antes do servidor, num computador específico: nesse computador, use **Backup e Segurança › Trazer os dados deste navegador para o servidor**."
     ],
     "exemplos": [],
     "cuidados": [
-     "Se os dados sumiram no mesmo computador, alguém pode ter limpado os dados do navegador ou usado uma janela anônima: restaure o último backup."
+     "Se algo sumiu, a administração pode recuperar pela Lixeira do sistema ou pelo último backup (Backup e Segurança)."
     ]
    },
    "imagens": [],
@@ -3172,14 +3175,14 @@ window.PR_AJUDA_CONTEUDO = {
     "onde-ficam-os-dados",
     "backup-e-restauracao"
    ],
-   "atualizadoEm": "2026-11-02"
+   "atualizadoEm": "2026-11-11"
   },
   {
    "id": "nao-consigo-entrar",
    "categoria": "problemas",
    "ordem": 3,
    "titulo": "Não consigo entrar na área restrita",
-   "resumo": "Verifique se o cadastro foi aprovado, se está no mesmo navegador do cadastro e se o e-mail e a senha estão corretos.",
+   "resumo": "Verifique se você confirmou o e-mail, se o cadastro foi aprovado e se o e-mail e a senha estão corretos.",
    "publico": "todos",
    "status": "publicado",
    "palavras": [
@@ -3195,11 +3198,11 @@ window.PR_AJUDA_CONTEUDO = {
     "oQueE": "",
     "finalidade": "",
     "passos": [
-     "Mensagem \"aguarda aprovação\": o administrador ainda não aprovou o cadastro.",
-     "Mensagem de recusado ou bloqueado: fale com o administrador do Parque.",
+     "Mensagem \"aguarda aprovação\": a administração ainda não aprovou o cadastro.",
+     "Mensagem de recusado ou bloqueado: fale com a administração do Parque.",
+     "Confirme o cadastro pelo link do e-mail que chegou (olhe também no spam).",
      "Confira o e-mail e a senha (maiúsculas e minúsculas fazem diferença).",
-     "Esqueceu a senha: peça ao administrador uma senha provisória em Gestão de Responsáveis.",
-     "Em outro computador a conta \"não existe\"? Enquanto o servidor não estiver ligado, as contas ficam no navegador onde foram criadas (veja [[onde-ficam-os-dados|Onde ficam os dados]])."
+     "Esqueceu a senha: toque em **Esqueci minha senha** na tela Entrar e siga o e-mail que chega."
     ],
     "exemplos": [],
     "cuidados": []
@@ -3210,14 +3213,14 @@ window.PR_AJUDA_CONTEUDO = {
     "gestao-de-responsaveis",
     "onde-ficam-os-dados"
    ],
-   "atualizadoEm": "2026-11-02"
+   "atualizadoEm": "2026-11-11"
   },
   {
    "id": "arquivo-ou-imagem-recusado",
    "categoria": "problemas",
    "ordem": 4,
-   "titulo": "Imagem ou arquivo recusado / espaço do navegador cheio",
-   "resumo": "Cada envio tem limite de tamanho e, nos banners, de proporção. O navegador guarda cerca de 5 MB no total.",
+   "titulo": "Imagem ou arquivo recusado",
+   "resumo": "Cada envio tem limite de tamanho e, nos banners, de proporção. Para materiais pesados, use links do Drive.",
    "publico": "todos",
    "status": "publicado",
    "palavras": [
@@ -3238,7 +3241,7 @@ window.PR_AJUDA_CONTEUDO = {
      "Confira o limite indicado ao lado do campo (ex.: até 1 MB, até 600 KB, até 10 fotos por vez).",
      "Reduza a imagem (por exemplo, envie pelo WhatsApp para você mesmo e baixe de novo, ou use um site de compressão).",
      "Banners: a imagem precisa ter a proporção exata do espaço (a mensagem diz a medida).",
-     "Espaço cheio: veja o uso em Backup e Segurança, baixe o backup e prefira links do Drive para materiais pesados."
+     "Arquivos grandes (vídeos, apresentações, muitas fotos): guarde numa pasta do Drive do Parque e cole o link."
     ],
     "exemplos": [],
     "cuidados": []
@@ -3249,7 +3252,7 @@ window.PR_AJUDA_CONTEUDO = {
     "backup-e-restauracao",
     "enviar-fotos-album"
    ],
-   "atualizadoEm": "2026-11-02"
+   "atualizadoEm": "2026-11-11"
   }
  ],
  "dicas": {
@@ -3522,7 +3525,7 @@ window.PR_AJUDA_CONTEUDO = {
   ],
   "painel.sair": [
    "Sair",
-   "Encerra o seu acesso neste navegador. Os dados continuam salvos; para voltar, use Entrar.",
+   "Encerra o seu acesso. Os dados continuam salvos no servidor; para voltar, use Entrar.",
    "painel-conecta"
   ],
   "painel.area.com": [
@@ -3814,7 +3817,7 @@ window.PR_AJUDA_CONTEUDO = {
   ],
   "r.acervo.g-c": [
    "Foto da capa",
-   "Imagem da capa (foto do celular serve). É reduzida automaticamente, mas ocupa espaço no navegador."
+   "Imagem da capa (foto do celular serve). É reduzida automaticamente."
   ],
   "r.acervo.g-u": [
    "Link para leitura",
@@ -4378,7 +4381,7 @@ window.PR_AJUDA_CONTEUDO = {
   ],
   "r.multiuso.d-f": [
    "Arquivo",
-   "PDF ou imagem de até 1 MB, guardado no navegador. Para arquivos maiores, use o link."
+   "PDF ou imagem de até 1 MB. Para arquivos maiores, use o link."
   ],
   "r.multiuso.t.adicionar-documento": [
    "Adicionar documento",
@@ -4406,7 +4409,7 @@ window.PR_AJUDA_CONTEUDO = {
   ],
   "r.jardinagem.d-f": [
    "Arquivo",
-   "PDF ou imagem de até 1 MB, guardado no navegador. Para arquivos maiores, use o link."
+   "PDF ou imagem de até 1 MB. Para arquivos maiores, use o link."
   ],
   "r.jardinagem.t.adicionar-documento": [
    "Adicionar documento",
@@ -5312,7 +5315,7 @@ window.PR_AJUDA_CONTEUDO = {
   ],
   "r.backup.bk-baixar": [
    "Baixar backup completo",
-   "Gera um arquivo .json com todos os dados da área restrita, com verificação de integridade. Guarde em outro lugar."
+   "Gera um arquivo .json com todos os dados da área restrita, com verificação de integridade. Guarde em outro lugar, como cópia de segurança."
   ],
   "r.backup.bk-arq": [
    "Arquivo de backup",
@@ -5812,7 +5815,7 @@ window.PR_AJUDA_CONTEUDO = {
   ],
   "r.central_ajuda.rs": [
    "Voltar ao publicado",
-   "Descarta as edições feitas neste navegador e volta ao texto do arquivo publicado.",
+   "Descarta as edições ainda não publicadas e volta ao texto do arquivo publicado.",
    "administrar-central-ajuda"
   ],
   "r.central_ajuda.del": [
@@ -5932,7 +5935,7 @@ window.PR_AJUDA_CONTEUDO = {
   ],
   "r.central_ajuda.ca-pexp": [
    "Exportar edições",
-   "Baixa só as edições feitas neste navegador, para importar em outro computador.",
+   "Baixa só as edições ainda não publicadas, em arquivo.",
    "publicar-ajuda"
   ],
   "r.central_ajuda.ca-pimp": [
@@ -5949,6 +5952,16 @@ window.PR_AJUDA_CONTEUDO = {
    "Limpar registro",
    "Apaga a lista de itens vistos (não afeta as explicações).",
    "editar-explicacoes-rapidas"
+  ],
+  "r.comunicacao.gerar": [
+   "Criar a partir do calendário",
+   "Cria uma publicação por rede social a partir de uma atividade ou data dos calendários.",
+   "calendario-comunicacao"
+  ],
+  "r.contas.im-ok": [
+   "Importar as planilhas",
+   "Grava os lançamentos das planilhas de novembro de 2026 na Prestação de Contas. Se já foram importados, atualiza sem duplicar.",
+   "prestacao-contas"
   ]
  },
  "contextos": {

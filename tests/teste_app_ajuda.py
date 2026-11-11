@@ -66,7 +66,8 @@ async def main():
         await pg.click('a[href="#guia/instalar"]'); await pg.wait_for_selector('.passos-ajuda li')
         ok('Agregar a pantalla de inicio' in await pg.inner_text('main'), "guia em espanhol")
         await pg.goto(B + '/app/?servidor=1&lang=es#ajuda-f/reservas'); await pg.wait_for_selector('main.artigo')
-        ok('todavía está en portugués' in await pg.inner_text('main'), "artigo da Central avisa que ainda está em português")
+        t_es = await pg.inner_text('main'); ok('todavía está en portugués' not in t_es and 'Paso a paso' in t_es and 'Abrir la herramienta' in t_es, "artigo da Central de Ajuda em espanhol")
+        ok('Alojamiento' in await pg.inner_text('.topo h1'), "título do artigo em espanhol")
         await pg.screenshot(path=OUT + '/app-ajuda-4-es.png', full_page=True)
 
         # pessoa com uma função: só a ajuda das ferramentas que pode abrir

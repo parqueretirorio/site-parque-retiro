@@ -13,7 +13,9 @@ def check(cond, msg):
     ok += 1; print('  ✓', msg)
 
 async def contexto(b, **kw):
-    ctx = await b.new_context(accept_downloads=True, **kw); await ctx.add_init_script("try{localStorage.setItem('pr_imp2611_auto','true')}catch(e){}")
+    ctx = await b.new_context(accept_downloads=True, **kw); await ctx.add_init_script("try{localStorage.setItem('pr_imp2611_auto','true')}catch(e){}"
+        # o acesso temporário pela mandala foi desligado no site (10/11/2026); o teste o religa só no navegador de teste, para entrar como administrador
+        "try{let v;Object.defineProperty(window,'PR_ACESSO_TEMPORARIO',{configurable:true,get(){return v},set(x){v=Object.assign({},x,{ativo:true})}});if(!localStorage.getItem('teste_temp_dono')){localStorage.setItem('teste_temp_dono','1');sessionStorage.setItem('pr_temp','1')}}catch(e){}")
     if FA:
         async def fa(route):
             u = route.request.url
@@ -120,12 +122,12 @@ async def main():
         await pg.wait_for_function("document.querySelector('#pr-aj-tip.on .pr-aj-tt') && document.querySelector('#pr-aj-tip .pr-aj-tt').textContent.includes('Zoom')", timeout=4000)
         check('Texto NOVO' in await pg.inner_text('#pr-aj-tip'), 'explicação editada no próprio item vale na hora')
         await pg.evaluate("document.querySelector('[data-tab=central_ajuda]').click()"); await pg.click('#ca-novo')
-        await pg.fill('#ca-t', 'Artigo de teste da Central'); await pg.fill('#ca-r', 'Resumo do teste.'); await pg.fill('#ca-3', 'Primeiro passo\nSegundo passo')
+        await pg.fill('#ca-t', 'Artigo de teste da Central'); await pg.fill('#ca-r', 'Resumo do teste.'); await pg.fill('#ca-3', 'Primeiro passo\nSegundo passo'); await pg.select_option('#ca-p', 'todos')  # visível para o visitante da outra aba
         await pg.check('#ca-rel input[value="backup-e-restauracao"]'); await pg.click('#ca-salvar')
         await pg.wait_for_selector('[data-ed="artigo-de-teste-da-central"]')
         check(True, 'novo artigo criado pela área restrita')
         pg2 = await ctx.new_page(); await pg2.goto(U + 'ajuda.html?a=artigo-de-teste-da-central'); await pg2.wait_for_selector('h1.pr-aj-titulo')
-        check('Segundo passo' in await pg2.inner_text('.pr-aj-passos') and 'Backup e restauração' in await pg2.inner_text('.pr-aj-rel'), 'artigo novo aparece na Central com passos e relacionado')
+        check('Segundo passo' in await pg2.inner_text('.pr-aj-passos') and await pg2.locator('.pr-aj-rel a').count() >= 2, 'artigo novo aparece na Central com passos e relacionados (o relacionado da equipe fica oculto para o visitante)')
         await pg.click('[data-st="artigo-de-teste-da-central"]'); await pg2.reload(); await pg2.wait_for_selector('.pr-aj-vazio')
         check('não encontrado' in await pg2.inner_text('#central-ajuda'), 'retirar do ar: visitante (outra aba, sem login) não vê o rascunho')
         await pg.click('[data-ver="artigo-de-teste-da-central"]'); await pg.wait_for_selector('#pr-aj-painel .pr-aj-rasc')
