@@ -1,8 +1,8 @@
 {
-  "versao": "1.1.0",
+  "versao": "1.1.1",
   "data": "2026-11-11",
   "novidades": [
-    "Aviso para instalar o app no celular, com o ícone do CONecta Retiro",
-    "Número da versão e aviso quando houver atualização"
+    "Tamanho da letra e dos botões se ajusta a cada celular",
+    "Aviso para instalar o app, versão e aviso de atualização"
   ]
 }

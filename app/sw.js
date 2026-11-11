@@ -1,7 +1,7 @@
 // CONecta Retiro: permite instalar o app e abrir a casca do app mesmo com internet fraca.
 // Sempre busca a versão nova na internet primeiro; só usa a cópia guardada se estiver sem conexão.
 // Os dados NÃO ficam aqui: vêm do servidor do Parque a cada abertura.
-const CACHE = 'conecta-retiro-1.1.0'; // mude junto com VERSAO (app.js) e versao.json
+const CACHE = 'conecta-retiro-1.1.1'; // mude junto com VERSAO (app.js) e versao.json
 const CASCA = ['./', './index.html', './app.css', './app.js', './manifest.webmanifest', './icone-192.png', './icone-512.png'];
 self.addEventListener('message', e => { if (e.data === 'atualizar') self.skipWaiting(); });
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CASCA)).then(() => self.skipWaiting())); });
