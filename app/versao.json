@@ -1,8 +1,8 @@
 {
-  "versao": "1.1.1",
+  "versao": "1.1.2",
   "data": "2026-11-11",
   "novidades": [
-    "Tamanho da letra e dos botões se ajusta a cada celular",
+    "Letra e botões no tamanho certo em cada celular, mesmo com a letra do sistema aumentada",
     "Aviso para instalar o app, versão e aviso de atualização"
   ]
 }

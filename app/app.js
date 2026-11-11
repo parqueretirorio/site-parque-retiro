@@ -17,7 +17,7 @@ const tela = $('#tela');
 const ferramenta = id => '../area-restrita.html?app=1#t=' + encodeURIComponent(id);
 let me = null;
 
-const VERSAO = '1.1.1', DATA_VERSAO = '11/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
+const VERSAO = '1.1.2', DATA_VERSAO = '11/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 
 /* ---------- Instalar o app e atualizações ---------- */
