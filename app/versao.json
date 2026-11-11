@@ -1,8 +1,9 @@
 {
-  "versao": "1.3.1",
+  "versao": "1.4.0",
   "data": "2026-11-11",
   "novidades": [
-    "Ajuda inteira em espanhol: guia do app e explicação de cada ferramenta",
-    "Textos da ajuda atualizados para o servidor do Parque"
+    "Telas próprias do Alojamento: pedidos, camas, ocupação e novo pedido",
+    "Inventário: procurar item, ficha e o que está emprestado",
+    "Documentos e Calendários: encaminhamentos das atas e nova atividade"
   ]
 }

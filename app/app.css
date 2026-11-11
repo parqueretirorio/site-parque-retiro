@@ -130,3 +130,57 @@ input[type=email], input[type=password], input[type=text], input[type=search] { 
 .ajuda-fim { margin-top: 1.6rem; }
 .voltar-entrar { color: var(--azul); font-weight: 700; }
 .topo h1 .fas { margin-right: 6px; }
+/* Bloco 2: Alojamento, Inventário, Documentos e Calendários */
+.b2 label { display: block; }
+.b2 input[type=date], .b2 input[type=time], .b2 input[type=tel], .b2 input[type=number], .b2 input:not([type]), .b2 select, .b2 textarea { width: 100%; font: inherit; font-size: 1rem; padding: 12px 14px; border: 2px solid var(--borda); border-radius: 14px; background: #fff; color: var(--texto); }
+.b2 select:focus-visible, .b2 textarea:focus-visible { outline: 3px solid #f2b705; outline-offset: 2px; }
+.sub { display: flex; gap: 6px; margin: 0 0 12px; flex-wrap: wrap; }
+.sub a { flex: 1 1 auto; text-align: center; padding: 10px 8px; border-radius: 12px; border: 2px solid var(--azul); color: var(--azul); text-decoration: none; font-weight: 700; font-size: 0.9rem; background: #fff; }
+.sub a.on { background: var(--azul); color: #fff; }
+.cartao-b2 { background: #fff; border: 2px solid var(--borda); border-radius: 16px; padding: 14px 16px; margin-bottom: 12px; }
+.cartao-b2.conf { border-color: #b9dcc6; }
+.cartao-b2.atrasado { border-color: #e6a597; }
+.cartao-b2 p { margin: 6px 0; }
+.cartao-b2 .bt { margin-top: 10px; }
+.contato { font-size: 0.9rem; }
+.tel { display: inline-block; margin-left: 6px; font-weight: 700; white-space: nowrap; }
+.aviso-nec { background: #fff4e0; border-radius: 10px; padding: 8px 10px; font-size: 0.9rem; }
+.desc { color: #3d4f60; font-size: 0.9rem; }
+.form-b2 { display: flex; flex-direction: column; gap: 4px; }
+.form-b2 .bt { margin-top: 12px; }
+.duas { display: flex; gap: 10px; }
+.duas > div { flex: 1 1 0; min-width: 0; }
+.marca { display: flex !important; align-items: center; gap: 10px; font-weight: 400 !important; margin-top: 12px; }
+.marca input { width: 1.4rem; height: 1.4rem; }
+.cama-linha { display: flex; flex-direction: column; gap: 6px; padding: 10px 0; border-top: 1px dashed var(--borda); }
+.bt-perigo { background: #fff; color: var(--alerta); border: 2px solid var(--alerta); }
+.totais { display: flex; gap: 10px; margin: 12px 0; }
+.totais > div { flex: 1; background: #fff; border: 2px solid var(--borda); border-radius: 14px; padding: 10px; text-align: center; }
+.totais span { display: block; font-size: 0.85rem; color: #3d4f60; }
+.totais b { font-size: 1.3rem; }
+.camas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.cama { border-radius: 12px; padding: 8px 10px; border: 2px solid var(--borda); background: #fff; display: flex; flex-direction: column; }
+.cama.ocupada { background: #fbe3dc; border-color: #e6a597; }
+.cama.livre { background: #dff3e7; border-color: #b9dcc6; }
+.cama small { color: #3d4f60; font-size: 0.8rem; }
+.cama span { font-size: 0.9rem; overflow-wrap: anywhere; }
+.faixa-ok { background: #dff3e7; border: 2px solid #8cc5a3; margin: 0 0 12px; }
+.item-b2 { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; align-items: center; background: #fff; border: 2px solid var(--borda); border-radius: 14px; padding: 10px 14px; margin-bottom: 8px; color: var(--texto); text-decoration: none; }
+.item-b2 b { color: var(--azul); font-size: 0.9rem; }
+.item-b2 span { font-weight: 700; }
+.item-b2 small { grid-column: 1 / -1; color: #3d4f60; font-size: 0.85rem; }
+.item-b2 .tag { grid-column: 1 / -1; justify-self: start; }
+.tag-cinza { background: #e6e9ec; color: #3d4f60; }
+.tag-azul { background: #e2ecf7; color: var(--azul-esc); }
+.ficha { background: #fff; border: 2px solid var(--borda); border-radius: 14px; padding: 6px 14px; }
+.ficha-l { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid #e6ebef; }
+.ficha-l:last-child { border-bottom: 0; }
+.ficha-l span { color: #3d4f60; font-size: 0.9rem; }
+.ficha-l b { text-align: right; overflow-wrap: anywhere; }
+.item-nome { margin-top: 6px; }
+.item-foto { width: 100%; max-height: 260px; object-fit: contain; background: #fff; border-radius: 14px; border: 2px solid var(--borda); margin: 8px 0; }
+.lista-b2 { list-style: none; padding: 0; margin: 0; }
+.lista-b2 li { background: #fff; border: 2px solid var(--borda); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; font-size: 0.92rem; }
+.lista-b2 li a { color: var(--texto); text-decoration: none; display: block; }
+.atraso { color: var(--alerta); font-weight: 700; }
+.acoes { display: flex; flex-direction: column; gap: 0; }

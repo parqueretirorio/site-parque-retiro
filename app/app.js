@@ -17,11 +17,14 @@ const fmtDia = iso => new Date(iso + 'T12:00:00').toLocaleDateString(I.locale(),
 const primeiro = n => String(n || '').trim().split(/\s+/)[0] || '';
 const tela = $('#tela');
 const ferramenta = id => '../area-restrita.html?app=1#t=' + encodeURIComponent(id);
+// Ferramentas com tela própria no app (Bloco 2). As demais abrem a área restrita completa.
+const NATIVAS = { reservas: 'alojamento', inventario: 'inventario', documentos: 'documentos' };
+const destino = id => NATIVAS[id] ? '#' + NATIVAS[id] : ferramenta(id);
 let me = null;
 // Mensagens do login vêm em português do adaptador; aqui viram o idioma do app.
 const traduzErro = m => /incorretos/.test(m) ? t('errCred') : /confirmar seu e-mail/.test(m) ? t('errConf') : /Sem conexão/.test(m) ? t('errRede') : /Muitas tentativas/.test(m) ? t('errMuitas') : m;
 
-const VERSAO = '1.3.1', DATA_VERSAO = '11/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
+const VERSAO = '1.4.0', DATA_VERSAO = '11/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 
 /* ---------- Instalar o app e atualizações ---------- */
@@ -105,7 +108,7 @@ function entrar(msg) {
 
 /* ---------- Início ---------- */
 // Linha de ferramenta: o nome abre a ferramenta; o "?" ao lado abre a explicação dela (Ajuda).
-const linhaFerr = (tb, extra) => `<div class="linha-f"><a class="linha" href="${ferramenta(tb[0])}"><i class="fas ${tb[1]}" aria-hidden="true"></i><span>${esc(I.aba(tb[0], tb[2]))}</span>${extra || ''}<i class="fas fa-chevron-right seta" aria-hidden="true"></i></a><a class="q" href="#ajuda-f/${encodeURIComponent(tb[0])}" aria-label="${esc(H('ajudaDe', { n: I.aba(tb[0], tb[2]) }))}" title="${esc(H('ajudaDe', { n: I.aba(tb[0], tb[2]) }))}">?</a></div>`;
+const linhaFerr = (tb, extra) => `<div class="linha-f"><a class="linha" href="${destino(tb[0])}"><i class="fas ${tb[1]}" aria-hidden="true"></i><span>${esc(I.aba(tb[0], tb[2]))}</span>${extra || ''}<i class="fas fa-chevron-right seta" aria-hidden="true"></i></a><a class="q" href="#ajuda-f/${encodeURIComponent(tb[0])}" aria-label="${esc(H('ajudaDe', { n: I.aba(tb[0], tb[2]) }))}" title="${esc(H('ajudaDe', { n: I.aba(tb[0], tb[2]) }))}">?</a></div>`;
 const botao = (href, ic, nome, extra) => `<a class="cartao" href="${href}"><i class="fas ${ic}" aria-hidden="true"></i><span>${esc(nome)}</span>${extra || ''}</a>`;
 function abas() { return A ? A.abasDe(me) : []; }
 function inicio() {
@@ -287,6 +290,222 @@ function ajudaFerramenta(tab) {
     .catch(() => { $('main').innerHTML = `<p class="faixa faixa-alerta">${H('erroAjuda')}</p>`; });
 }
 
+/* ---------- Bloco 2: telas próprias de Alojamento, Inventário, Documentos e Calendários ---------- */
+// Mesmos dados e regras da área restrita (coleções pedidos, inv_itens/inv_emp/inv_mov, docs, ativ); o que é mais raro fica na ferramenta completa.
+const tv = v => { const k = 'val_' + v, x = t(k); return x === k ? v : x; }; // situações e tipos fixos traduzidos
+let flash = '';
+const mostraFlash = () => { const f = flash; flash = ''; return f ? `<p class="faixa faixa-ok" role="status"><i class="fas fa-check-circle" aria-hidden="true"></i> ${esc(f)}</p>` : ''; };
+const grava = (col, l) => { try { return db.set(col, l) !== false; } catch (e) { return false; } };
+const temAba = id => abas().some(x => x[0] === id);
+const nomeAba = id => I.aba(id, (abas().find(x => x[0] === id) || [])[2] || id);
+const abasSub = (lista, atual, base) => `<nav class="sub" aria-label="${esc(document.title.split(' · ')[0])}">${lista.map(([k, n]) => `<a href="#${base}${k ? '/' + k : ''}" class="${k === atual ? 'on' : ''}"${k === atual ? ' aria-current="page"' : ''}>${esc(n)}</a>`).join('')}</nav>`;
+const rodapeFerr = (id, txt) => `${txt ? `<p class="nota">${esc(txt)}</p>` : ''}<a class="bt bt-claro" href="${ferramenta(id)}"><i class="fas fa-external-link-alt" aria-hidden="true"></i> ${t('b2_ferrCompleta')}</a>
+  <a class="bt bt-texto" href="#ajuda-f/${encodeURIComponent(id)}"><i class="fas fa-question-circle" aria-hidden="true"></i> ${H('ajudaBt')}</a>`;
+const telLink = tel => { const n = String(tel || '').replace(/\D/g, ''); return n ? ` <a href="tel:${n}" class="tel"><i class="fas fa-phone" aria-hidden="true"></i> ${t('b2_ligar')}</a> <a href="https://wa.me/${n.length <= 11 ? '55' + n : n}" class="tel" target="_blank" rel="noopener"><i class="fab fa-whatsapp" aria-hidden="true"></i> WhatsApp</a>` : ''; };
+
+/* --- Alojamento (mesmas regras de area.js: 12 camas, ímpares embaixo, sem choque de datas) --- */
+const QUARTOS = [['Paz', 1, 4], ['Força', 5, 8], ['Alegria', 9, 12]], NCAMAS = 12;
+const quartoDe = n => (QUARTOS.find(q => n >= q[1] && n <= q[2]) || ['?'])[0];
+const nivelCama = n => t(n % 2 ? 'b2_baixo' : 'b2_cima');
+const pad2 = n => String(n).padStart(2, '0');
+const camaTxt = n => t('b2_cama', { n: pad2(n), nv: nivelCama(n), q: quartoDe(n) });
+const fimEf = r => r.saida > r.chegada ? r.saida : somaDias(r.chegada, 1);
+const choca = (a, b) => a.chegada < fimEf(b) && b.chegada < fimEf(a);
+const pedidos = () => db.get('pedidos', []) || [];
+const ocupadas = r => { const m = {}; pedidos().filter(p => p.status === 'confirmada' && p.id !== r.id && choca(p, r)).forEach(p => (p.camas || []).forEach(c => { m[c.cama] = p; })); return m; };
+const assefazDe = (r, st) => (r.assefaz || []).filter(a => !st || a.status === st);
+const mesmoNome = (a, b) => norm(a) === norm(b);
+let alojAbre = '';
+function alojamento(sub) {
+  if (!temAba('reservas')) return inicio();
+  sub = sub || 'pedidos';
+  document.title = nomeAba('reservas') + ' · CONecta Retiro';
+  const SUBS = [['pedidos', t('b2_pedidos')], ['ocupacao', t('b2_ocup')], ['novo', t('b2_novo')]];
+  const per = r => t('b2_periodo', { a: fmtDia(r.chegada).slice(0, 5), b: fmtDia(r.saida) });
+  const info = r => `<h3>${esc(r.nome)}</h3><p>${t('b2_pessoas', { n: r.pessoas })} · ${per(r)}${r.hora ? ' · ' + t('b2_chegHora', { h: esc(r.hora) }) : ''}</p>
+    ${r.telefone || r.email ? `<p class="contato">${esc([r.telefone, r.email].filter(Boolean).join(' · '))}${telLink(r.telefone)}</p>` : ''}
+    ${r.necessidades || r.camaBaixa ? `<p class="aviso-nec"><i class="fas fa-exclamation-circle" aria-hidden="true"></i> ${r.necessidades ? `<b>${t('b2_nec')}:</b> ${esc(r.necessidades)} ` : ''}${r.camaBaixa ? `<b>(${t('b2_camaBaixa')})</b>` : ''}</p>` : ''}
+    ${r.detalhes ? `<p class="desc">${esc(r.detalhes)}</p>` : ''}`;
+  let corpo = '';
+  if (sub === 'pedidos') {
+    const ps = pedidos(), pend = ps.filter(r => r.status === 'pendente').sort((a, b) => a.chegada.localeCompare(b.chegada));
+    const h = hoje(), lim = somaDias(h, 60), conf = ps.filter(r => r.status === 'confirmada' && fimEf(r) > h && r.chegada <= lim).sort((a, b) => a.chegada.localeCompare(b.chegada));
+    const cartao = r => {
+      const oc = ocupadas(r), livres = []; for (let n = 1; n <= NCAMAS; n++) if (!oc[n] && (!r.camaBaixa || n % 2)) livres.push(n);
+      const total = NCAMAS - Object.keys(oc).length, fora = assefazDe(r, 'confirmada'), nCama = r.hospedagem ? Math.max(0, r.pessoas - fora.length) : 0, nomeFora = fora.some(a => mesmoNome(a.pessoa, r.nome));
+      const aberto = alojAbre === r.id;
+      const camas = aberto && nCama ? `<p class="nota">${t('b2_dicaCamas')}</p>` + Array.from({ length: nCama }, (_, i) => `<div class="cama-linha"><label class="oculto" for="p-${i}">${t('b2_nomePessoa', { n: i + 1 })}</label><input id="p-${i}" data-p="${i}" maxlength="80" value="${i === 0 && !nomeFora ? esc(r.nome) : ''}" placeholder="${esc(t('b2_nomePessoa', { n: i + 1 }))}">
+        <label class="oculto" for="c-${i}">${esc(t('b2_escolhaCama'))}</label><select id="c-${i}" data-c="${i}"><option value="">${t('b2_escolhaCama')}</option>${livres.map(n => `<option value="${n}">${esc(t('b2_camaCurta', { n: pad2(n), nv: nivelCama(n), q: quartoDe(n) }))}</option>`).join('')}</select></div>`).join('') : '';
+      return `<article class="cartao-b2" data-id="${esc(r.id)}">${info(r)}
+        <p class="nota">${r.hospedagem ? t('b2_livres', { n: total, t: NCAMAS }) + (nCama > total ? ` <span class="tag tag-ocupado">${t('b2_naoCabe')}</span>` : '') : t('b2_semCama')}</p>
+        ${fora.length ? `<p class="nota">${esc(t('b2_naAssefaz', { p: fora.map(a => a.pessoa).join(', ') }))}</p>` : ''}
+        ${aberto ? `<div class="form-b2">${camas}<p class="erro" role="alert" hidden></p><button type="button" class="bt bt-principal" data-salva>${t(nCama ? 'b2_confirmar' : 'b2_confirmarSem')}</button>
+          <label for="m-${esc(r.id)}">${t('b2_motivo')}</label><input id="m-${esc(r.id)}" data-motivo maxlength="200">
+          <button type="button" class="bt bt-perigo" data-recusa>${t('b2_simRecusar')}</button><button type="button" class="bt bt-texto" data-fecha>${t('b2_cancelar')}</button></div>`
+        : `<button type="button" class="bt bt-principal" data-abre>${t(nCama ? 'b2_confirmar' : 'b2_confirmarSem')} / ${t('b2_recusar')}</button>`}</article>`;
+    };
+    corpo = `<h2>${t('b2_aguard', { n: pend.length })}</h2>${pend.length ? pend.map(cartao).join('') : `<p class="vazio">${t('b2_semAguard')}</p>`}
+      <h2>${t('b2_proxConf')}</h2>${conf.length ? conf.map(r => `<article class="cartao-b2 conf"><h3>${esc(r.nome)}</h3><p>${t('b2_pessoas', { n: r.pessoas })} · ${per(r)}</p><p class="desc">${(r.camas || []).map(c => esc(c.pessoa) + ': ' + esc(camaTxt(c.cama))).concat(assefazDe(r, 'confirmada').map(a => esc(a.pessoa) + ': ASSEFAZ')).join('<br>') || esc(t('b2_semCama'))}</p></article>`).join('') : `<p class="vazio">${t('b2_semConf')}</p>`}`;
+  } else if (sub === 'ocupacao') {
+    const dia = sessionStorage.getItem('pr_app_ocup') || hoje(), ocupa = {};
+    const conf = pedidos().filter(r => r.status === 'confirmada' && r.chegada <= dia && dia < fimEf(r));
+    conf.forEach(r => (r.camas || []).forEach(c => { ocupa[c.cama] = c.pessoa; }));
+    const fora = []; conf.forEach(r => assefazDe(r, 'confirmada').forEach(a => fora.push(a.pessoa)));
+    const n = Object.keys(ocupa).length;
+    corpo = `<label for="o-d">${t('b2_data')}</label><input id="o-d" type="date" value="${dia}">
+      <div class="totais"><div><span>${t('b2_ocupadas')}</span><b>${n} / ${NCAMAS}</b></div><div><span>${t('b2_livresT')}</span><b>${NCAMAS - n}</b></div></div>
+      ${QUARTOS.map(q => { let b = ''; for (let c = q[1]; c <= q[2]; c++) b += `<div class="cama ${ocupa[c] ? 'ocupada' : 'livre'}"><b>${pad2(c)}</b><small>${nivelCama(c)}</small><span>${ocupa[c] ? esc(ocupa[c]) : t('b2_livre')}</span></div>`; return `<h2>${t('b2_quarto', { q: q[0] })}</h2><div class="camas">${b}</div>`; }).join('')}
+      ${fora.length ? `<h2>${t('b2_assefazDia')}</h2><p>${esc(fora.join(', '))}</p>` : ''}`;
+  } else {
+    corpo = `<p class="nota">${t('b2_dicaNovo')}</p><form id="fn" class="form-b2" novalidate>
+      <label for="n-n">${t('b2_nome')}</label><input id="n-n" maxlength="80" autocomplete="off">
+      <label for="n-t">${t('b2_telefone')}</label><input id="n-t" type="tel" maxlength="30">
+      <label for="n-e">${t('b2_email')}</label><input id="n-e" type="email" maxlength="80">
+      <div class="duas"><div><label for="n-c">${t('b2_chegada')}</label><input id="n-c" type="date"></div><div><label for="n-s">${t('b2_saida')}</label><input id="n-s" type="date"></div></div>
+      <div class="duas"><div><label for="n-h">${t('b2_hora')}</label><input id="n-h" type="time"></div><div><label for="n-p">${t('b2_nPessoas')}</label><input id="n-p" type="number" min="1" max="99" value="1" inputmode="numeric"></div></div>
+      <label class="marca"><input type="checkbox" id="n-g" checked> ${t('b2_precisaCama')}</label>
+      <label class="marca"><input type="checkbox" id="n-b"> ${t('b2_camaBaixa')}</label>
+      <label for="n-nec">${t('b2_necessidades')}</label><textarea id="n-nec" rows="2" maxlength="500"></textarea>
+      <label for="n-d">${t('b2_detalhes')}</label><textarea id="n-d" rows="3" maxlength="1500"></textarea>
+      <p class="erro" role="alert" hidden></p><button class="bt bt-principal">${t('b2_salvarPedido')}</button></form>`;
+  }
+  tela.innerHTML = topo(nomeAba('reservas'), true) + aviso() + `<main class="b2">${abasSub(SUBS, sub, 'alojamento')}${mostraFlash()}${corpo}${rodapeFerr('reservas', t('b2_ferrCompletaAloj'))}</main>`;
+  if (sub === 'pedidos') tela.querySelectorAll('.cartao-b2[data-id]').forEach(box => {
+    const id = box.dataset.id, er = box.querySelector('.erro'), falha = m => { er.textContent = m; er.hidden = false; };
+    const ab = box.querySelector('[data-abre]'); if (ab) ab.onclick = () => { alojAbre = id; alojamento('pedidos'); const b = $('.cartao-b2[data-id="' + id + '"]'); if (b) b.scrollIntoView({ block: 'start' }); };
+    const fe = box.querySelector('[data-fecha]'); if (fe) fe.onclick = () => { alojAbre = ''; alojamento('pedidos'); };
+    const sv = box.querySelector('[data-salva]'); if (sv) sv.onclick = () => {
+      er.hidden = true; const l = pedidos(), x = l.find(r => r.id === id); if (!x) return;
+      const camas = [], ns = [...box.querySelectorAll('[data-p]')], cs = [...box.querySelectorAll('[data-c]')];
+      for (let i = 0; i < cs.length; i++) { const n = +cs[i].value; if (!n) return falha(t('b2_errCama')); camas.push({ pessoa: ns[i].value.trim() || t('b2_nomePessoa', { n: i + 1 }), cama: n }); }
+      if (new Set(camas.map(c => c.cama)).size < camas.length) return falha(t('b2_errDupla'));
+      const oc = ocupadas(x); if (camas.some(c => oc[c.cama])) return falha(t('b2_errOcupada'));
+      x.status = 'confirmada'; x.camas = camas; x.motivo = '';
+      if (!grava('pedidos', l)) return falha(t('b2_erroSalvar'));
+      alojAbre = ''; flash = t('b2_okConf'); alojamento('pedidos');
+    };
+    const rc = box.querySelector('[data-recusa]'); if (rc) rc.onclick = () => {
+      const l = pedidos(), x = l.find(r => r.id === id); if (!x) return;
+      x.status = 'recusada'; x.motivo = (box.querySelector('[data-motivo]').value || '').trim(); x.camas = [];
+      if (!grava('pedidos', l)) return falha(t('b2_erroSalvar'));
+      alojAbre = ''; flash = t('b2_okRec'); alojamento('pedidos');
+    };
+  });
+  if (sub === 'ocupacao') $('#o-d').onchange = e => { if (e.target.value) { sessionStorage.setItem('pr_app_ocup', e.target.value); alojamento('ocupacao'); } };
+  if (sub === 'novo') $('#fn').onsubmit = e => {
+    e.preventDefault(); const v = id => $('#' + id).value.trim(), er = $('#fn .erro'), falha = m => { er.textContent = m; er.hidden = false; er.scrollIntoView({ block: 'center' }); }; er.hidden = true;
+    const p = parseInt(v('n-p'), 10);
+    if (!v('n-n') || !v('n-c') || !v('n-s')) return falha(t('b2_errNovo1'));
+    if (v('n-s') < v('n-c')) return falha(t('b2_errNovo2'));
+    if (!(p >= 1)) return falha(t('b2_errNovo3'));
+    if ($('#n-g').checked && p > NCAMAS) return falha(t('b2_errNovo4', { n: NCAMAS }));
+    const l = pedidos(), id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    l.push({ id, status: 'pendente', nome: v('n-n'), telefone: v('n-t'), email: v('n-e'), cidade: '', comunidade: '', chegada: v('n-c'), saida: v('n-s'), hora: v('n-h'), pessoas: p, hospedagem: $('#n-g').checked, camaBaixa: $('#n-b').checked, necessidades: v('n-nec'), detalhes: v('n-d'), camas: [], criado: hoje(), por: me.nome });
+    if (!grava('pedidos', l)) return falha(t('b2_erroSalvar'));
+    alojAbre = id; flash = t('b2_okNovo'); location.hash = '#alojamento/pedidos';
+  };
+}
+
+/* --- Inventário: consulta rápida, ficha do item e o que está emprestado; movimentar fica na ferramenta completa --- */
+function inventario(itemId) {
+  if (!temAba('inventario')) return inicio();
+  document.title = nomeAba('inventario') + ' · CONecta Retiro';
+  const itens = db.get('inv_itens', []) || [], emp = (db.get('inv_emp', []) || []).filter(e => !e.devolvido), h = hoje();
+  const catNome = id => (window.PR_INVENTARIO && window.PR_INVENTARIO.catNome) ? window.PR_INVENTARIO.catNome(id) : id;
+  const tag = st => `<span class="tag ${st === 'Disponível' ? 'tag-ok' : st === 'Baixado' ? 'tag-cinza' : st === 'Em uso' ? 'tag-azul' : 'tag-ocupado'}">${esc(tv(st))}</span>`;
+  const empLinha = e => `<li><b>${esc(e.codigo)}</b> ${esc(e.nome)} · ${esc(t('b2_comPessoa', { p: e.pessoa }))}${e.prevista ? ` · <span class="${e.prevista < h ? 'atraso' : ''}">${t('b2_devolverAte', { d: fmtDia(e.prevista) })}${e.prevista < h ? ' (' + t('b2_atrasado') + ')' : ''}</span>` : ''}</li>`;
+  if (itemId) {
+    const it = itens.find(x => x.id === itemId);
+    if (!it) { location.hash = '#inventario'; return; }
+    const lo = emp.filter(e => e.item === it.id), mv = (db.get('inv_mov', []) || []).filter(m => m.item === it.id).slice(-8).reverse();
+    const lin = (k, v) => v || v === 0 ? `<div class="ficha-l"><span>${t(k)}</span><b>${esc(v)}</b></div>` : '';
+    tela.innerHTML = topo(esc(it.codigo), false).replace('<header class="topo">', `<header class="topo"><a class="voltar" href="#inventario"><i class="fas fa-arrow-left" aria-hidden="true"></i> ${t('b2_voltarLista')}</a>`) + aviso() + `<main class="b2">
+      <h2 class="item-nome">${esc(it.nome)}</h2><p>${tag(it.status)}</p>
+      ${it.foto ? `<img class="item-foto" src="${esc(it.foto)}" alt="${esc(it.nome)}">` : ''}
+      <div class="ficha">${lin('b2_cat', catNome(it.cat))}${lin('b2_qtd', (it.quantidade ?? '') + (it.unidade ? ' ' + it.unidade : ''))}${lin('b2_local', it.local)}${lin('b2_conserv', it.conserv ? tv(it.conserv) : '')}${lin('b2_resp', it.responsavel)}${lin('b2_pat', it.patNumero)}${lin('b2_marcaSerie', [it.marca, it.modelo, it.serie].filter(Boolean).join(' · '))}${lin('b2_projeto', it.projeto)}</div>
+      ${it.descricao ? `<p class="desc">${esc(it.descricao)}</p>` : ''}
+      ${lo.length ? `<h2>${t('b2_emprestados', { n: lo.length })}</h2><ul class="lista-b2">${lo.map(empLinha).join('')}</ul>` : ''}
+      <h2>${t('b2_ultMov')}</h2>${mv.length ? `<ul class="lista-b2">${mv.map(m => `<li>${esc(fmtDia(m.data))} · <b>${esc(tv(m.tipo))}</b>${m.qtd !== '' && m.qtd != null ? ' · ' + esc(m.qtd) : ''}${m.det ? ' · ' + esc(m.det) : ''}${m.por ? ` <small>(${esc(m.por)})</small>` : ''}</li>`).join('')}</ul>` : `<p class="vazio">${t('b2_semMov')}</p>`}
+      <a class="bt bt-principal" href="${ferramenta('inventario')}"><i class="fas fa-exchange-alt" aria-hidden="true"></i> ${t('b2_movimentar')}</a>
+      ${rodapeFerr('inventario')}
+    </main>`;
+    window.scrollTo(0, 0); return;
+  }
+  const q0 = sessionStorage.getItem('pr_app_invq') || '';
+  tela.innerHTML = topo(nomeAba('inventario'), true) + aviso() + `<main class="b2">
+    ${emp.length ? `<h2>${t('b2_emprestados', { n: emp.length })}</h2><ul class="lista-b2">${emp.sort((a, b) => (a.prevista || '9').localeCompare(b.prevista || '9')).map(e => `<li><a href="#inv/${encodeURIComponent(e.item)}">${empLinha(e).slice(4, -5)}</a></li>`).join('')}</ul>` : ''}
+    <h2>${t('b2_procurarItem')}</h2>
+    <label for="ib" class="oculto">${t('b2_invBusca')}</label><input id="ib" type="search" placeholder="${esc(t('b2_invBusca'))}" value="${esc(q0)}" autocomplete="off">
+    <div id="ires" aria-live="polite"></div>
+    ${rodapeFerr('inventario')}
+  </main>`;
+  const mostra = () => {
+    const q = norm($('#ib').value); sessionStorage.setItem('pr_app_invq', $('#ib').value);
+    const ord = itens.slice().sort((a, b) => String(a.codigo).localeCompare(String(b.codigo)));
+    const l = ord.filter(x => !q || norm([x.codigo, x.nome, x.marca, x.modelo, x.serie, x.local, x.patNumero].join(' ')).includes(q));
+    $('#ires').innerHTML = `<p class="nota">${t('b2_itens', { n: l.length })}</p>` + (l.length ? l.slice(0, 50).map(x => `<a class="item-b2" href="#inv/${encodeURIComponent(x.id)}"><b>${esc(x.codigo)}</b><span>${esc(x.nome)}</span><small>${esc(x.local || '')}${x.quantidade > 1 ? ' · ' + esc(x.quantidade) + ' ' + esc(x.unidade || '') : ''}</small>${tag(x.status)}</a>`).join('') + (l.length > 50 ? `<p class="nota">${t('b2_primeiros', { n: 50 })}</p>` : '') : `<p class="vazio">${t('b2_nadaInv')}</p>`);
+  };
+  $('#ib').oninput = mostra; mostra();
+}
+
+/* --- Documentos e Calendários: encaminhamentos das atas e nova atividade --- */
+function documentos(sub) {
+  if (!temAba('documentos')) return inicio();
+  // Como na ferramenta do site: todos consultam; só o Responsável pelos Documentos e Calendários (ou o administrador) altera.
+  const pode = !!(A && A.tem && A.tem(me, 'documentos'));
+  sub = pode ? (sub || 'enc') : 'enc';
+  document.title = nomeAba('documentos') + ' · CONecta Retiro';
+  const SUBS = [['enc', t('b2_encAberto', { n: '' }).replace(/\s*\(\)\s*$/, '')]].concat(pode ? [['nova', t('b2_novaAtiv')]] : []);
+  let corpo = '';
+  if (sub === 'enc') {
+    const h = hoje(), ab = [];
+    (db.get('docs', []) || []).filter(d => d.area === 'atas').forEach(d => (d.enc || []).forEach(e => { if (e.status === 'Em aberto') ab.push({ d, e }); }));
+    ab.sort((a, b) => (a.e.data || '9').localeCompare(b.e.data || '9'));
+    corpo = `<p class="nota">${t('b2_dicaEnc')}</p><h2>${t('b2_encAberto', { n: ab.length })}</h2>` + (ab.length ? ab.map(({ d, e }) => {
+      const atraso = e.data && e.data < h;
+      return `<article class="cartao-b2${atraso ? ' atrasado' : ''}"><h3>${esc(e.texto)}</h3>
+        <p>${e.resp ? esc(e.resp) + ' · ' : ''}${e.data ? `<span class="${atraso ? 'atraso' : ''}">${t('b2_prazo', { d: fmtDia(e.data) })}${atraso ? ' · ' + t('b2_emAtraso') : ''}</span>` : ''}</p>
+        <p class="desc">${esc(t('b2_daAta', { t: d.titulo, d: d.data ? fmtDia(d.data) : '' }))}</p>
+        ${pode ? `<div class="acoes"><button type="button" class="bt bt-principal" data-st="${esc(d.id)}|${esc(e.id)}|Feito"><i class="fas fa-check" aria-hidden="true"></i> ${t('b2_feito')}</button><button type="button" class="bt bt-texto" data-st="${esc(d.id)}|${esc(e.id)}|Cancelado">${t('b2_cancelarEnc')}</button></div>` : ''}</article>`;
+    }).join('') : `<p class="vazio">${t('b2_semEnc')}</p>`);
+  } else {
+    const cats = ['Encontro Estacional', 'Reunião de Escola', 'Retiro / Seminário', 'Mutirão / Manutenção', 'Celebração / Evento', 'Outras atividades', 'Campanha'].concat(db.get('ativ_cats', []) || []);
+    corpo = `<form id="fa" class="form-b2" novalidate>
+      <label for="a-t">${t('b2_titulo')}</label><input id="a-t" maxlength="120">
+      <div class="duas"><div><label for="a-d">${t('b2_dataIni')}</label><input id="a-d" type="date"></div><div><label for="a-f">${t('b2_dataFim')}</label><input id="a-f" type="date"></div></div>
+      <label for="a-h">${t('b2_horaAtiv')}</label><input id="a-h" maxlength="20" placeholder="09:00">
+      <label for="a-c">${t('b2_tipo')}</label><select id="a-c">${cats.map(c => `<option value="${esc(c)}">${esc(tv(c))}</option>`).join('')}</select>
+      <label for="a-l">${t('b2_localAtiv')}</label><input id="a-l" maxlength="120">
+      <label for="a-s">${t('b2_descricao')}</label><textarea id="a-s" rows="3" maxlength="1500"></textarea>
+      <p class="erro" role="alert" hidden></p><button class="bt bt-principal">${t('b2_salvarAtiv')}</button></form>`;
+  }
+  tela.innerHTML = topo(nomeAba('documentos'), true) + aviso() + `<main class="b2">${abasSub(SUBS, sub, 'documentos')}${mostraFlash()}${corpo}<a class="bt bt-claro" href="#agenda"><i class="fas fa-calendar-alt" aria-hidden="true"></i> ${t('b2_verAgenda')}</a>${rodapeFerr('documentos')}</main>`;
+  if (pode) tela.querySelectorAll('[data-st]').forEach(b => b.onclick = () => {
+    const [di, ei, st] = b.dataset.st.split('|'), l = db.get('docs', []) || [], d = l.find(x => x.id === di), e = d && (d.enc || []).find(x => x.id === ei);
+    if (!e) return; e.status = st;
+    if (!grava('docs', l)) { flash = ''; alert(t('b2_erroSalvar')); return; }
+    flash = t('b2_okEnc'); documentos('enc');
+  });
+  if (sub === 'nova' && pode) $('#fa').onsubmit = ev => {
+    ev.preventDefault(); const g = id => $('#' + id).value.trim(), er = $('#fa .erro'), falha = m => { er.textContent = m; er.hidden = false; }; er.hidden = true;
+    const ti = g('a-t'), d = g('a-d'), f = g('a-f');
+    if (!ti || !d) return falha(t('b2_errAtiv1'));
+    if (f && f < d) return falha(t('b2_errAtiv2'));
+    const l = db.get('ativ', []) || [];
+    l.push({ id: 'a' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), titulo: ti, data: d, fim: f && f !== d ? f : '', hora: g('a-h'), categoria: g('a-c'), local: g('a-l'), descricao: g('a-s'), criado: hoje(), por: me.nome });
+    if (!grava('ativ', l)) return falha(t('b2_erroSalvar'));
+    flash = t('b2_okAtiv'); documentos('nova');
+  };
+}
+function rotaBloco2(k) {
+  const [n, arg] = [k.split('/')[0], decodeURIComponent(k.split('/').slice(1).join('/'))];
+  if (n === 'alojamento') { alojamento(arg); return true; }
+  if (n === 'inventario') { inventario(); return true; }
+  if (n === 'inv') { inventario(arg); return true; }
+  if (n === 'documentos') { documentos(arg); return true; }
+  return false;
+}
+
 /* ---------- roteiro ---------- */
 const TELAS = { inicio, agenda, biblioteca, areas };
 // Telas de ajuda: #ajuda, #guia/<id>, #artigo/<id>, #ajuda-f/<ferramenta>.
@@ -309,7 +528,7 @@ function rota() {
   if (!me || (me.status || 'aprovado') !== 'aprovado') { SB.sair(); return entrar(t('pendente')); }
   sessionStorage.setItem('pr_sess', me.email);
   const k = location.hash.slice(1);
-  if (!rotaAjuda(k)) (TELAS[k] || inicio)();
+  if (!rotaAjuda(k) && !rotaBloco2(k)) (TELAS[k] || inicio)();
   window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', rota);
