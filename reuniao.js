@@ -3,7 +3,7 @@
 // e temas propostos livremente pelos Mestres. Votos e presenças são VISÍVEIS (com o nome de cada pessoa).
 // Quem participa: qualquer pessoa com conta na área restrita (todos os Mestres, de qualquer nível; participação livre).
 //   -> quando os perfis (Prompt 02) existirem, restringir a quem for Mestre.
-// Quem cria a reunião, define e altera a data: administrador e Responsável pelas Atividades. A data pode ser alterada a qualquer momento.
+// Quem cria a reunião, define e altera a data: administrador e Administrador das Atividades. A data pode ser alterada a qualquer momento.
 // Pauta orgânica: qualquer pessoa propõe tema; ninguém barra tema dos outros (o autor pode retirar o próprio).
 // A data definida vira atividade "Reunião de Escola" no calendário (chave 'ativ'). Só tela: a trava real vem com o servidor,
 // e sem servidor cada navegador enxerga apenas os próprios dados (os votos de várias pessoas só se juntam com o servidor).
@@ -16,7 +16,7 @@ const rot = (lista, k) => (lista.find(x => x[0] === k) || [k, k])[1];
 
 window.PR_REUNIAO = { abrir(me, root, H) {
   const { db, esc, $, uid, hoje, fmtData, csv, safeUrl } = H;
-  const chave = String(me.email || me.nome || '').toLowerCase(), pode = H.tem(me, 'atividades'); // administrador ou Responsável pelas Atividades
+  const chave = String(me.email || me.nome || '').toLowerCase(), pode = H.tem(me, 'atividades'); // administrador ou Administrador das Atividades
   let selId = null, msg = '', erro = '', edit = null; // edit: 'novo' | 'dados' | 'data' | null
   const todas = () => db.get('reuniao_escola', []);
   const salva = l => db.set('reuniao_escola', l);
@@ -54,7 +54,7 @@ window.PR_REUNIAO = { abrir(me, root, H) {
   const listaView = el => {
     const l = todas().slice().sort((a, b) => (encerrada(a) - encerrada(b)) || (b.criado || '').localeCompare(a.criado || ''));
     el.innerHTML = `<h3><i class="fas fa-users"></i> Reunião de Escola</h3>
-    <p>Pesquisa de datas (dois dias de fim de semana), confirmação de presença (presencial ou virtual) e temas propostos por qualquer Mestre. Participação livre; votos e presenças aparecem com o nome de cada pessoa.${pode ? '' : ' Criar reunião e definir a data é com o administrador e o Responsável pelas Atividades.'}</p>
+    <p>Pesquisa de datas (dois dias de fim de semana), confirmação de presença (presencial ou virtual) e temas propostos por qualquer Mestre. Participação livre; votos e presenças aparecem com o nome de cada pessoa.${pode ? '' : ' Criar reunião e definir a data é com o administrador e o Administrador das Atividades.'}</p>
     ${msg ? `<p class="tip-box" role="status"><i class="fas fa-check-circle"></i> ${esc(msg)}</p>` : ''}
     ${pode ? '<p><button class="btn-visit" id="r-novo"><i class="fas fa-plus-circle"></i> Nova reunião</button></p>' : ''}
     ${l.length ? `<table class="doc-table"><thead><tr><th>Reunião</th><th>Situação</th><th>Data</th><th>Respostas</th><th>Temas</th><th></th></tr></thead><tbody>${l.map(r => `<tr><td><strong>${esc(r.titulo)}</strong></td><td><span class="badge-status ${ST_CLASSE[r.status] || 'badge-pend'}">${esc(r.status)}</span></td><td>${r.final && r.final.data ? esc(dataTxt(r.final.data)) : r.opcoes.map(o => esc(fmtData(o.data))).join(' ou ')}</td><td>${Object.keys(r.votosData || {}).length} de data · ${Object.keys(r.presenca || {}).length} de presença</td><td>${(r.temas || []).filter(t => !t.retirado).length}</td><td><button class="btn-visit" data-abrir="${r.id}">Abrir</button></td></tr>`).join('')}</tbody></table>` : '<p class="vazio">Nenhuma reunião criada ainda.</p>'}`;

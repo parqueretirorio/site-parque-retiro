@@ -1,4 +1,5 @@
 (function(){var d=(window.PR_I18N_DATA=window.PR_I18N_DATA||{}); d.es=Object.assign(d.es||{}, {
+"Pesquisa de datas (dois dias de fim de semana), confirmação de presença (presencial ou virtual) e temas propostos por qualquer Mestre. Participação livre; votos e presenças aparecem com o nome de cada pessoa. Criar reunião e definir a data é com o administrador e o Administrador das Atividades.": "Encuesta de fechas (dos días de fin de semana), confirmación de asistencia (presencial o virtual) y temas propuestos por cualquier Maestro. Participación libre; los votos y asistencias aparecen con el nombre de cada persona. Crear la reunión y definir la fecha corresponde al administrador y al Administrador de las Actividades.",
 "Administrador das Atividades (corrige qualquer atividade e organiza a Reunião de Escola)": "Administrador de las Actividades (corrige cualquier actividad y organiza la Reunión de Escuela)",
 "Responsável pela atividade": "Responsable de la actividad",
 "Quem cuida desta atividade. Para passar a outra pessoa, escolha o nome dela.": "Quién cuida esta actividad. Para pasarla a otra persona, elige su nombre.",

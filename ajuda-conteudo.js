@@ -348,7 +348,7 @@ window.PR_AJUDA_CONTEUDO = {
     ],
     "exemplos": [],
     "cuidados": [
-     "As atividades são publicadas pelo Responsável pelas Atividades na área restrita (veja [[atividades-gestao|Atividades: registrar e publicar]])."
+     "As atividades são publicadas pela equipe na área restrita: cada atividade tem o seu responsável, e o Administrador das Atividades acompanha todas (veja [[atividades-gestao|Atividades: registrar e publicar]])."
     ]
    },
    "imagens": [],
@@ -1678,7 +1678,7 @@ window.PR_AJUDA_CONTEUDO = {
     "oQueE": "",
     "finalidade": "",
     "passos": [
-     "O administrador ou o Responsável pelas Atividades clica em **Nova reunião** e propõe dois dias de fim de semana.",
+     "O administrador ou o Administrador das Atividades clica em **Nova reunião** e propõe dois dias de fim de semana.",
      "Cada Mestre abre a reunião, vota nas datas e confirma presença (presencial ou virtual) em **Salvar resposta**.",
      "Qualquer Mestre pode **Propor tema**.",
      "Com a data decidida, use **Salvar a data**; depois, **Marcar como realizada**. **Copiar texto** prepara o convite para o WhatsApp."

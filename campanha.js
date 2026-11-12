@@ -45,7 +45,7 @@ function situacao(c) {
 /* ---------- Tela da campanha (consulta) ---------- */
 function abrir(me, root, H) {
   const { db, irPara, tem } = H;
-  const pode = tem(me, 'atividades'); // administrador ou Responsável pelas Atividades editam as datas
+  const pode = tem(me, 'atividades'); // administrador ou Administrador das Atividades editam as datas
   let msg = '', erro = '', sel = (lista(db)[0] || {}).id;
   const draw = () => {
     const cs = lista(db), c = cs.find(x => x.id === sel) || cs[0], ap = aportes(db, c.id).sort((a, b) => String(b.data).localeCompare(String(a.data)));
