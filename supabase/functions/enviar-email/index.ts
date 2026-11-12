@@ -12,8 +12,6 @@
 // Opcional: REMETENTE_NOME (padrão "Parque de Estudo e Reflexão Retiro")
 import nodemailer from 'npm:nodemailer@6.9.16';
 
-declare const Deno: { env: { get(k: string): string | undefined }; serve(h: (r: Request) => Response | Promise<Response>): void };
-
 const ORIGENS = ['https://parqueretirorio.github.io', 'https://parqueretiro.org.br', 'https://www.parqueretiro.org.br'];
 const MAX_POR_CHAMADA = 20;
 const emailOk = (e: string) => /^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]{2,}$/.test(e);
