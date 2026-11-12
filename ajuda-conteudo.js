@@ -1609,7 +1609,7 @@ window.PR_AJUDA_CONTEUDO = {
    "categoria": "comissoes",
    "ordem": 10,
    "titulo": "Atividades: registrar e publicar no site",
-   "resumo": "Cadastre eventos, encontros, retiros e reuniões (e atividades externas) e publique-os em O Parque › Atividades.",
+   "resumo": "Qualquer pessoa da equipe cadastra uma atividade e fica responsável por ela; o Administrador das Atividades pode corrigir qualquer uma.",
    "publico": "equipe",
    "status": "publicado",
    "palavras": [
@@ -1619,21 +1619,26 @@ window.PR_AJUDA_CONTEUDO = {
     "retiro",
     "publicar",
     "banner",
-    "notícia"
+    "notícia",
+    "responsável",
+    "administrador das atividades",
+    "transferir"
    ],
-   "onde": "**Comissões Parque Retiro › Atividades** (edita: Responsável pelas Atividades ou administrador).",
+   "onde": "**Comissões Parque Retiro › Atividades** (cria: qualquer pessoa da equipe; corrige todas: Administrador das Atividades ou administrador).",
    "secoes": {
-    "oQueE": "",
+    "oQueE": "Registro dos eventos, encontros, retiros e reuniões do Parque (e de atividades externas ligadas a ele). Quem cria a atividade fica **responsável por ela**. O **Administrador das Atividades** (uma responsabilidade marcada pelo administrador do sistema) pode corrigir, publicar, transferir ou excluir qualquer atividade.",
     "finalidade": "",
     "passos": [
      "Clique em **Nova atividade**.",
      "Preencha título, tipo, onde acontece (no Parque ou externa), data, local, lide (resumo), texto, foto pequena e autor.",
-     "Para destacar no carrossel do Início, marque **Destacar no banner do Início** e envie a imagem de banner.",
-     "Escolha a situação: **rascunho** (só na área restrita) ou **publicada** (aparece no site).",
-     "Use **Mostrar** para filtrar por tipo; **Editar** e **Excluir** em cada atividade."
+     "Em **Responsável pela atividade**, deixe o seu nome ou escolha outra pessoa para passar a atividade a ela.",
+     "Escolha a situação: **rascunho** (só na área restrita) ou **publicada** (aparece no site, sem aprovação prévia).",
+     "Na lista, **Editar**, **Publicar** e **Excluir** aparecem nas atividades que são suas (ou em todas, para o Administrador das Atividades).",
+     "Destaque no carrossel do Início: só o Administrador das Atividades marca **Destacar no banner do Início**."
     ],
     "exemplos": [],
     "cuidados": [
+     "Se algo foi publicado com erro, avise o Administrador das Atividades: ele pode corrigir ou tirar do site.",
      "No máximo 5 atividades aparecem no carrossel do Início.",
      "As imagens ficam dentro do registro: use fotos leves."
     ]
@@ -1650,7 +1655,7 @@ window.PR_AJUDA_CONTEUDO = {
     "album-gestao",
     "documentos-calendarios"
    ],
-   "atualizadoEm": "2026-11-02"
+   "atualizadoEm": "2026-11-12"
   },
   {
    "id": "reuniao-de-escola",
@@ -4264,7 +4269,7 @@ window.PR_AJUDA_CONTEUDO = {
   ],
   "r.atividades.at-novo": [
    "Nova atividade",
-   "Abre o formulário: título, tipo, onde acontece, data, local, lide, texto, foto, autor, banner do Início e situação."
+   "Abre o formulário da atividade. Qualquer pessoa da equipe pode criar; quem cria fica responsável por ela."
   ],
   "r.atividades.at-fil": [
    "Mostrar",
@@ -5962,6 +5967,10 @@ window.PR_AJUDA_CONTEUDO = {
    "Importar as planilhas",
    "Grava os lançamentos das planilhas de novembro de 2026 na Prestação de Contas. Se já foram importados, atualiza sem duplicar.",
    "prestacao-contas"
+  ],
+  "r.atividades.at-r": [
+   "Responsável pela atividade",
+   "Quem cuida desta atividade (editar, publicar, excluir). Para passar a outra pessoa, escolha o nome dela."
   ]
  },
  "contextos": {

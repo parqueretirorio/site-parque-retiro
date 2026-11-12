@@ -2,7 +2,7 @@
 (function () {
 const NIV = { leitor: 1, comentador: 2, editor: 3, administrador: 4 };
 const NIVN = { leitor: 'Leitor', comentador: 'Comentador', editor: 'Editor', administrador: 'Administrador' };
-const FUNC = { reservas: 'Responsável de Reservas', estela: 'Responsável pela Estela', album: 'Responsável pelo Álbum Parque Retiro', inventario: 'Responsável pelo Inventário', financeiro: 'Responsável Financeiro (Prestação de Contas e Compras)', compras: 'Departamento de Compras (cotações e registro das compras)', solicitante: 'Solicitante de compras (faz pedidos de compra)', documentos: 'Responsável pelos Documentos e Calendários', comunicacao: 'Responsável pela Comunicação, Redes Sociais e Site', lojinha: 'Responsável pela Lojinha', rifa: 'Responsável pela Rifa Solidária', vaquinha: 'Responsável pela Vaquinha Coletiva', voluntario: 'Responsável pelos Voluntários', jardinagem: 'Responsável pela Jardinagem / Área Externa', atividades: 'Responsável pelas Atividades', multiuso: 'Responsável pelo Multiuso', construcao: 'Responsável pela Construção', manutencao: 'Responsável pela Manutenção', traducoes: 'Responsável pelas Traduções', ajuda: 'Responsável pela Central de Ajuda' };
+const FUNC = { reservas: 'Responsável de Reservas', estela: 'Responsável pela Estela', album: 'Responsável pelo Álbum Parque Retiro', inventario: 'Responsável pelo Inventário', financeiro: 'Responsável Financeiro (Prestação de Contas e Compras)', compras: 'Departamento de Compras (cotações e registro das compras)', solicitante: 'Solicitante de compras (faz pedidos de compra)', documentos: 'Responsável pelos Documentos e Calendários', comunicacao: 'Responsável pela Comunicação, Redes Sociais e Site', lojinha: 'Responsável pela Lojinha', rifa: 'Responsável pela Rifa Solidária', vaquinha: 'Responsável pela Vaquinha Coletiva', voluntario: 'Responsável pelos Voluntários', jardinagem: 'Responsável pela Jardinagem / Área Externa', atividades: 'Administrador das Atividades (corrige qualquer atividade e organiza a Reunião de Escola)', multiuso: 'Responsável pelo Multiuso', construcao: 'Responsável pela Construção', manutencao: 'Responsável pela Manutenção', traducoes: 'Responsável pelas Traduções', ajuda: 'Responsável pela Central de Ajuda' };
 const tem = (me, f) => me.nivel === 'administrador' || (me.funcoes || []).includes(f);
 const $ = (s, r = document) => r.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -417,10 +417,12 @@ V.users = (me, root) => {
         + ` <button class="icon-btn" data-del="${e}" aria-label="Remover ${esc(u.nome)}"><i class="fas fa-trash"></i></button>`;
     };
     root.innerHTML = `<h3><i class="fas fa-user-clock"></i> Solicitações de cadastro (${pend.length})</h3>
-    <p>Pessoas que usaram <strong>Criar conta</strong> na página Entrar. Escolha o nível de acesso e aprove, ou não aprove o cadastro.</p>
-    ${pend.length ? `<table class="doc-table"><thead><tr><th>Nome</th><th>E-mail</th><th>Pedido em</th><th>Nível ao aprovar</th><th></th></tr></thead><tbody>${pend.map(u => `<tr><td>${esc(u.nome)}</td><td>${esc(u.email)}</td><td>${u.criado ? fmtData(u.criado) : '-'}</td>
-      <td><select data-nvp="${esc(u.email)}" aria-label="Nível de ${esc(u.nome)}">${Object.keys(NIVN).map(k => `<option value="${k}"${k === 'leitor' ? ' selected' : ''}>${NIVN[k]}</option>`).join('')}</select></td>
-      <td><button class="btn-visit" data-ap="${esc(u.email)}"><i class="fas fa-check"></i> Aprovar</button> <button class="btn-visit btn-bloq" data-st="recusado" data-em="${esc(u.email)}"><i class="fas fa-times"></i> Não aprovar</button></td></tr>`).join('')}</tbody></table>` : '<p class="vazio">Nenhuma solicitação aguardando.</p>'}
+    <p>Pessoas que usaram <strong>Criar conta</strong> na página Entrar. Escolha o nível de acesso, marque as <strong>responsabilidades</strong> (as áreas que a pessoa vai cuidar) e aprove. Tudo pode ser mudado depois, na lista de responsáveis.</p>
+    ${pend.length ? pend.map(u => `<div class="aprova-card" data-card="${esc(u.email)}">
+      <p><strong>${esc(u.nome)}</strong> · ${esc(u.email)}${u.whatsapp ? ' · ' + esc(u.whatsapp) : ''} · <small>pedido em ${u.criado ? fmtData(u.criado) : '-'}</small></p>
+      <div class="form-row"><label for="nvp-${esc(u.email)}">Nível de acesso ao aprovar</label><select id="nvp-${esc(u.email)}" data-nvp="${esc(u.email)}">${Object.keys(NIVN).map(k => `<option value="${k}"${k === 'leitor' ? ' selected' : ''}>${NIVN[k]}</option>`).join('')}</select></div>
+      <fieldset class="funcoes" data-fnbox="${esc(u.email)}"><legend>Responsabilidades desta pessoa (marque as áreas que ela vai cuidar)</legend>${Object.entries(FUNC).map(([k, v]) => `<label><input type="checkbox" data-fnp="${k}"> ${v}</label>`).join('')}</fieldset>
+      <p><button class="btn-visit" data-ap="${esc(u.email)}"><i class="fas fa-check"></i> Aprovar com estas responsabilidades</button> <button class="btn-visit btn-bloq" data-st="recusado" data-em="${esc(u.email)}"><i class="fas fa-times"></i> Não aprovar</button></p></div>`).join('') : '<p class="vazio">Nenhuma solicitação aguardando.</p>'}
     <h3 style="margin-top:28px">Cadastrar responsáveis e níveis de acesso</h3><p>Exclusivo do administrador. Defina a senha provisória e combine com a pessoa uma forma segura de recebê-la.</p>
     <form id="fu" class="form-reserva" novalidate>
       <div class="form-row"><label for="u-n">Nome completo do responsável *</label><input id="u-n" required autocomplete="off"></div>
@@ -440,7 +442,9 @@ V.users = (me, root) => {
       const eu = u.email === me.email;
       return `<tr><td>${esc(u.nome)}${eu ? ' (você)' : ''}${cadastroIncompleto(u) ? ' <span class="badge st-pendente" title="Falta WhatsApp, nome completo ou autorização LGPD">cadastro incompleto</span>' : ''}</td><td>${esc(u.email)}</td><td>${esc(u.whatsapp || '—')}</td><td>${eu ? `<span class="badge ${u.nivel}">${NIVN[u.nivel]}</span>` : `<select data-nv="${esc(u.email)}" aria-label="Perfil de ${esc(u.nome)}">${Object.keys(NIVN).map(k => `<option value="${k}"${k === u.nivel ? ' selected' : ''}>${NIVN[k]}</option>`).join('')}</select>`}</td><td><span class="badge st-${statusDe(u)}">${ST[statusDe(u)]}</span></td><td>${fnCell(u)}</td><td>${acoes(u)}</td></tr>`;
     }).join('')}</tbody></table>`;
-    root.querySelectorAll('[data-ap]').forEach(b => b.onclick = () => { const nv = root.querySelector(`[data-nvp="${CSS.escape(b.dataset.ap)}"]`).value; salva(b.dataset.ap, u => { u.status = 'aprovado'; u.nivel = nv; }); });
+    root.querySelectorAll('[data-ap]').forEach(b => b.onclick = () => { const em = CSS.escape(b.dataset.ap), nv = root.querySelector(`[data-nvp="${em}"]`).value;
+      const box = root.querySelector(`[data-fnbox="${em}"]`), fns = box ? [...box.querySelectorAll('[data-fnp]:checked')].map(i => i.dataset.fnp) : [];
+      salva(b.dataset.ap, u => { u.status = 'aprovado'; u.nivel = nv; u.funcoes = [...new Set([...(u.funcoes || []), ...fns])]; }); });
     root.querySelectorAll('[data-st]').forEach(b => b.onclick = () => {
       const novo = b.dataset.st, msg = novo === 'bloqueado' ? 'Bloquear este usuário? Ele perde o acesso à área restrita.' : novo === 'recusado' ? 'Não aprovar este cadastro?' : null;
       if (msg && !confirm(msg)) return;

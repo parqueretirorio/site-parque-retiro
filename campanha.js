@@ -66,7 +66,7 @@ function abrir(me, root, H) {
         <div class="form-row"><label for="cp-m">Meta de arrecadação (opcional)</label><input id="cp-m" type="number" min="0" step="0.01" value="${c.meta || ''}" placeholder="0,00"></div>
         <div class="form-row"><label for="cp-d">Descrição curta (aparece no calendário)</label><input id="cp-d" maxlength="300" value="${esc(c.descricao)}"></div>
         <p class="form-erro" id="cp-er" role="alert"${erro ? '' : ' hidden'}>${esc(erro)}</p>
-        <button class="btn-visit"><i class="fas fa-save"></i> Salvar e colocar no calendário</button></form>` : '<p><small>Só o administrador e o Responsável pelas Atividades alteram as datas.</small></p>'}
+        <button class="btn-visit"><i class="fas fa-save"></i> Salvar e colocar no calendário</button></form>` : '<p><small>Só o administrador e o Administrador das Atividades alteram as datas.</small></p>'}
       ${msg ? `<p class="tip-box" role="status"><i class="fas fa-check-circle"></i> ${esc(msg)}</p>` : ''}</div>
     <div class="totais"><div><span>Total aportado</span><strong>${brl(total)}</strong></div><div><span>Pessoas que aportaram</span><strong>${pl.length}</strong></div><div><span>Aportes</span><strong>${ap.length}</strong></div>${c.meta > 0 ? `<div><span>Meta ${brl(c.meta)}</span><strong>${Math.round((total / c.meta) * 1000) / 10}%</strong></div>` : ''}</div>
     ${fora ? `<p class="aviso-local"><i class="fas fa-exclamation-triangle"></i> ${fora} aporte(s) têm data fora do período da campanha. Estão incluídos no total; confira em Prestação de Contas se for o caso.</p>` : ''}

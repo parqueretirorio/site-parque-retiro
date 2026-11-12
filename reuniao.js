@@ -78,7 +78,7 @@ window.PR_REUNIAO = { abrir(me, root, H) {
     $('#rf', el).onsubmit = e => {
       e.preventDefault(); const g = id => $('#' + id, el).value.trim(), a = g('rf-a'), b = g('rf-b'), t = g('rf-t').replace(/\s+/g, ' ');
       const falha = m => { const x = $('#rf-e', el); x.textContent = m; x.hidden = false; };
-      if (!pode) return falha('Só o administrador e o Responsável pelas Atividades criam ou editam a reunião.');
+      if (!pode) return falha('Só o administrador e o Administrador das Atividades criam ou editam a reunião.');
       if (!t) return falha('Informe o título.');
       if (!a || !b) return falha('Informe as duas datas.');
       if (a === b) return falha('As duas datas devem ser diferentes.');
@@ -108,7 +108,7 @@ window.PR_REUNIAO = { abrir(me, root, H) {
     $('#rd-x', el).onclick = () => { edit = null; erro = ''; draw(); };
     $('#rd', el).onsubmit = e => {
       e.preventDefault(); const g = id => $('#' + id, el).value.trim(), falha = m => { const x = $('#rd-e', el); x.textContent = m; x.hidden = false; };
-      if (!pode) return falha('Só o administrador e o Responsável pelas Atividades definem a data.');
+      if (!pode) return falha('Só o administrador e o Administrador das Atividades definem a data.');
       const d = g('rd-o') === '__outra' ? g('rd-d') : g('rd-o'); if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return falha('Informe a data.');
       const z = g('rd-z'); if (z && !(/^https:\/\//i.test(z) && safeUrl(z))) return falha('O link do Zoom deve começar com https://');
       const antes = r.final && r.final.data, novo = { data: d, hora: g('rd-h'), local: g('rd-l'), link: z };

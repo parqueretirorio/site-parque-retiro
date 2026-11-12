@@ -1316,3 +1316,7 @@ body.modo-app .page-hero { display: none; }
 .app-promo .app-ver { font-size: .9rem; color: #555; }
 .app-promo .app-novo { grid-column: 1 / -1; font-size: .9rem; }
 .app-promo .btn-visit { grid-column: 1 / -1; justify-content: center; text-align: center; }
+
+/* Aprovação de cadastro com responsabilidades */
+.aprova-card { border: 2px solid #d6dde4; border-radius: 12px; padding: 12px 16px; margin: 0 0 14px; background: #fff; }
+.aprova-card .funcoes label { display: block; margin: 4px 0; }

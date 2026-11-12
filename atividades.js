@@ -104,12 +104,18 @@ async function imagemBanner(file) { // recorte centralizado na proporção 3:1 (
 /* ---------- Área restrita ---------- */
 function abrir(me, root, H) {
   const { $, db, uid: uid2 } = H;
-  const edita = H.tem(me, 'atividades');
+  // Decisão de 09/11 e 12/11: qualquer pessoa aprovada cria uma atividade, que aparece sem aprovação prévia, e fica responsável por ela.
+  // O Administrador das Atividades (função "atividades") ou o administrador do sistema corrige e gerencia todas.
+  const admAtiv = H.tem(me, 'atividades');
+  const edita = true; // todos podem criar
+  const minha = a => !!a && ((a.respEmail && a.respEmail === me.email) || (!a.respEmail && a.criadoPorEmail === me.email));
+  const podeEd = a => admAtiv || minha(a);
+  const pessoas = () => (db.get('users', []) || []).filter(u => (u.status || 'aprovado') === 'aprovado' && u.email);
   const S = { edit: '', msg: '', erro: '', foto: null, banner: null, cat: '' };
   const lista = () => db.get('atividades', []);
   const draw = () => {
     const ed = S.edit && S.edit !== 'novo' ? lista().find(a => a.id === S.edit) : null;
-    const forma = !!S.edit && edita;
+    const forma = !!S.edit && (S.edit === 'novo' || podeEd(ed));
     const v = ed || { titulo: '', categoria: 'evento', origem: 'parque', dataAtiv: hoje(), local: '', organizacao: '', linkExterno: '', lide: '', texto: '', foto: '', banner: '', bannerAlt: '', destaque: false, autor: me.nome || '', status: 'rascunho' };
     if (S.foto === null) S.foto = v.foto || ''; if (S.banner === null) S.banner = v.banner || '';
     const itens = lista().filter(a => !S.cat || catDe(a.categoria) === S.cat).sort((a, b) => String(b.dataAtiv || '').localeCompare(String(a.dataAtiv || '')));
@@ -117,7 +123,7 @@ function abrir(me, root, H) {
     <p>Registre por escrito o que acontece no Parque (eventos, encontros, retiros e reuniões) e também atividades externas que tenham relação com o Parque Retiro. As atividades <strong>publicadas</strong> aparecem na área aberta, em <a href="atividades.html" target="_blank" rel="noopener">O Parque &rsaquo; Atividades</a>, e as marcadas como destaque entram no banner do Início.</p>
     ${S.msg ? `<p class="tip-box" role="status">${esc(S.msg)}</p>` : ''}
     ${edita && !forma ? '<p><button type="button" class="btn-visit" id="at-novo"><i class="fas fa-plus"></i> Nova atividade</button></p>' : ''}
-    ${!edita ? '<p class="vazio">Você pode consultar as atividades. Somente quem é responsável pelas Atividades (ou o administrador) cria e altera.</p>' : ''}
+    <p class="tip-box" role="note">${admAtiv ? 'Você é <strong>Administrador das Atividades</strong>: pode corrigir, publicar, transferir ou excluir qualquer atividade.' : 'Qualquer pessoa da equipe pode criar uma atividade e fica <strong>responsável por ela</strong> (editar, publicar, passar para outra pessoa). O Administrador das Atividades pode corrigir qualquer atividade.'}</p>
     ${forma ? `<form id="at-form" class="form-reserva" novalidate><h4>${ed ? 'Editar atividade' : 'Nova atividade'}</h4>
       <div class="form-row"><label for="at-t">Título *</label><input id="at-t" maxlength="120" value="${esc(v.titulo)}"></div>
       <div class="form-row"><label for="at-c">Tipo *</label><select id="at-c">${Object.keys(CATS).map(k => `<option value="${k}"${catDe(v.categoria) === k ? ' selected' : ''}>${esc(CAT1[k])}</option>`).join('')}</select></div>
@@ -133,24 +139,26 @@ function abrir(me, root, H) {
       <div class="form-row"><label for="at-f">Foto pequena (aparece na lista e no artigo)</label><input id="at-f" type="file" accept="image/jpeg,image/png,image/webp">
         <div id="at-fp">${S.foto ? `<img src="${esc(S.foto)}" alt="Foto atual" style="max-width:160px;height:auto;margin-top:6px"> <button type="button" class="btn-visit" id="at-fx">Remover foto</button>` : ''}</div></div>
       <div class="form-row"><label for="at-a">Autor *</label><input id="at-a" maxlength="80" value="${esc(v.autor)}"></div>
-      <fieldset class="funcoes"><legend>Banner do Início</legend>
+      ${(() => { const rEmail = ed ? (ed.respEmail || ed.criadoPorEmail || '') : me.email, ps = pessoas(); const ok = admAtiv || minha(ed) || !ed;
+        return ok ? `<div class="form-row"><label for="at-r">Responsável pela atividade</label><select id="at-r">${(ps.some(u => u.email === rEmail) ? [] : [{ email: rEmail, nome: (ed && (ed.respNome || ed.por)) || me.nome || rEmail }]).concat(ps).map(u => `<option value="${esc(u.email)}"${u.email === rEmail ? ' selected' : ''}>${esc(u.nome || u.email)}</option>`).join('')}</select><small>Quem cuida desta atividade. Para passar a outra pessoa, escolha o nome dela.</small></div>` : ''; })()}
+      ${admAtiv ? `<fieldset class="funcoes"><legend>Banner do Início</legend>
         <label><input type="checkbox" id="at-dest"${v.destaque ? ' checked' : ''}> Destacar no banner do Início (leva para esta atividade)</label>
         <div class="form-row"><label for="at-b">Imagem do banner <small>(ideal: ${BANNER_W} × ${BANNER_H} px; imagens de outra proporção são recortadas no centro)</small></label><input id="at-b" type="file" accept="image/jpeg,image/png,image/webp">
           <div id="at-bp">${S.banner ? `<img src="${esc(S.banner)}" alt="Banner atual" style="max-width:360px;width:100%;height:auto;margin-top:6px;border:1px solid #ccd"> <button type="button" class="btn-visit" id="at-bx">Remover banner</button>` : ''}</div></div>
         <div class="form-row"><label for="at-ba">Descrição do banner e da foto (para quem não enxerga a imagem)</label><input id="at-ba" maxlength="200" value="${esc(v.bannerAlt)}"></div>
-      </fieldset>
+      </fieldset>` : ''}
       <div class="form-row"><label for="at-s">Situação</label><select id="at-s"><option value="rascunho"${v.status !== 'publicada' ? ' selected' : ''}>Rascunho (só aparece aqui)</option><option value="publicada"${v.status === 'publicada' ? ' selected' : ''}>Publicada (aparece no site)</option></select></div>
       <p class="form-erro" id="at-er" role="alert"${S.erro ? '' : ' hidden'}>${esc(S.erro)}</p>
       <button class="btn-visit btn-large"><i class="fas fa-save"></i> ${ed ? 'Salvar alterações' : 'Salvar atividade'}</button> <button type="button" class="btn-visit" id="at-cancel" style="background:#6c7a7b">Cancelar</button>
     </form>` : ''}
     <div class="rc-filtros"><div class="form-row"><label for="at-fil">Mostrar</label><select id="at-fil"><option value="">Todos os tipos</option>${Object.keys(CATS).map(k => `<option value="${k}"${S.cat === k ? ' selected' : ''}>${esc(CATS[k])}</option>`).join('')}</select></div></div>
     <h4>Atividades registradas (${itens.length})</h4>
-    ${itens.length ? `<table class="doc-table"><thead><tr><th>Título</th><th>Tipo</th><th>Data</th><th>Situação</th><th>Banner</th>${edita ? '<th></th>' : ''}</tr></thead><tbody>${itens.map(a => `<tr><td>${esc(a.titulo)}${a.origem === 'externa' ? ' <small>(externa)</small>' : ''}</td><td>${esc(CAT1[catDe(a.categoria)])}</td><td>${esc(fmtData(a.dataAtiv))}</td><td><span class="badge-status ${a.status === 'publicada' ? 'badge-disponivel' : 'badge-pend'}">${a.status === 'publicada' ? 'Publicada' : 'Rascunho'}</span></td><td>${a.destaque && imgOk(a.banner) ? 'No Início' : '-'}</td>${edita ? `<td><button class="btn-visit" data-ed="${esc(a.id)}">Editar</button> <button class="btn-visit" data-pub="${esc(a.id)}">${a.status === 'publicada' ? 'Tirar do site' : 'Publicar'}</button> <button class="btn-visit" data-del="${esc(a.id)}" style="background:#a33">Excluir</button></td>` : ''}</tr>`).join('')}</tbody></table>` : '<p class="vazio">Nenhuma atividade registrada ainda.</p>'}`;
+    ${itens.length ? `<table class="doc-table"><thead><tr><th>Título</th><th>Tipo</th><th>Data</th><th>Situação</th><th>Banner</th><th>Responsável</th><th></th></tr></thead><tbody>${itens.map(a => `<tr><td>${esc(a.titulo)}${a.origem === 'externa' ? ' <small>(externa)</small>' : ''}</td><td>${esc(CAT1[catDe(a.categoria)])}</td><td>${esc(fmtData(a.dataAtiv))}</td><td><span class="badge-status ${a.status === 'publicada' ? 'badge-disponivel' : 'badge-pend'}">${a.status === 'publicada' ? 'Publicada' : 'Rascunho'}</span></td><td>${a.destaque && imgOk(a.banner) ? 'No Início' : '-'}</td><td>${esc(a.respNome || a.por || '-')}</td>${podeEd(a) ? `<td><button class="btn-visit" data-ed="${esc(a.id)}">Editar</button> <button class="btn-visit" data-pub="${esc(a.id)}">${a.status === 'publicada' ? 'Tirar do site' : 'Publicar'}</button> <button class="btn-visit" data-del="${esc(a.id)}" style="background:#a33">Excluir</button></td>` : '<td></td>'}</tr>`).join('')}</tbody></table>` : '<p class="vazio">Nenhuma atividade registrada ainda.</p>'}`;
     const nv = $('#at-novo', root); if (nv) nv.onclick = () => { S.edit = 'novo'; S.foto = null; S.banner = null; S.msg = ''; S.erro = ''; draw(); };
     $('#at-fil', root).onchange = e => { S.cat = e.target.value; draw(); };
     root.querySelectorAll('[data-ed]').forEach(b => b.onclick = () => { S.edit = b.dataset.ed; S.foto = null; S.banner = null; S.msg = ''; S.erro = ''; draw(); window.scrollTo({ top: root.getBoundingClientRect().top + scrollY - 20 }); });
-    root.querySelectorAll('[data-pub]').forEach(b => b.onclick = () => { const l = lista(), x = l.find(a => a.id === b.dataset.pub); if (!x) return; x.status = x.status === 'publicada' ? 'rascunho' : 'publicada'; x.atualizadoEm = new Date().toISOString(); db.set('atividades', l); S.msg = x.status === 'publicada' ? 'Atividade publicada no site.' : 'Atividade retirada do site (voltou a rascunho).'; draw(); });
-    root.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { const x = lista().find(a => a.id === b.dataset.del); if (x && confirm(`Excluir a atividade "${x.titulo}"?`)) { db.set('atividades', lista().filter(a => a.id !== x.id)); S.edit = ''; S.msg = 'Atividade excluída.'; draw(); } });
+    root.querySelectorAll('[data-pub]').forEach(b => b.onclick = () => { const l = lista(), x = l.find(a => a.id === b.dataset.pub); if (!x || !podeEd(x)) return; x.status = x.status === 'publicada' ? 'rascunho' : 'publicada'; x.atualizadoEm = new Date().toISOString(); db.set('atividades', l); S.msg = x.status === 'publicada' ? 'Atividade publicada no site.' : 'Atividade retirada do site (voltou a rascunho).'; draw(); });
+    root.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { const x = lista().find(a => a.id === b.dataset.del); if (x && podeEd(x) && confirm(`Excluir a atividade "${x.titulo}"?`)) { db.set('atividades', lista().filter(a => a.id !== x.id)); S.edit = ''; S.msg = 'Atividade excluída.'; draw(); } });
     const f = $('#at-form', root); if (!f) return;
     $('#at-cancel', root).onclick = () => { S.edit = ''; S.erro = ''; draw(); };
     $('#at-o', root).onchange = e => { $('#at-ext', root).hidden = e.target.value !== 'externa'; };
@@ -158,9 +166,9 @@ function abrir(me, root, H) {
     const px = $('#at-fx', root); if (px) px.onclick = () => { S.foto = ''; $('#at-fp', root).innerHTML = ''; };
     const bx = $('#at-bx', root); if (bx) bx.onclick = () => { S.banner = ''; $('#at-bp', root).innerHTML = ''; };
     $('#at-f', root).onchange = async e => { const fl = e.target.files[0]; if (!fl) return; try { S.foto = await fotoPequena(fl); $('#at-fp', root).innerHTML = `<img src="${esc(S.foto)}" alt="Foto escolhida" style="max-width:160px;height:auto;margin-top:6px">`; $('#at-er', root).hidden = true; } catch (x) { e.target.value = ''; erro(x.message || 'Imagem inválida.'); } };
-    $('#at-b', root).onchange = async e => { const fl = e.target.files[0]; if (!fl) return; try { const r = await imagemBanner(fl); S.banner = r.img; $('#at-bp', root).innerHTML = `<img src="${esc(S.banner)}" alt="Banner escolhido" style="max-width:360px;width:100%;height:auto;margin-top:6px;border:1px solid #ccd">`; if (r.aviso) erro(r.aviso); else $('#at-er', root).hidden = true; } catch (x) { e.target.value = ''; erro(x.message || 'Imagem inválida.'); } };
+    if ($('#at-b', root)) $('#at-b', root).onchange = async e => { const fl = e.target.files[0]; if (!fl) return; try { const r = await imagemBanner(fl); S.banner = r.img; $('#at-bp', root).innerHTML = `<img src="${esc(S.banner)}" alt="Banner escolhido" style="max-width:360px;width:100%;height:auto;margin-top:6px;border:1px solid #ccd">`; if (r.aviso) erro(r.aviso); else $('#at-er', root).hidden = true; } catch (x) { e.target.value = ''; erro(x.message || 'Imagem inválida.'); } };
     f.onsubmit = e => {
-      e.preventDefault(); if (!edita) return;
+      e.preventDefault(); if (ed ? !podeEd(ed) : !edita) return;
       const g = id => ($('#' + id, root).value || '').trim();
       if (!g('at-t')) return erro('Informe o título.');
       if (!g('at-d')) return erro('Informe a data da atividade.');
@@ -169,10 +177,13 @@ function abrir(me, root, H) {
       if (!g('at-a')) return erro('Informe o autor.');
       const ext = g('at-o') === 'externa', link = ext ? g('at-u') : '';
       if (link && !urlOk(link)) return erro('O link precisa começar com http:// ou https://.');
-      const destaque = $('#at-dest', root).checked;
+      const destaque = admAtiv ? $('#at-dest', root).checked : !!(ed && ed.destaque);
       if (destaque && !S.banner) return erro('Para destacar no banner do Início, escolha a imagem do banner.');
       const agora = new Date().toISOString();
-      const reg = { id: ed ? ed.id : uid2(), titulo: g('at-t'), categoria: g('at-c'), origem: g('at-o'), dataAtiv: g('at-d'), local: g('at-l'), organizacao: ext ? g('at-og') : '', linkExterno: link, lide: g('at-li'), texto: $('#at-x', root).value.trim(), foto: S.foto || '', banner: S.banner || '', bannerAlt: g('at-ba'), destaque, autor: g('at-a'), status: g('at-s'), criadoEm: ed ? ed.criadoEm : agora, atualizadoEm: agora, por: me.nome };
+      const reg = { id: ed ? ed.id : uid2(), titulo: g('at-t'), categoria: g('at-c'), origem: g('at-o'), dataAtiv: g('at-d'), local: g('at-l'), organizacao: ext ? g('at-og') : '', linkExterno: link, lide: g('at-li'), texto: $('#at-x', root).value.trim(), foto: S.foto || '', banner: S.banner || '', bannerAlt: admAtiv ? g('at-ba') : (ed ? ed.bannerAlt || '' : ''), destaque, autor: g('at-a'), status: g('at-s'), criadoEm: ed ? ed.criadoEm : agora, atualizadoEm: agora, por: me.nome,
+        criadoPorEmail: ed ? (ed.criadoPorEmail || '') : me.email, criadoPorNome: ed ? (ed.criadoPorNome || ed.por || '') : (me.nome || '') };
+      { const rs = $('#at-r', root), re = rs ? rs.value : (ed ? ed.respEmail || '' : me.email), pu = pessoas().find(u => u.email === re);
+        reg.respEmail = re; reg.respNome = pu ? pu.nome : (ed && ed.respNome) || (re === me.email ? me.nome : re); }
       const l = lista().filter(a => a.id !== reg.id); l.push(reg);
       if (!db.set('atividades', l)) return erro('Não foi possível salvar: o espaço do navegador está cheio. Use imagens menores ou remova atividades antigas.');
       S.msg = reg.status === 'publicada' ? 'Atividade salva e publicada no site.' : 'Atividade salva como rascunho.'; S.edit = ''; S.erro = ''; S.foto = S.banner = null; draw();
