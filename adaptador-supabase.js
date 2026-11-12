@@ -151,6 +151,11 @@ async function novaSenha(token, senha) {
   if (/expired|invalid/i.test(m) || r.status === 401) return { erro: 'O link expirou. Peça um novo em "Esqueci minha senha".' };
   return { erro: 'Não foi possível trocar a senha (' + (m || r.status) + ').' };
 }
+// Chama uma função de servidor do Parque (Supabase Edge Function) com a sessão de quem está logado.
+async function funcao(nome, corpo) {
+  const s = await sessaoValida(); if (!s) return { status: 401, corpo: { erro: 'Sua sessão terminou. Entre de novo.' } };
+  return http('POST', '/functions/v1/' + nome, corpo, s.access_token);
+}
 async function sair() {
   const s = sessao(); limpaSessao();
   if (s) await http('POST', '/auth/v1/logout', {}, s.access_token, { keepalive: true });
@@ -315,5 +320,5 @@ function criarArmazenamento(opc) {
   return arm;
 }
 
-window.PR_SUPABASE = { ligado, paginaRestrita, sessao, entrar, cadastrar, recuperar, lerRetornoDoEmail, novaSenha, sair, criarArmazenamento, guardaSessao };
+window.PR_SUPABASE = { ligado, funcao, paginaRestrita, sessao, entrar, cadastrar, recuperar, lerRetornoDoEmail, novaSenha, sair, criarArmazenamento, guardaSessao };
 })();

@@ -1,0 +1,78 @@
+# Teste: Comunicação > E-mail marketing > "Convite para a área restrita".
+# Rodar a partir da pasta do site:  python3 tests/teste_convite_area.py
+import asyncio, subprocess, time, os, json
+from playwright.async_api import async_playwright
+SITE=os.path.dirname(os.path.dirname(os.path.abspath(__file__))); PORT=8843
+srv=subprocess.Popen(["python3","-m","http.server",str(PORT),"-d",SITE],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL); time.sleep(1)
+OUT=os.environ.get('SHOTS','/tmp')
+KEYS=set()
+async def colhe(pg):
+    if os.environ.get('DUMP'): KEYS.update(await pg.evaluate("PR_IDIOMA.coletar()"))
+def ok(c,m):
+    print(("OK  " if c else "FALHOU ")+m); assert c,m
+async def aba(pg,t):
+    await pg.evaluate("t=>{const b=document.querySelector(`[data-tab=${t}]`);const c=b&&b.closest('.area-col');if(c&&!c.classList.contains('aberta')&&!document.querySelector('.areas.inicio'))c.querySelector('.area-titulo').click()}",t)
+    await pg.click(f'[data-tab="{t}"]')
+async def main():
+    async with async_playwright() as p:
+        b=await p.chromium.launch(); ctx=await b.new_context(); await ctx.add_init_script("try{localStorage.setItem('pr_imp2611_auto','true')}catch(e){}"); pg=await ctx.new_page()
+        errs=[]; pg.on("pageerror",lambda e:errs.append(str(e))); pg.on("dialog",lambda d:asyncio.ensure_future(d.accept()))
+        await pg.goto(f"http://localhost:{PORT}/login.html#criar-conta")
+        ok(await pg.inner_text('#loginBox h2')=='Criar conta',"link #criar-conta abre direto em Criar conta")
+        await pg.fill('#n','Admin Teste'); await pg.fill('#e','a@t.com'); await pg.fill('#s','senha12345'); await pg.fill('#s2','senha12345'); await pg.fill('#w','21999990000'); await pg.check('#cc-lgpd-ok'); await pg.click('#f button.btn-large')
+        await pg.wait_for_url("**/area-restrita.html")
+        # lista do convite: 4 pessoas; uma já tem conta aprovada, outra está esperando aprovação
+        await pg.evaluate("""()=>{const E=PR_EMAILMKT;['ana silva;ana@x.com','bia@x.com','Caio Lima;caio@x.com','Davi;davi@x.com'].forEach(l=>{const p=l.split(';');E.adicionar('convite',p[1]||p[0],p[1]?p[0]:'','importação')});
+          const u=PR_DADOS.db.get('users',[]);u.push({nome:'Caio Lima',email:'caio@x.com',status:'aprovado',nivel:'leitor',funcoes:[]});PR_DADOS.db.set('users',u);}""")
+        await aba(pg,'comunicacao'); await pg.click('[data-s="emkt"]'); await pg.click('#ek-conv')
+        t=await pg.inner_text('#ek-tot'); ok(t.startswith('3 pessoa'),"quem já tem conta fica de fora do convite ("+t[:40]+")")
+        ok(await pg.input_value('#ek-lk')==f"http://localhost:{PORT}/login.html#criar-conta","botão leva direto para Criar conta")
+        ok(not await pg.is_visible('#ek-eng') and not await pg.is_visible('#ek-tema'),"campos de marketing escondidos no convite")
+        await pg.select_option('#ek-pv','ana@x.com'); await pg.wait_for_timeout(150)
+        html=await pg.get_attribute('#ek-p','srcdoc')
+        ok('Olá, Ana!' in html and 'Criar minha conta' in html and '27/11' in html,"prévia com nome, botão e aviso de 27/11")
+        ok('faz parte das comissões' in html and 'descadastro.html' not in html,"rodapé próprio do convite, sem descadastro do Comunicado")
+        ok('#criar-conta' in html and 'utm_source' in html,"link do botão mantém #criar-conta com rastreio")
+        await pg.select_option('#ek-lang','es'); await pg.wait_for_timeout(150); await pg.select_option('#ek-pv','ana@x.com'); await pg.wait_for_timeout(150)
+        html=await pg.get_attribute('#ek-p','srcdoc')
+        ok('¡Hola, Ana!' in html and 'Crear mi cuenta' in html and 'lang="es"' in html,"versão em espanhol")
+        await pg.select_option('#ek-lang','pt'); await pg.wait_for_timeout(100)
+        await pg.screenshot(path=OUT+'/convite-editor.png',full_page=True)
+        await colhe(pg)
+        await pg.evaluate("document.querySelector('#ek-salvar').scrollIntoView({block:'center'})"); await pg.click('#ek-salvar'); await pg.wait_for_timeout(300)
+        txt=await pg.inner_text('#com-sub')
+        ok('Para enviar agora: 3 pessoa' in txt,"convite não segue o limite de aquecimento")
+        ok(await pg.locator('a[href^="mailto:"]').count()==3,"um e-mail por pessoa")
+        ok(await pg.locator('#ek-auto').count()==0,"sem servidor: botão de envio automático não aparece")
+        await pg.click('#ek-env'); await pg.wait_for_timeout(200)
+        ok(await pg.evaluate("PR_DADOS.db.get('emkt_aquec',{dias:{}}).dias[new Date().toISOString().slice(0,10)]||0")==0,"convite não gasta o aquecimento do Comunicado")
+        # Bia cria a conta (aguardando aprovação)
+        await pg.evaluate("()=>{const u=PR_DADOS.db.get('users',[]);u.push({nome:'Bia',email:'bia@x.com',status:'pendente',nivel:'leitor',funcoes:[]});PR_DADOS.db.set('users',u);}")
+        await pg.click('#ek-volta'); await pg.click('[data-ver]'); await pg.wait_for_timeout(200)
+        txt=await pg.inner_text('#com-sub')
+        ok('Cadastrou: aguardando aprovação' in txt and 'Ainda não se cadastrou' in txt,"acompanhamento mostra a situação de cada um")
+        ok('3 convite(s) enviado(s) de 3' in txt.replace('\n',' '),"resumo dos convites")
+        await pg.click('#ek-lemb'); await pg.wait_for_timeout(200)
+        txt=await pg.inner_text('#com-sub')
+        ok('Para enviar agora: 2 pessoa' in txt,"lembrete só para quem ainda não se cadastrou")
+        hrefs=await pg.eval_on_selector_all('a[href^="mailto:"]',"a=>a.map(x=>decodeURIComponent(x.href))")
+        ok(all('Lembrete: Convite' in h for h in hrefs) and not any('bia@x.com' in h for h in hrefs),"assunto do lembrete e Bia fora")
+        await pg.screenshot(path=OUT+'/convite-painel.png',full_page=True)
+        await colhe(pg)
+        # envio automático (servidor simulado)
+        await pg.evaluate("""()=>{window.PR_DADOS.modo='supabase';window.PR_SUPABASE=window.PR_SUPABASE||{};window.__env=[];
+          PR_SUPABASE.funcao=async(n,c)=>{__env.push(n);return{status:200,corpo:{enviados:c.mensagens.map(m=>m.para).slice(0,1),falhas:c.mensagens.slice(1).map(m=>({email:m.para,erro:'x'}))}}}}""")
+        await pg.click('#ek-volta'); await pg.click('[data-ver]'); await pg.wait_for_timeout(200)
+        ok(await pg.locator('#ek-auto').count()==1,"com servidor: botão Enviar agora pelo Gmail do Parque")
+        await pg.click('#ek-auto'); await pg.wait_for_timeout(400)
+        txt=await pg.inner_text('#com-sub')
+        ok('1 e-mail(s) enviados pelo Gmail do Parque' in txt and 'não foram' in txt and 'Para enviar agora: 1 pessoa' in txt,"enviados marcados; falha continua pendente")
+        await pg.evaluate("PR_SUPABASE.funcao=async()=>({status:503,corpo:{erro:'nao-configurado'}})")
+        await pg.click('#ek-auto'); await pg.wait_for_timeout(300)
+        ok('ainda não foi ligado' in await pg.inner_text('#com-sub'),"sem a senha no servidor: aviso claro")
+        await colhe(pg); await pg.click('#ek-volta'); await colhe(pg)
+        if os.environ.get('DUMP'): open(os.environ['DUMP'],'w').write(json.dumps(sorted(KEYS),ensure_ascii=False))
+        ok(not errs,"sem erros de JavaScript "+str(errs))
+        await b.close()
+try: asyncio.run(main())
+finally: srv.terminate()

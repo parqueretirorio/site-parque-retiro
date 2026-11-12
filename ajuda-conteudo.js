@@ -2426,6 +2426,52 @@ window.PR_AJUDA_CONTEUDO = {
    "atualizadoEm": "2026-11-02"
   },
   {
+   "id": "convite-area-restrita",
+   "categoria": "comunicacao",
+   "ordem": 9,
+   "titulo": "Convite por e-mail para a área restrita",
+   "resumo": "Envie para as comissões e a administração o convite para criar conta no CONecta Retiro e acompanhe quem já se cadastrou.",
+   "publico": "equipe",
+   "status": "publicado",
+   "palavras": [
+    "convite",
+    "cadastro",
+    "criar conta",
+    "área restrita",
+    "e-mail",
+    "lembrete",
+    "gmail"
+   ],
+   "onde": "**Comissões Parque Retiro › Comunicação, Redes Sociais e Site › E-mail marketing**, botão **Convite para a área restrita**.",
+   "secoes": {
+    "oQueE": "Um e-mail pronto, em português ou espanhol, com o botão **Criar minha conta**, que abre direto o cadastro da área restrita. Quem já tem conta não recebe. Depois do envio, a tela mostra quem já tem acesso, quem está esperando aprovação e quem ainda não se cadastrou.",
+    "finalidade": "Trazer para o CONecta Retiro as pessoas das comissões e da administração, sem precisar mandar o link uma a uma pelo WhatsApp.",
+    "passos": [
+     "Em **Listas de e-mail**, abra a lista **Convite área restrita** e use **Importar** (um por linha: e-mail, ou nome;e-mail).",
+     "Em **E-mail marketing**, toque em **Convite para a área restrita**. Confira o texto e a prévia; troque o **Idioma do convite** se for para quem fala espanhol.",
+     "Toque em **Salvar e montar a fila de envio**.",
+     "Envie: **Enviar agora pelo Gmail do Parque** (quando o envio automático estiver ligado) ou **Abrir e-mail** em cada pessoa e depois **Marcar como enviados**.",
+     "Acompanhe em **Quem já se cadastrou**. Os cadastros novos aparecem em **Gestão de Responsáveis** para aprovar e marcar as responsabilidades.",
+     "Alguns dias depois, use **Preparar lembrete para quem ainda não se cadastrou**: o assunto ganha \"Lembrete:\" e só vai para quem falta."
+    ],
+    "exemplos": [
+     "Para um grupo que fala espanhol, faça um segundo convite, escolhendo Español no idioma, com uma lista só dessas pessoas."
+    ],
+    "cuidados": [
+     "Convide só quem é das comissões e da administração: a área restrita é para elas.",
+     "O convite não usa o limite de aquecimento do Comunicado; o Gmail aceita cerca de 500 e-mails por dia.",
+     "A senha de app do Gmail fica só no servidor (Supabase); nunca a mande por mensagem."
+    ]
+   },
+   "imagens": [],
+   "relacionados": [
+    "listas-email",
+    "gestao-de-responsaveis",
+    "criar-conta-e-entrar"
+   ],
+   "atualizadoEm": "2026-11-12"
+  },
+  {
    "id": "prestacao-contas",
    "categoria": "admin",
    "ordem": 1,

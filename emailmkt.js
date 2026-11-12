@@ -9,6 +9,7 @@ const LISTAS = {
   visitante:  { nome: 'Visitante',       desc: 'Quem se cadastrou pelo wifi do Parque', manual: true },
   aderente:   { nome: 'Aderente',        desc: 'Quem se cadastrou pelo site para receber o Comunicado por e-mail', manual: true },
   lancamentos:{ nome: 'Interessados em lançamentos', desc: 'Quem pediu para receber avisos de lançamentos de livros (marcou a opção ao encomendar)', manual: true },
+  convite:    { nome: 'Convite área restrita', desc: 'Pessoas das comissões e da administração que vão receber o convite para criar conta na área restrita', manual: true },
   postulante: { nome: 'Postulantes',     desc: 'Quem está fazendo a Escola', manual: true },
   mestres1:   { nome: 'Mestres 1',       desc: 'Todos os mestres com acesso à área restrita (Gestão de Responsáveis)', manual: false },
   mestrescom: { nome: 'Mestres Comissão', desc: 'Mestres responsáveis por uma comissão ou módulo', manual: false }
@@ -115,7 +116,7 @@ function montaHtml(d) {
   const img = urlOk(d.imagem) ? `<tr><td style="padding:0;"><img src="${esc(d.imagem)}" alt="${esc(d.titulo)}" width="600" style="display:block;width:100%;max-width:600px;height:auto;border:0;"></td></tr>` : '';
   const botao = urlOk(d.link) && d.botao ? `<p style="margin:24px 0 8px;"><a href="${esc(linkRastreado(d))}" style="background:${dest};color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:6px;font-weight:bold;display:inline-block;">${esc(d.botao)}</a></p>` : '';
   return `<!DOCTYPE html>
-<html lang="pt-br"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${esc(d.assunto || d.titulo)}</title></head>
+<html lang="${d.lang === 'es' ? 'es' : 'pt-br'}"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${esc(d.assunto || d.titulo)}</title></head>
 <body style="margin:0;padding:0;background:#f4f6f6;font-family:Arial,Helvetica,sans-serif;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f6;"><tr><td align="center" style="padding:24px 12px;">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#ffffff;border-radius:8px;overflow:hidden;">
@@ -125,11 +126,11 @@ ${img}
 <h1 style="margin:0 0 16px;font-size:24px;line-height:1.3;color:${cor};">${esc(d.titulo)}</h1>
 ${ps}${botao}
 </td></tr>
-<tr><td style="padding:18px 28px;background:#f9fbfb;font-size:12px;line-height:1.5;color:#777777;">${esc(d.remetente || 'Parque de Estudo e Reflexão Retiro')} · Maricá, Rio de Janeiro, Brasil<br>Você recebe este Comunicado por e-mail porque se cadastrou no Parque Retiro.<br>${urlOk(d.descadastro) ? `<a href="${esc(d.descadastro)}" style="color:#777777;text-decoration:underline;">Deixar de receber o Comunicado do Parque Retiro</a>` : 'Deixar de receber o Comunicado do Parque Retiro: responda este e-mail pedindo para sair.'}</td></tr>
+<tr><td style="padding:18px 28px;background:#f9fbfb;font-size:12px;line-height:1.5;color:#777777;">${esc(d.remetente || 'Parque de Estudo e Reflexão Retiro')} · Maricá, Rio de Janeiro, Brasil<br>${d.rodape ? esc(d.rodape) : `Você recebe este Comunicado por e-mail porque se cadastrou no Parque Retiro.<br>${urlOk(d.descadastro) ? `<a href="${esc(d.descadastro)}" style="color:#777777;text-decoration:underline;">Deixar de receber o Comunicado do Parque Retiro</a>` : 'Deixar de receber o Comunicado do Parque Retiro: responda este e-mail pedindo para sair.'}`}</td></tr>
 </table></td></tr></table></body></html>`;
 }
 function montaTexto(d) {
-  return [d.titulo, '', ...paragrafos(d.texto).flatMap(p => [p, '']), urlOk(d.link) ? (d.botao || 'Saiba mais') + ': ' + linkRastreado(d) : '', '', (d.remetente || 'Parque de Estudo e Reflexão Retiro') + ' · Maricá, RJ', (urlOk(d.descadastro) ? 'Deixar de receber o Comunicado do Parque Retiro: ' + d.descadastro : 'Deixar de receber o Comunicado do Parque Retiro: responda pedindo para sair.')].join('\n').trim();
+  return [d.titulo, '', ...paragrafos(d.texto).flatMap(p => [p, '']), urlOk(d.link) ? (d.botao || 'Saiba mais') + ': ' + linkRastreado(d) : '', '', (d.remetente || 'Parque de Estudo e Reflexão Retiro') + ' · Maricá, RJ', d.rodape ? d.rodape : (urlOk(d.descadastro) ? 'Deixar de receber o Comunicado do Parque Retiro: ' + d.descadastro : 'Deixar de receber o Comunicado do Parque Retiro: responda pedindo para sair.')].join('\n').trim();
 }
 const copia = async t => { try { await navigator.clipboard.writeText(t); return true; } catch (e) { const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); let ok = false; try { ok = document.execCommand('copy'); } catch (x) { /* sem cópia */ } a.remove(); return ok; } };
 const baixa = (nome, texto, tipo) => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([texto], { type: tipo })); a.download = nome; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); };
@@ -306,6 +307,6 @@ function abrirContatos(me, root) {
   draw();
 }
 
-window.PR_EMAILMKT = { descadastrar, calcMetricas, linkRastreado, LISTAS, membros, destinatarios, adicionar, montaHtml, abrirGerador, barra, abrirContatos };
+window.PR_EMAILMKT = { descadastrar, calcMetricas, linkRastreado, LISTAS, membros, destinatarios, adicionar, montaHtml, montaTexto, abrirGerador, barra, abrirContatos };
 document.addEventListener('DOMContentLoaded', cadastroPublico);
 })();

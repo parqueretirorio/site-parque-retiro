@@ -15,6 +15,30 @@ const hoje = () => new Date().toISOString().slice(0, 10);
 const diasEntre = (a, b) => Math.round((new Date(b) - new Date(a)) / 864e5);
 const H = { db: null, esc: s => String(s == null ? '' : s), uid: () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6) };
 
+/* ---------- Convite para a área restrita ---------- */
+const CONVITE = {
+  pt: {
+    assunto: 'Convite: sua conta na área restrita do Parque Retiro', saudacao: 'Olá, {{primeiro_nome}}!',
+    titulo: 'Você está convidado(a) para o CONecta Retiro', botao: 'Criar minha conta',
+    texto: 'O CONecta Retiro é a nova área restrita (site e app) das Comissões e da Administração do Parque de Estudo e Reflexão Retiro. Nela ficam avisos, agenda, atividades, Reunião de Escola, documentos e as ferramentas de cada comissão.\n\nPara entrar, crie a sua conta (leva uns 3 minutos):\n1. Toque no botão abaixo.\n2. Preencha nome completo, e-mail, WhatsApp e crie uma senha.\n3. Você vai receber um e-mail do CONecta Retiro: abra e toque em confirmar. Se não aparecer, olhe no Spam ou em Promoções.\n4. Aguarde a aprovação. Depois é só entrar com o seu e-mail e senha, pelo site ou pelo app.\n\nImportante: a partir de 27/11 o endereço passa a ser parqueretiro.org.br. Seu e-mail e sua senha continuam os mesmos.\n\nDentro do site e do app há o botão Ajuda, que explica cada tela. Qualquer dúvida, é só responder este e-mail.',
+    rodape: 'Você recebe este convite porque faz parte das comissões ou da administração do Parque Retiro. Se não quiser participar, é só ignorar este e-mail.', lembrete: 'Lembrete: '
+  },
+  es: {
+    assunto: 'Invitación: tu cuenta en el área restringida del Parque Retiro', saudacao: '¡Hola, {{primeiro_nome}}!',
+    titulo: 'Estás invitado(a) a CONecta Retiro', botao: 'Crear mi cuenta',
+    texto: 'CONecta Retiro es la nueva área restringida (sitio y app) de las Comisiones y de la Administración del Parque de Estudio y Reflexión Retiro. Allí están los avisos, la agenda, las actividades, la Reunión de Escuela, los documentos y las herramientas de cada comisión.\n\nPara entrar, crea tu cuenta (toma unos 3 minutos):\n1. Toca el botón de abajo.\n2. Completa nombre completo, correo, WhatsApp y crea una contraseña.\n3. Recibirás un correo de CONecta Retiro: ábrelo y toca en confirmar. Si no aparece, revisa Spam o Promociones.\n4. Espera la aprobación. Después solo tienes que entrar con tu correo y contraseña, por el sitio o por la app.\n\nImportante: a partir del 27/11 la dirección pasa a ser parqueretiro.org.br. Tu correo y tu contraseña siguen siendo los mismos.\n\nDentro del sitio y de la app está el botón Ayuda, que explica cada pantalla. Cualquier duda, solo responde este correo.',
+    rodape: 'Recibes esta invitación porque formas parte de las comisiones o de la administración del Parque Retiro. Si no deseas participar, simplemente ignora este correo.', lembrete: 'Recordatorio: '
+  }
+};
+const dataBR = iso => /^\d{4}-\d{2}-\d{2}$/.test(iso || '') ? iso.slice(8, 10) + '/' + iso.slice(5, 7) + '/' + iso.slice(0, 4) : (iso || '');
+const ehConvite = c => !!c && c.tipo === 'convite';
+const linkCadastro = () => location.protocol.startsWith('http') ? location.origin + location.pathname.replace(/[^/]*$/, '') + 'login.html#criar-conta' : 'https://parqueretiro.org.br/login.html#criar-conta';
+// Situação do cadastro de um e-mail na área restrita: 'aprovado', 'pendente', 'outro' (não aprovado) ou '' (ainda não se cadastrou).
+function situacaoCadastro(email, users) {
+  const e = String(email || '').toLowerCase(), u = (users || (H.db ? H.db.get('users', []) : [])).find(x => String(x.email || '').toLowerCase() === e);
+  if (!u) return ''; const st = u.status || 'aprovado'; return st === 'aprovado' || st === 'pendente' ? st : 'outro';
+}
+
 /* ---------- Personalização ---------- */
 function primeiroNome(nome) {
   const p = String(nome || '').trim().split(/\s+/)[0] || '';
@@ -30,11 +54,13 @@ function personaliza(t, pessoa) {
 function dadosPessoa(c, pessoa) {
   const sau = personaliza(c.saudacao, pessoa).trim();
   const base = location.protocol.startsWith('http') ? location.origin + location.pathname.replace(/[^/]*$/, '') : '';
+  const conv = ehConvite(c), M = CONVITE[c.lang === 'es' ? 'es' : 'pt'];
   return {
-    assunto: personaliza(c.assunto, pessoa), titulo: personaliza(c.titulo, pessoa),
+    assunto: (conv && c.lembrete ? M.lembrete : '') + personaliza(c.assunto, pessoa), titulo: personaliza(c.titulo, pessoa), lang: c.lang || 'pt',
+    rodape: conv ? M.rodape : '',
     texto: (sau ? sau + '\n\n' : '') + personaliza(c.texto, pessoa),
     imagem: c.imagem, botao: c.botao, link: c.link, remetente: c.remetente || 'Parque de Estudo e Reflexão Retiro',
-    descadastro: base ? base + 'descadastro.html?e=' + encodeURIComponent(pessoa.email) : ''
+    descadastro: conv ? '' : base ? base + 'descadastro.html?e=' + encodeURIComponent(pessoa.email) : ''
   };
 }
 
@@ -53,6 +79,7 @@ function interessesDe(p) { return Object.keys(p && p.interesses || {}).filter(k 
 function publico(c) {
   const E = window.PR_EMAILMKT, P = perfis();
   const listas = c.todas ? Object.keys(E.LISTAS) : (c.listas || []);
+  if (ehConvite(c)) { const us = H.db ? H.db.get('users', []) : []; return E.destinatarios(listas).filter(m => !situacaoCadastro(m.email, us)); }
   return E.destinatarios(listas).filter(m => {
     const p = P[m.email.toLowerCase()];
     if (p && (p.bloqueado || p.semAbrir >= SEM_RESPOSTA)) return false;
@@ -135,23 +162,26 @@ function abrir(el, h) {
 
   function lista(c) {
     const l = camps().slice().reverse();
-    c.innerHTML = `${aviso}<p><button type="button" class="btn-visit" id="ek-nova"><i class="fas fa-plus"></i> Nova campanha de e-mail</button></p>
+    c.innerHTML = `${aviso}<p><button type="button" class="btn-visit" id="ek-nova"><i class="fas fa-plus"></i> Nova campanha de e-mail</button> <button type="button" class="btn-visit" id="ek-conv"><i class="fas fa-user-plus"></i> Convite para a área restrita</button></p>
       ${l.length ? `<div style="overflow-x:auto"><table class="doc-table"><thead><tr><th>Campanha</th><th>Listas</th><th>Enviados</th><th>Abertura</th><th>Cliques</th><th></th></tr></thead><tbody>${l.map(x => { const r = resumo(x); return `<tr><td><strong>${esc(x.nome || x.assunto)}</strong><br><small>${esc(x.criado)}${x.tema ? ' · ' + esc(x.tema) : ''}</small></td><td>${x.todas ? 'Todas' : esc((x.listas || []).map(k => (E.LISTAS[k] || {}).nome || k).join(', '))}</td><td>${r.env} de ${(x.fila || []).length}</td><td>${r.tAb}</td><td>${r.tCl}</td><td><button type="button" class="btn-visit" data-ver="${esc(x.id)}">Abrir</button></td></tr>`; }).join('')}</tbody></table></div>` : '<p class="vazio">Nenhuma campanha de e-mail ainda.</p>'}`;
     c.querySelector('#ek-nova').onclick = () => { S.ed = { id: H.uid(), criado: hoje(), nome: '', tema: '', listas: [], todas: false, engaj: 'todos', interesses: [], assunto: '', saudacao: 'Olá, {{primeiro_nome}}!', titulo: '', texto: '', imagem: '', botao: 'Saiba mais', link: '', enviados: {}, result: {} }; S.msg = ''; draw(); };
+    c.querySelector('#ek-conv').onclick = () => { const M = CONVITE.pt; S.ed = { id: H.uid(), criado: hoje(), tipo: 'convite', lang: 'pt', nome: 'Convite para a área restrita', tema: '', listas: ['convite'], todas: false, engaj: 'todos', interesses: [], assunto: M.assunto, saudacao: M.saudacao, titulo: M.titulo, texto: M.texto, imagem: '', botao: M.botao, link: linkCadastro(), enviados: {}, result: {} }; S.msg = ''; draw(); };
     c.querySelectorAll('[data-ver]').forEach(b => b.onclick = () => { S.ver = b.dataset.ver; S.msg = ''; draw(); });
   }
 
   function editor(c, d) {
-    const nLista = k => E.membros(k).length;
+    const nLista = k => E.membros(k).length, conv = ehConvite(d);
     c.innerHTML = `<form id="ek-f" novalidate><div class="emkt-cols"><div class="emkt-form">
       <div class="form-row"><label for="ek-nome">Nome da campanha (só para a equipe)</label><input id="ek-nome" maxlength="100" value="${esc(d.nome)}"></div>
+      ${conv ? `<p class="tip-box" role="note"><i class="fas fa-user-plus"></i> Convite para criar conta na área restrita. O botão leva direto para <strong>Criar conta</strong>. Quem já tem cadastro não recebe. Monte a lista <strong>Convite área restrita</strong> em Listas de e-mail.</p>
+      <div class="form-row"><label for="ek-lang">Idioma do convite</label><select id="ek-lang"><option value="pt" ${d.lang !== 'es' ? 'selected' : ''}>Português</option><option value="es" ${d.lang === 'es' ? 'selected' : ''}>Español</option></select><small>Ao trocar o idioma, o texto volta ao modelo daquele idioma. Para quem fala espanhol, faça um segundo convite em Español.</small></div>` : ''}
       <fieldset class="funcoes"><legend>Para quem enviar</legend>
         <label class="fn"><input type="checkbox" id="ek-todas" ${d.todas ? 'checked' : ''}> <strong>Todas as listas</strong></label>
         ${Object.keys(E.LISTAS).map(k => `<label class="fn" title="${esc(E.LISTAS[k].desc)}"><input type="checkbox" name="ek-l" value="${k}" ${d.todas || d.listas.includes(k) ? 'checked' : ''} ${d.todas ? 'disabled' : ''}> ${esc(E.LISTAS[k].nome)} <small>(${nLista(k)})</small></label>`).join('')}
       </fieldset>
-      <div class="form-row"><label for="ek-eng">Perfil do público</label><select id="ek-eng">${Object.keys(ENGAJ).map(k => `<option value="${k}" ${d.engaj === k ? 'selected' : ''}>${esc(ENGAJ[k])}</option>`).join('')}</select></div>
-      <fieldset class="funcoes" id="ek-int"><legend>Interesses (para o filtro "só quem tem os interesses")</legend>${INTERESSES.map(i => `<label class="fn"><input type="checkbox" name="ek-i" value="${esc(i)}" ${d.interesses.includes(i) ? 'checked' : ''}> ${esc(i)}</label>`).join('')}</fieldset>
-      <div class="form-row"><label for="ek-tema">Tema desta campanha</label><select id="ek-tema"><option value="">— nenhum —</option>${INTERESSES.map(i => `<option ${d.tema === i ? 'selected' : ''}>${esc(i)}</option>`).join('')}</select><small>Quem clicar ganha este interesse no perfil. Com o tempo, as campanhas vão para quem realmente se interessa pelo tema.</small></div>
+      <div class="form-row"${conv ? ' hidden' : ''}><label for="ek-eng">Perfil do público</label><select id="ek-eng">${Object.keys(ENGAJ).map(k => `<option value="${k}" ${d.engaj === k ? 'selected' : ''}>${esc(ENGAJ[k])}</option>`).join('')}</select></div>
+      <fieldset class="funcoes" id="ek-int"${conv ? ' hidden' : ''}><legend>Interesses (para o filtro "só quem tem os interesses")</legend>${INTERESSES.map(i => `<label class="fn"><input type="checkbox" name="ek-i" value="${esc(i)}" ${d.interesses.includes(i) ? 'checked' : ''}> ${esc(i)}</label>`).join('')}</fieldset>
+      <div class="form-row"${conv ? ' hidden' : ''}><label for="ek-tema">Tema desta campanha</label><select id="ek-tema"><option value="">— nenhum —</option>${INTERESSES.map(i => `<option ${d.tema === i ? 'selected' : ''}>${esc(i)}</option>`).join('')}</select><small>Quem clicar ganha este interesse no perfil. Com o tempo, as campanhas vão para quem realmente se interessa pelo tema.</small></div>
       <p class="tip-box" id="ek-tot" role="status"></p>
       <div class="form-row"><label for="ek-as">Assunto *</label><input id="ek-as" maxlength="150" value="${esc(d.assunto)}"><small>Pode usar {{primeiro_nome}} também no assunto.</small></div>
       <div class="form-row"><label for="ek-sa">Saudação (primeira linha)</label><input id="ek-sa" maxlength="120" value="${esc(d.saudacao)}"><small>{{primeiro_nome}} vira o primeiro nome da pessoa. Se não tivermos o nome, fica só "Olá!".</small></div>
@@ -171,14 +201,15 @@ function abrir(el, h) {
       engaj: $('#ek-eng').value, interesses: [...c.querySelectorAll('[name=ek-i]:checked')].map(i => i.value), tema: $('#ek-tema').value,
       assunto: $('#ek-as').value.trim(), saudacao: $('#ek-sa').value, titulo: $('#ek-ti').value.trim(), texto: $('#ek-tx').value,
       imagem: $('#ek-im').value.trim(), botao: $('#ek-bt').value.trim(), link: $('#ek-lk').value.trim()
-    });
+    }, conv ? { lang: $('#ek-lang').value } : {});
+    if (conv) $('#ek-lang').addEventListener('change', () => { const M = CONVITE[$('#ek-lang').value === 'es' ? 'es' : 'pt']; $('#ek-as').value = M.assunto; $('#ek-sa').value = M.saudacao; $('#ek-ti').value = M.titulo; $('#ek-tx').value = M.texto; $('#ek-bt').value = M.botao; });
     let pub = [];
     const atualiza = () => {
       ler();
       c.querySelectorAll('[name=ek-l]').forEach(i => { i.disabled = d.todas; if (d.todas) i.checked = true; });
       pub = montarFila(d);
       const dias = Math.max(1, Math.ceil(pub.length / Math.max(1, limiteHoje())));
-      $('#ek-tot').textContent = `${pub.length} pessoa(s) vão receber (sem repetir quem está em mais de uma lista). No ritmo atual de aquecimento, cerca de ${dias} dia(s) de envio.`;
+      $('#ek-tot').textContent = conv ? `${pub.length} pessoa(s) vão receber o convite (quem já se cadastrou fica de fora).` : `${pub.length} pessoa(s) vão receber (sem repetir quem está em mais de uma lista). No ritmo atual de aquecimento, cerca de ${dias} dia(s) de envio.`;
       const sel = $('#ek-pv'), atual = sel.value;
       sel.innerHTML = '<option value="">Exemplo: pessoa sem nome</option>' + pub.slice(0, 60).map(p => `<option value="${esc(p.email)}">${esc(p.nome || p.email)}</option>`).join('');
       if ([...sel.options].some(o => o.value === atual)) sel.value = atual; else if (pub[0]) sel.value = pub[0].email;
@@ -196,7 +227,7 @@ function abrir(el, h) {
       if (!d.botao || !/^https?:\/\//i.test(d.link)) { er.textContent = 'Informe o texto e o link do botão (começando com https://).'; return; }
       if (d.imagem && !/^https?:\/\//i.test(d.imagem)) { er.textContent = 'O endereço da imagem precisa começar com https://.'; return; }
       if (d.engaj === 'interessados' && !d.interesses.length) { er.textContent = 'Marque ao menos um interesse para filtrar o público.'; return; }
-      if (!pub.length) { er.textContent = 'Nenhuma pessoa nas listas e no perfil escolhidos.'; return; }
+      if (!pub.length) { er.textContent = conv ? 'Ninguém para convidar: a lista está vazia ou todos já se cadastraram.' : 'Nenhuma pessoa nas listas e no perfil escolhidos.'; return; }
       const enviados = d.enviados || {};
       d.fila = pub.map(p => p.email); d.nomes = Object.fromEntries(pub.map(p => [p.email, p.nome]));
       Object.keys(enviados).forEach(e => { if (!d.fila.includes(e)) d.fila.unshift(e); });
@@ -206,39 +237,82 @@ function abrir(el, h) {
 
   function painel(c, d) {
     if (!d) { S.ver = null; return draw(); }
+    const conv = ehConvite(d), us = H.db.get('users', []);
     const pend = (d.fila || []).filter(e => !(d.enviados || {})[e]);
-    const P = perfis(), vivos = pend.filter(e => !(P[e] && (P[e].bloqueado || P[e].semAbrir >= SEM_RESPOSTA)));
-    const resto = restanteHoje(), lote = vivos.slice(0, resto).map(e => ({ email: e, nome: (d.nomes || {})[e] || '' }));
+    const P = perfis(), vivos = pend.filter(e => conv ? !situacaoCadastro(e, us) : !(P[e] && (P[e].bloqueado || P[e].semAbrir >= SEM_RESPOSTA)));
+    const resto = conv ? 400 : restanteHoje(), lote = vivos.slice(0, resto).map(e => ({ email: e, nome: (d.nomes || {})[e] || '' }));
     const r = resumo(d), a = aquec();
+    const auto = !!(window.PR_SUPABASE && window.PR_DADOS && PR_DADOS.modo === 'supabase' && PR_SUPABASE.funcao);
+    const sit = conv ? (d.fila || []).map(e => ({ email: e, nome: (d.nomes || {})[e] || '', st: situacaoCadastro(e, us), env: (d.enviados || {})[e] || '', lemb: ((d.lembretes || {})[e] || []).length })) : [];
+    const cont = k => sit.filter(x => x.st === k).length;
+    const faltam = sit.filter(x => !x.st && x.env);
+    const ROT = { aprovado: 'Já tem acesso', pendente: 'Cadastrou: aguardando aprovação', outro: 'Cadastro não aprovado', '': 'Ainda não se cadastrou' };
     c.innerHTML = `<p><button type="button" class="btn-visit" id="ek-volta"><i class="fas fa-arrow-left"></i> Campanhas</button> <button type="button" class="btn-visit" id="ek-edit"><i class="fas fa-pen"></i> Editar</button></p>
       <h4>${esc(d.nome || d.assunto)}</h4>
-      <p><strong>${r.env}</strong> enviados de <strong>${(d.fila || []).length}</strong> · Abertura ${r.tAb} · Cliques ${r.tCl} · Rejeição ${r.tRj}</p>
-      ${aviso}
-      <h4><i class="fas fa-calendar-day"></i> Lote de hoje: ${lote.length} pessoa(s)</h4>
-      <p class="vazio">Limite de hoje no aquecimento: ${limiteHoje(a)} e-mail(s); já enviados hoje (todas as campanhas): ${a.dias[hoje()] || 0}.${a.segurar ? ' O volume está segurado porque a última rejeição passou de 3%: limpe a lista antes de crescer.' : ''}</p>
-      ${lote.length ? `<p><button type="button" class="btn-visit" id="ek-csv"><i class="fas fa-file-csv"></i> Baixar lote (.csv para mala direta)</button>
+      ${conv ? `<p><strong>${r.env}</strong> convite(s) enviado(s) de <strong>${(d.fila || []).length}</strong> · <strong>${cont('aprovado')}</strong> já com acesso · <strong>${cont('pendente')}</strong> aguardando aprovação · <strong>${cont('')}</strong> ainda não se cadastraram</p>`
+        : `<p><strong>${r.env}</strong> enviados de <strong>${(d.fila || []).length}</strong> · Abertura ${r.tAb} · Cliques ${r.tCl} · Rejeição ${r.tRj}</p>${aviso}`}
+      <h4><i class="fas fa-calendar-day"></i> ${conv ? 'Para enviar agora' : 'Lote de hoje'}: ${lote.length} pessoa(s)</h4>
+      ${conv ? (d.lembrete ? '<p class="vazio">Este envio é um lembrete: o assunto começa com "Lembrete:".</p>' : '') : `<p class="vazio">Limite de hoje no aquecimento: ${limiteHoje(a)} e-mail(s); já enviados hoje (todas as campanhas): ${a.dias[hoje()] || 0}.${a.segurar ? ' O volume está segurado porque a última rejeição passou de 3%: limpe a lista antes de crescer.' : ''}</p>`}
+      ${lote.length ? `${auto ? `<p><button type="button" class="btn-visit btn-large" id="ek-auto"><i class="fas fa-paper-plane"></i> Enviar agora pelo Gmail do Parque</button></p><p class="vazio" id="ek-prog" role="status"></p>` : ''}
+        <p><button type="button" class="btn-visit" id="ek-csv"><i class="fas fa-file-csv"></i> Baixar lote (.csv para mala direta)</button>
         <button type="button" class="btn-visit" id="ek-html"><i class="fas fa-code"></i> Baixar e-mail (.html com {{primeiro_nome}})</button>
-        <button type="button" class="btn-visit btn-large" id="ek-env"><i class="fas fa-check"></i> Marcar lote de hoje como enviado</button></p>
-        <div style="overflow-x:auto"><table class="doc-table"><thead><tr><th>Nome</th><th>E-mail</th><th>Enviar um a um</th></tr></thead><tbody>${lote.map(p => { const dd = dadosPessoa(d, p); const corpo = [dd.titulo, '', dd.texto, '', (dd.botao || 'Saiba mais') + ': ' + E.linkRastreado(dd), '', dd.remetente, 'Deixar de receber: ' + (dd.descadastro || 'responda pedindo para sair.')].join('\n'); return `<tr><td>${esc(p.nome || '—')}</td><td>${esc(p.email)}</td><td><a class="btn-visit" href="mailto:${encodeURIComponent(p.email)}?subject=${encodeURIComponent(dd.assunto)}&body=${encodeURIComponent(corpo)}">Abrir e-mail para ${esc(primeiroNome(p.nome) || 'esta pessoa')}</a></td></tr>`; }).join('')}</tbody></table></div>`
-        : `<p class="vazio">${pend.length ? 'O limite de hoje já foi atingido. Amanhã o lote continua, um pouco maior.' : 'Todos da fila já receberam esta campanha.'}</p>`}
-      <details id="ek-res"><summary><strong>Registrar resultados</strong> (quem abriu, clicou ou voltou)</summary>
+        <button type="button" class="btn-visit" id="ek-env"><i class="fas fa-check"></i> Marcar ${conv ? 'como enviados' : 'lote de hoje como enviado'}</button></p>
+        <div style="overflow-x:auto"><table class="doc-table"><thead><tr><th>Nome</th><th>E-mail</th><th>Enviar um a um</th></tr></thead><tbody>${lote.map(p => { const dd = dadosPessoa(d, p); const corpo = E.montaTexto(dd); return `<tr><td>${esc(p.nome || '—')}</td><td>${esc(p.email)}</td><td><a class="btn-visit" href="mailto:${encodeURIComponent(p.email)}?subject=${encodeURIComponent(dd.assunto)}&body=${encodeURIComponent(corpo)}">Abrir e-mail para ${esc(primeiroNome(p.nome) || 'esta pessoa')}</a></td></tr>`; }).join('')}</tbody></table></div>`
+        : `<p class="vazio">${conv ? 'Ninguém pendente: todos da lista já receberam o convite ou já se cadastraram.' : pend.length ? 'O limite de hoje já foi atingido. Amanhã o lote continua, um pouco maior.' : 'Todos da fila já receberam esta campanha.'}</p>`}
+      ${conv ? `<h4><i class="fas fa-user-check"></i> Quem já se cadastrou</h4>
+        <p class="vazio">Atualiza sozinho: quando a pessoa cria a conta, aparece aqui e em Gestão de Responsáveis, para você aprovar.</p>
+        ${faltam.length ? `<p><button type="button" class="btn-visit" id="ek-lemb"><i class="fas fa-bell"></i> Preparar lembrete para quem ainda não se cadastrou (${faltam.length})</button></p>` : ''}
+        <div style="overflow-x:auto"><table class="doc-table"><thead><tr><th>Pessoa</th><th>Convite enviado</th><th>Situação</th></tr></thead><tbody>${sit.map(x => `<tr><td>${esc(x.nome || '—')}<br><small>${esc(x.email)}</small></td><td>${x.env ? esc(dataBR(x.env)) : x.lemb ? esc(dataBR(d.lembretes[x.email][x.lemb - 1])) + '<br><small>lembrete a enviar</small>' : '—'}</td><td>${ROT[x.st]}</td></tr>`).join('')}</tbody></table></div>`
+      : `<details id="ek-res"><summary><strong>Registrar resultados</strong> (quem abriu, clicou ou voltou)</summary>
         <p class="vazio">Cole o relatório do serviço de envio, uma pessoa por linha: <code>e-mail;abriu;clicou;rejeitou</code> (sim/não). Quem responder ou clicar no e-mail enviado um a um também conta como abertura. E-mails que voltaram saem das próximas campanhas.</p>
         <textarea id="ek-rel" rows="5" placeholder="maria@email.com;sim;sim;não"></textarea>
-        <p><button type="button" class="btn-visit" id="ek-apl"><i class="fas fa-chart-line"></i> Aplicar resultados</button></p></details>`;
+        <p><button type="button" class="btn-visit" id="ek-apl"><i class="fas fa-chart-line"></i> Aplicar resultados</button></p></details>`}`;
     $('#ek-volta').onclick = () => { S.ver = null; S.msg = ''; draw(); };
     $('#ek-edit').onclick = () => { S.ed = d; S.ver = null; S.msg = ''; draw(); };
     const baixa = (nome, txt, tipo) => { const x = document.createElement('a'); x.href = URL.createObjectURL(new Blob([txt], { type: tipo })); x.download = nome; x.click(); };
+    const marca = emails => {
+      if (!emails.length) return;
+      d.enviados = d.enviados || {};
+      if (conv) emails.forEach(e => { d.enviados[e] = hoje(); });
+      else {
+        const Pf = perfis();
+        emails.forEach(e => { d.enviados[e] = hoje(); const pf = perfil(Pf, e); pf.enviados++; pf.semAbrir++; pf.ultimoEnvio = hoje(); });
+        H.db.set('emkt_perfis', Pf); registraEnvio(emails.length);
+      }
+      salva(d);
+    };
     if (lote.length) {
-      $('#ek-csv').onclick = () => baixa('lote-' + hoje() + '.csv', '﻿primeiro_nome;nome;email;assunto\r\n' + lote.map(p => `"${primeiroNome(p.nome)}";"${String(p.nome).replace(/"/g, '""')}";${p.email};"${personaliza(d.assunto, p).replace(/"/g, '""')}"`).join('\r\n'), 'text/csv');
-      $('#ek-html').onclick = () => baixa('email-' + hoje() + '.html', E.montaHtml({ assunto: d.assunto, titulo: d.titulo, texto: (d.saudacao ? d.saudacao + '\n\n' : '') + d.texto, imagem: d.imagem, botao: d.botao, link: d.link, remetente: 'Parque de Estudo e Reflexão Retiro', descadastro: '' }), 'text/html');
-      $('#ek-env').onclick = () => {
-        const Pf = perfis(); d.enviados = d.enviados || {};
-        lote.forEach(p => { d.enviados[p.email] = hoje(); const pf = perfil(Pf, p.email); pf.enviados++; pf.semAbrir++; pf.ultimoEnvio = hoje(); });
-        H.db.set('emkt_perfis', Pf); registraEnvio(lote.length); salva(d);
-        S.msg = `${lote.length} e-mail(s) marcados como enviados hoje.`; draw();
+      $('#ek-csv').onclick = () => baixa('lote-' + hoje() + '.csv', '﻿primeiro_nome;nome;email;assunto\r\n' + lote.map(p => `"${primeiroNome(p.nome)}";"${String(p.nome).replace(/"/g, '""')}";${p.email};"${dadosPessoa(d, p).assunto.replace(/"/g, '""')}"`).join('\r\n'), 'text/csv');
+      $('#ek-html').onclick = () => { const dd = dadosPessoa(d, { nome: '{{primeiro_nome}}', email: '' }); baixa('email-' + hoje() + '.html', E.montaHtml(Object.assign(dd, { texto: (d.saudacao ? d.saudacao + '\n\n' : '') + d.texto, descadastro: '' })), 'text/html'); };
+      $('#ek-env').onclick = () => { marca(lote.map(p => p.email)); S.msg = `${lote.length} e-mail(s) marcados como enviados hoje.`; draw(); };
+      const ba = $('#ek-auto');
+      if (ba) ba.onclick = async () => {
+        const prog = $('#ek-prog'); ba.disabled = true; let ok = [], falhas = [], parar = '';
+        for (let i = 0; i < lote.length && !parar; i += 20) {
+          const parte = lote.slice(i, i + 20);
+          prog.textContent = `Enviando ${Math.min(i + 20, lote.length)} de ${lote.length}...`;
+          const msgs = parte.map(p => { const dd = dadosPessoa(d, p); return { para: p.email, nome: p.nome || '', assunto: dd.assunto, html: E.montaHtml(dd), texto: E.montaTexto(dd) }; });
+          const resp = await PR_SUPABASE.funcao('enviar-email', { mensagens: msgs });
+          const cp = resp.corpo || {};
+          if (resp.status === 200) { ok = ok.concat(cp.enviados || []); falhas = falhas.concat(cp.falhas || []); marca(cp.enviados || []); }
+          else if (resp.status === 404) parar = 'O envio automático ainda não foi instalado no servidor. Por enquanto, use "Abrir e-mail" em cada pessoa.';
+          else if (resp.status === 503) parar = 'O envio automático ainda não foi ligado (falta a senha de app do Gmail no servidor). Por enquanto, use "Abrir e-mail" em cada pessoa.';
+          else if (resp.status === 403) parar = 'Só o administrador ou o Responsável pela Comunicação pode enviar.';
+          else if (resp.status === 0) parar = 'Sem conexão com o servidor. Confira a internet e tente de novo.';
+          else { if (cp.enviados && cp.enviados.length) { ok = ok.concat(cp.enviados); marca(cp.enviados); } parar = 'O servidor não conseguiu enviar (' + (cp.erro || resp.status) + ').'; }
+        }
+        S.msg = (ok.length ? `${ok.length} e-mail(s) enviados pelo Gmail do Parque.` : '') + (falhas.length ? ` ${falhas.length} não foram: ${falhas.map(f => f.email).join(', ')}.` : '') + (parar ? ' ' + parar : '');
+        draw();
       };
     }
-    $('#ek-apl').onclick = () => {
+    const bl = $('#ek-lemb');
+    if (bl) bl.onclick = () => {
+      d.lembretes = d.lembretes || {};
+      faltam.forEach(x => { (d.lembretes[x.email] = d.lembretes[x.email] || []).push(d.enviados[x.email]); delete d.enviados[x.email]; });
+      d.lembrete = true; salva(d); S.msg = `Lembrete pronto para ${faltam.length} pessoa(s). O assunto começa com "${CONVITE[d.lang === 'es' ? 'es' : 'pt'].lembrete.trim()}".`; draw();
+    };
+    const ap = $('#ek-apl');
+    if (ap) ap.onclick = () => {
       const linhas = $('#ek-rel').value.split(/\r?\n/).map(l => l.split(/[;\t,]/)).filter(p => p[0] && p[0].includes('@')).map(p => ({ email: p[0], abriu: p[1], clicou: p[2], rejeitou: p[3] }));
       const res = aplicarResultados(d, linhas); salva(d);
       S.msg = `Resultados aplicados a ${res.n} pessoa(s).${res.rej ? ` ${res.rej} e-mail(s) que voltaram saíram das próximas campanhas.` : ''}`; draw();
@@ -268,5 +342,5 @@ function abrir(el, h) {
   draw();
 }
 
-window.PR_COM_EMKT = { RAMPA, INTERESSES, primeiroNome, personaliza, dadosPessoa, pontuacao, montarFila, publico, limiteHoje, registraEnvio, aplicarResultados, abrir };
+window.PR_COM_EMKT = { CONVITE, situacaoCadastro, RAMPA, INTERESSES, primeiroNome, personaliza, dadosPessoa, pontuacao, montarFila, publico, limiteHoje, registraEnvio, aplicarResultados, abrir };
 })();
