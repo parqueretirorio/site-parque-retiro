@@ -1572,7 +1572,7 @@ function loginServidor() {
   if (ret && ret.tipo !== 'recovery' && !ret.erro) { history.replaceState(null, '', location.pathname); } // volta da confirmação de e-mail
   const s = SB.sessao(), eu = s && db.get('users', []).find(u => u.email === s.user.email);
   if (!ret && eu && statusDe(eu) === 'aprovado') { sessionStorage.setItem('pr_sess', eu.email); location.replace('area-restrita.html'); return; }
-  let modo = ret && ret.tipo === 'recovery' ? 'nova' : 'entrar', aviso = '', ocupado = false;
+  let modo = ret && ret.tipo === 'recovery' ? 'nova' : (!ret && location.hash === '#criar-conta' ? 'cadastro' : 'entrar'), aviso = '', ocupado = false;
   if (ret && ret.erro) aviso = 'O link do e-mail não funcionou (' + ret.erro + '). Se for de senha, peça outro em "Esqueci minha senha".';
   else if (ret && ret.tipo === 'signup') aviso = 'E-mail confirmado! Agora aguarde: o administrador vai aprovar ou não o seu acesso. Você pode tentar entrar depois da aprovação.';
   else if (ret && ret.tipo !== 'recovery') aviso = 'E-mail confirmado.';
@@ -1645,7 +1645,7 @@ function login() {
   const logado = users.find(u => u.email === sessionStorage.getItem('pr_sess'));
   if (logado && statusDe(logado) === 'aprovado') { location.replace('area-restrita.html'); return; }
   const primeiro = !users.some(u => u.nivel === 'administrador' && statusDe(u) === 'aprovado'); // o primeiro cadastro sempre vira Administrador
-  let modo = 'entrar', aviso = '';
+  let modo = location.hash === '#criar-conta' ? 'cadastro' : 'entrar', aviso = '';
 
   const desenha = () => {
     const cad = modo === 'cadastro';
