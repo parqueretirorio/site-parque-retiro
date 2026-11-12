@@ -2272,7 +2272,7 @@
 "＋ Outro projeto...": "＋ Otro proyecto...",
 "Convite para a área restrita": "Invitación al área restringida",
 "Convite área restrita": "Invitación área restringida",
-"Pessoas das comissões e da administração que vão receber o convite para criar conta na área restrita": "Personas de las comisiones y de la administración que recibirán la invitación para crear su cuenta en el área restringida",
+"Mestres e pessoas das comissões e da administração que vão receber o convite para criar conta na área restrita": "Maestros y personas de las comisiones y de la administración que recibirán la invitación para crear su cuenta en el área restringida",
 "Convite para criar conta na área restrita. O botão leva direto para <strong>Criar conta</strong>. Quem já tem cadastro não recebe. Monte a lista <strong>Convite área restrita</strong> em Listas de e-mail.": "Invitación para crear una cuenta en el área restringida. El botón lleva directo a <strong>Crear cuenta</strong>. Quien ya tiene registro no la recibe. Arma la lista <strong>Invitación área restringida</strong> en Listas de correo.",
 "Idioma do convite": "Idioma de la invitación",
 "Ao trocar o idioma, o texto volta ao modelo daquele idioma. Para quem fala espanhol, faça um segundo convite em Español.": "Al cambiar el idioma, el texto vuelve al modelo de ese idioma. Para quien habla español, haz una segunda invitación en Español.",

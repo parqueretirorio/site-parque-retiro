@@ -9,7 +9,7 @@ const LISTAS = {
   visitante:  { nome: 'Visitante',       desc: 'Quem se cadastrou pelo wifi do Parque', manual: true },
   aderente:   { nome: 'Aderente',        desc: 'Quem se cadastrou pelo site para receber o Comunicado por e-mail', manual: true },
   lancamentos:{ nome: 'Interessados em lançamentos', desc: 'Quem pediu para receber avisos de lançamentos de livros (marcou a opção ao encomendar)', manual: true },
-  convite:    { nome: 'Convite área restrita', desc: 'Pessoas das comissões e da administração que vão receber o convite para criar conta na área restrita', manual: true },
+  convite:    { nome: 'Convite área restrita', desc: 'Mestres e pessoas das comissões e da administração que vão receber o convite para criar conta na área restrita', manual: true },
   postulante: { nome: 'Postulantes',     desc: 'Quem está fazendo a Escola', manual: true },
   mestres1:   { nome: 'Mestres 1',       desc: 'Todos os mestres com acesso à área restrita (Gestão de Responsáveis)', manual: false },
   mestrescom: { nome: 'Mestres Comissão', desc: 'Mestres responsáveis por uma comissão ou módulo', manual: false }
