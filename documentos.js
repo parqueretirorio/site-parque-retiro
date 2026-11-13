@@ -132,7 +132,7 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, abri
   const pode = H.tem(me, 'documentos'); // administrador ou Responsável pelos Documentos e Calendários
   const anoHoje = +hoje().slice(0, 4);
   const areas = AREAS.filter(a => a.lugar === lugar), cals = lugar === 'docs' ? CALS : [];
-  let sub = (areas[0] || cals[0]).id, form = null, msg = '';
+  let sub = (areas[0] || cals[0]).id, form = null, msg = '', imp = null; // imp: pacote de atas sendo conferido antes de importar
   const F = { ano: '', cat: '', q: '', aberto: false };                       // filtros da lista de documentos
   const mesHoje = +hoje().slice(5, 7) - 1;
   const W = { ini: domingoDe(hoje()) }; // semana mostrada no calendário semanal (domingo)
@@ -174,6 +174,47 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, abri
   const encItem = (d, e) => { const at = e.ativ ? ativs().find(a => a.id === e.ativ) : null, dt = at ? at.data : e.data, atraso = e.status === 'Em aberto' && dt && dt < hoje();
     return `<li><span class="badge-status" style="background:${atraso ? '#a31d21' : encCor(e.status)};color:#fff">${esc(atraso ? 'Em atraso' : e.status)}</span> ${esc(e.texto)}${e.resp ? ` <small>(${esc(e.resp)})</small>` : ''}${dt ? ` <small>· prazo ${fmtData(dt)}</small>` : ''}${at ? ' <small title="Está nos calendários"><i class="fas fa-calendar-check" aria-hidden="true"></i> no calendário</small>' : ''}${pode ? ` <select data-es="${d.id}|${e.id}" aria-label="Situação do encaminhamento">${opt(ENC_ST, e.status)}</select>` : ''}</li>`; };
 
+  /* ---------- Importar ata preparada (pacote .json montado pelo Claude a partir da ata) ----------
+     { tipo: 'pr-atas', versao: 1, atas: [{ id, titulo, data, categoria, descricao, link, videos: [{titulo, url}], arquivo, arqNome,
+       anexos: [{rotulo, nome, arquivo}], enc: [{id, texto, resp, data, status, tipo, cal}] }], atividades: [{id, titulo, data, fim, hora, categoria, local, descricao}] }
+     Importar de novo o mesmo pacote não duplica nada: atas, encaminhamentos e atividades têm id fixo e são atualizados. */
+  const okData = d => /^\d{4}-\d{2}-\d{2}$/.test(d || '');
+  const validaPacote = txt => {
+    let p; try { p = JSON.parse(txt); } catch (e) { return 'Este arquivo não é um pacote de ata válido (.json).'; }
+    if (!p || p.tipo !== 'pr-atas' || !Array.isArray(p.atas)) return 'Este arquivo não é um pacote de ata do CONecta Retiro.';
+    for (const a of p.atas) { if (!a.id || !a.titulo || !okData(a.data)) return 'Uma das atas do pacote está sem título ou sem data.'; if (a.arquivo && !H.safeUrl(a.arquivo)) return 'Arquivo anexado de tipo não aceito na ata "' + a.titulo + '".'; }
+    for (const t of p.atividades || []) if (!t.id || !t.titulo || !okData(t.data)) return 'Uma das datas do pacote está incompleta.';
+    return p;
+  };
+  const impBloco = p => {
+    const ativs0 = ativs(), novaAt = id => !ativs0.some(a => a.id === id), ja = id => docs().some(d => d.id === id);
+    return `<section class="tip-box" style="display:block"><h4 style="margin-top:0"><i class="fas fa-file-import"></i> Conferir antes de importar</h4>
+      ${p.atas.map(a => `<div style="border-top:1px solid #dfe6ec;padding:10px 0"><strong>${esc(a.titulo)}</strong> · ${fmtData(a.data)} ${ja(a.id) ? '<span class="badge-status badge-uso">já existe: será atualizada</span>' : '<span class="badge-status badge-aprovado">nova</span>'}
+        ${a.descricao ? `<p style="margin:4px 0">${esc(a.descricao)}</p>` : ''}
+        <p style="margin:4px 0"><small>${a.arquivo ? '<i class="fas fa-file-pdf"></i> ' + esc(a.arqNome || 'ata') + ' · ' : ''}${(a.anexos || []).length ? (a.anexos || []).length + ' anexo(s) · ' : ''}${(a.videos || []).length} vídeo(s)</small></p>
+        ${(a.enc || []).length ? `<ul style="margin:4px 0 0 18px">${a.enc.map(e => `<li>${esc(e.texto)}${e.resp ? ` <em>(${esc(e.resp)})</em>` : ''}${e.data ? ' · ' + fmtData(e.data) : ''} · <span style="color:${encCor(e.status || ENC_ST[0])}">${esc(e.status || ENC_ST[0])}</span>${e.cal && e.data ? ' · <i class="fas fa-calendar-plus" title="vai para o calendário"></i>' : ''}</li>`).join('')}</ul>` : ''}</div>`).join('')}
+      ${(p.atividades || []).length ? `<div style="border-top:1px solid #dfe6ec;padding:10px 0"><strong>Datas para o calendário</strong><ul style="margin:4px 0 0 18px">${p.atividades.map(t => `<li>${fmtData(t.data)}${t.fim ? ' a ' + fmtData(t.fim) : ''}${t.hora ? ' · ' + esc(t.hora) : ''} · ${esc(t.titulo)} <small>(${esc(t.categoria || 'Outras atividades')})${novaAt(t.id) ? '' : ' · já existe: será atualizada'}</small></li>`).join('')}</ul></div>` : ''}
+      <p><button type="button" class="btn-visit btn-large" id="imp-ok"><i class="fas fa-check"></i> Está certo, importar</button> <button type="button" class="btn-visit" id="imp-x">Cancelar</button></p></section>`;
+  };
+  const importa = p => {
+    const l = docs(), al = ativs(); let nAt = 0, nCal = 0;
+    const poeAtiv = (id, x) => { const i = al.findIndex(a => a.id === id); const o = Object.assign({ fim: '', hora: '', local: '', descricao: '' }, x, { id, origem: 'ata', criado: hoje(), por: me.nome }); if (i >= 0) al[i] = Object.assign(al[i], o, { criado: al[i].criado || o.criado }); else al.push(o); nCal++; };
+    p.atas.forEach(a => {
+      const enc = (a.enc || []).map(e => {
+        const e1 = { id: e.id || uid(), texto: String(e.texto || '').slice(0, 300), resp: String(e.resp || '').slice(0, 80), data: okData(e.data) ? e.data : '', status: ENC_ST.includes(e.status) ? e.status : ENC_ST[0], tipo: e.tipo || 'Outras atividades', ativ: '' };
+        if (e.cal && e1.data) { e1.ativ = 'imp-' + e1.id; poeAtiv(e1.ativ, { titulo: e1.texto.slice(0, 120), data: e1.data, categoria: e1.tipo, descricao: e1.resp ? 'Responsável: ' + e1.resp : '' }); }
+        return e1;
+      });
+      const dados = { area: 'atas', titulo: a.titulo, data: a.data, ano: +a.data.slice(0, 4), categoria: a.categoria || 'Reunião de Escola', descricao: a.descricao || '', arquivo: a.arquivo || '', arqNome: a.arqNome || '', link: a.link || '', videos: (a.videos || []).filter(v => /^https:\/\//i.test(v.url || '')), anexos: (a.anexos || []).filter(x => H.safeUrl(x.arquivo || '')), enc, origem: 'importacao' };
+      const i = l.findIndex(d => d.id === a.id);
+      if (i >= 0) l[i] = Object.assign(l[i], dados, { editado: hoje(), editadoPor: me.nome }); else l.push(Object.assign({ id: a.id }, dados, { criado: hoje(), por: me.nome }));
+      nAt++;
+    });
+    (p.atividades || []).forEach(t => poeAtiv(t.id, { titulo: t.titulo, data: t.data, fim: okData(t.fim) ? t.fim : '', hora: t.hora || '', categoria: t.categoria || 'Outras atividades', local: t.local || '', descricao: t.descricao || '' }));
+    if (!db.set('ativ', al) || !db.set('docs', l)) return 'Não foi possível salvar a importação.';
+    return `Importação concluída: ${nAt} ata(s) e ${nCal} data(s) no calendário.`;
+  };
+
   /* ---------- Atas e documentos ---------- */
   const docArea = (el, area) => {
     const todos = docs().filter(d => d.area === area.id), cats = catsDe(area), ed = typeof form === 'string' && form !== 'novo' ? todos.find(d => d.id === form) : null;
@@ -182,7 +223,8 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, abri
     <p>Documentos organizados por ano e, dentro de cada ano, pela data (do mais recente ao mais antigo).${pode ? '' : ' Seu acesso é de consulta.'}</p>
     ${area.id === 'atas' ? (() => { const ab = todos.reduce((n, d) => n + (d.enc || []).filter(e => e.status === 'Em aberto').length, 0); return `<p class="tip-box" role="note"><i class="fas fa-tasks"></i> <strong>${ab}</strong> encaminhamento(s) em aberto nas atas. Decisões que precisam de data podem ser levadas ao calendário direto da ata.</p>`; })() : ''}
     ${msg ? `<p class="tip-box" role="status"><i class="fas fa-check-circle"></i> ${esc(msg)}</p>` : ''}
-    ${pode && !form ? `<p><button class="btn-visit btn-large" id="d-novo"><i class="fas fa-plus-circle"></i> Novo documento</button></p>` : ''}
+    ${pode && !form && !imp ? `<p><button class="btn-visit btn-large" id="d-novo"><i class="fas fa-plus-circle"></i> Novo documento</button>${area.id === 'atas' ? ` <label class="btn-visit btn-large" for="d-imp" style="cursor:pointer"><i class="fas fa-file-import"></i> Importar ata preparada</label><input id="d-imp" type="file" accept=".json,application/json" hidden>` : ''}</p>${area.id === 'atas' ? '<p class="vazio"><small>"Importar ata preparada": arquivo .json montado pelo Claude a partir da ata, com datas, encaminhamentos e vídeos. Você confere tudo antes de gravar.</small></p>' : ''}` : ''}
+    ${pode && imp ? impBloco(imp) : ''}
     ${pode && form ? `<form id="fd" class="form-reserva" novalidate><h4 style="margin-top:0">${ed ? 'Editar documento' : 'Cadastrar documento'}</h4>
       <div class="form-row"><label for="d-t">Título *</label><input id="d-t" maxlength="140" value="${esc(ed ? ed.titulo : '')}"></div>
       <div class="form-row"><label for="d-d">Data *</label><input id="d-d" type="date" value="${esc(ed ? ed.data : hoje())}"></div>
@@ -205,7 +247,9 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, abri
       const por = {}; f.forEach(d => { (por[d.ano] = por[d.ano] || []).push(d); });
       $('#l-res', el).innerHTML = f.length ? Object.keys(por).sort((a, b) => b - a).map(a => `<h4>${a} <small>(${por[a].length} documento(s))</small></h4>` + por[a].sort((x, y) => (y.data || '').localeCompare(x.data || '') || x.titulo.localeCompare(y.titulo, 'pt-BR')).map(d => {
         const link = d.arquivo && H.safeUrl(d.arquivo) ? `<a class="btn-visit" href="${esc(d.arquivo)}" download="${esc(d.arqNome || 'documento')}"><i class="fas fa-download"></i> Baixar</a>` : '';
-        const ext = d.link && /^https?:\/\//i.test(d.link) ? `<a class="btn-visit" href="${esc(d.link)}" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i> Abrir link</a>` : '';
+        const ext = (d.link && /^https?:\/\//i.test(d.link) ? `<a class="btn-visit" href="${esc(d.link)}" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i> Abrir link</a>` : '')
+          + (d.videos || []).filter(v => /^https:\/\//i.test(v.url || '')).map(v => ` <a class="btn-visit" href="${esc(v.url)}" target="_blank" rel="noopener"><i class="fab fa-youtube"></i> ${esc(v.titulo || 'Vídeo')}</a>`).join('')
+          + (d.anexos || []).filter(a => H.safeUrl(a.arquivo || '')).map(a => ` <a class="btn-visit" href="${esc(a.arquivo)}" download="${esc(a.nome || 'anexo')}"><i class="fas fa-paperclip"></i> ${esc(a.rotulo || a.nome || 'Anexo')}</a>`).join('');
         return `<div class="doc-item"><div class="doc-data">${fmtData(d.data)}</div><div class="doc-corpo"><strong>${esc(d.titulo)}</strong> <span class="badge-status badge-uso">${esc(d.categoria)}</span>${d.descricao ? `<p>${esc(d.descricao)}</p>` : ''}${area.id === 'atas' && (d.enc || []).length ? `<ul class="enc-lista" style="margin:6px 0 6px 18px">${d.enc.map(e => encItem(d, e)).join('')}</ul>` : ''}<span class="acoes">${link}${ext}${!link && !ext ? '<small class="vazio">Sem arquivo anexado</small>' : ''}${pode ? ` <button class="icon-btn" data-ed="${d.id}" aria-label="Editar ${esc(d.titulo)}"><i class="fas fa-edit" style="color:var(--accent-color)"></i></button><button class="icon-btn" data-del="${d.id}" aria-label="Excluir ${esc(d.titulo)}"><i class="fas fa-trash"></i></button>` : ''}</span></div></div>`;
       }).join('')).join('') : `<p class="vazio">${todos.length ? 'Nenhum documento com esses filtros.' : 'Nenhum documento cadastrado ainda.'}</p>`;
       el.querySelectorAll('[data-es]').forEach(x => x.onchange = () => { if (!pode) return; const [di, ei] = x.dataset.es.split('|'), l = docs(), d = l.find(y => y.id === di), e = d && (d.enc || []).find(y => y.id === ei); if (!e) return; e.status = x.value; db.set('docs', l); msg = 'Situação do encaminhamento atualizada.'; draw(); });
@@ -215,6 +259,9 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, abri
     $('#l-a', el).onchange = e => { F.ano = e.target.value; lista(); }; $('#l-c', el).onchange = e => { F.cat = e.target.value; lista(); }; $('#l-q', el).oninput = e => { F.q = e.target.value.trim(); lista(); }; const lab = $('#l-ab', el); if (lab) lab.onchange = () => { F.aberto = lab.checked; lista(); };
     lista();
     const nv = $('#d-novo', el); if (nv) nv.onclick = () => { form = 'novo'; msg = ''; draw(); };
+    const fi = $('#d-imp', el); if (fi) fi.onchange = () => { const f = fi.files[0]; if (!f) return; const rd = new FileReader();
+      rd.onload = () => { const v = validaPacote(rd.result); if (typeof v === 'string') { msg = v; draw(); return; } imp = v; msg = ''; draw(); window.scrollTo(0, 0); }; rd.readAsText(f); };
+    if (imp) { $('#imp-x', el).onclick = () => { imp = null; draw(); }; $('#imp-ok', el).onclick = () => { msg = importa(imp); imp = null; draw(); }; }
     if (!form || !pode) return;
     $('#d-x', el).onclick = () => { form = null; draw(); };
     $('#d-d', el).onchange = e => { if (e.target.value) $('#d-a', el).value = e.target.value.slice(0, 4); };

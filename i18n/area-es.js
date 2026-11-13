@@ -2317,5 +2317,16 @@
 "Ninguém ainda. Adicione acima ou marque outra lista.": "Nadie todavía. Agrega arriba o marca otra lista.",
 "Confira o e-mail: ele parece incompleto.": "Revisa el correo: parece incompleto.",
 "Não consegui salvar agora. Tente de novo.": "No pude guardar ahora. Intenta de nuevo.",
-"Nome": "Nombre"
+"Nome": "Nombre",
+"Importar ata preparada": "Importar acta preparada",
+"\"Importar ata preparada\": arquivo .json montado pelo Claude a partir da ata, com datas, encaminhamentos e vídeos. Você confere tudo antes de gravar.": "\"Importar acta preparada\": archivo .json armado por Claude a partir del acta, con fechas, encaminamientos y videos. Revisas todo antes de guardar.",
+"Conferir antes de importar": "Revisar antes de importar",
+"Está certo, importar": "Está bien, importar",
+"nova": "nueva",
+"já existe: será atualizada": "ya existe: será actualizada",
+"Datas para o calendário": "Fechas para el calendario",
+"Importação concluída: # ata(s) e # data(s) no calendário.": "Importación concluida: # acta(s) y # fecha(s) en el calendario.",
+"Este arquivo não é um pacote de ata válido (.json).": "Este archivo no es un paquete de acta válido (.json).",
+"Este arquivo não é um pacote de ata do CONecta Retiro.": "Este archivo no es un paquete de acta de CONecta Retiro.",
+"Ata em espanhol": "Acta en español"
 });})();
