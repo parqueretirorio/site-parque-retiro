@@ -70,6 +70,8 @@ class SupabaseFalso:
         self.log = []
         self.enviados = []      # e-mails "enviados" (confirmação, recuperação)
         self.arquivos = {}      # Storage: 'bucket/caminho' -> {bytes, tipo}
+        self.r2 = False         # função album-r2: False = não configurada (503); True = ligada
+        self.r2_arquivos = {}   # Cloudflare R2 simulada: caminho -> bytes
         self.ultimo_binario = None
 
     # ---------- dados de teste ----------
@@ -120,6 +122,8 @@ class SupabaseFalso:
     def rotear(self, m, caminho, q, corpo, uid, tok):
         if m == 'OPTIONS':
             return 200, None
+        if caminho == '/functions/v1/album-r2':
+            return self.album_r2(corpo or {}, uid)
         if caminho.startswith('/storage/v1/'):
             return self.storage(m, caminho[len('/storage/v1/'):], corpo, uid)
         if caminho == '/auth/v1/token' and q.get('grant_type') == ['password']:
@@ -238,3 +242,33 @@ class SupabaseFalso:
                 if r: apagados.append({'name': n}); self.arquivos.pop(bucket + '/' + n, None)
             return 200, apagados
         return 404, {'error': 'not found'}
+
+    # ---------- função album-r2 (Edge Function) + Cloudflare R2 simulada ----------
+    def album_r2(self, corpo, uid):
+        if not uid: return 403, {'erro': 'sem login'}
+        p = psql(f"select nivel || '|' || status || '|' || array_to_string(funcoes, ',') from perfis where id='{uid}'", self.db)
+        nivel, status, fn = (p[0].split('|') + ['', '', ''])[:3] if p else ('', '', '')
+        if status != 'aprovado' or not (nivel == 'administrador' or 'album' in fn.split(',')): return 403, {'erro': 'sem permissão'}
+        if not self.r2: return 503, {'erro': 'nao-configurado'}
+        ac = corpo.get('acao')
+        if ac == 'assinar':
+            return 200, {'arquivos': [{'caminho': a['caminho'], 'url': 'https://r2-falso.test/put/' + a['caminho'], 'publica': 'https://fotos-falso.test/' + a['caminho']} for a in corpo.get('arquivos', [])[:20]]}
+        if ac == 'apagar':
+            ap = [c for c in corpo.get('caminhos', []) if self.r2_arquivos.pop(c, None) is not None]
+            return 200, {'apagados': ap}
+        if ac == 'uso':
+            return 200, {'arquivos': len(self.r2_arquivos), 'bytes': sum(len(b) for b in self.r2_arquivos.values()), 'limiteGratis': 10 * 1024 ** 3}
+        return 400, {'erro': 'ação'}
+
+    async def tratar_r2(self, route):
+        req = route.request; u = urlparse(req.url)
+        cors = {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'PUT, GET', 'Access-Control-Allow-Headers': 'content-type'}
+        if req.method == 'OPTIONS': await route.fulfill(status=200, headers=cors, body=''); return
+        if u.hostname == 'r2-falso.test' and req.method == 'PUT' and u.path.startswith('/put/'):
+            self.r2_arquivos[u.path[len('/put/'):]] = req.post_data_buffer or b''
+            await route.fulfill(status=200, headers=cors, body=''); return
+        if u.hostname == 'fotos-falso.test':
+            b = self.r2_arquivos.get(u.path.lstrip('/'))
+            await route.fulfill(status=200 if b else 404, headers=cors, content_type='image/jpeg', body=b or b'')
+            return
+        await route.fulfill(status=404, body='')

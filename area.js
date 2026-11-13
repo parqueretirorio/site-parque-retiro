@@ -1066,7 +1066,8 @@ V.estela = (me, root) => {
 /* ---------- Álbum Parque Retiro (Responsável pelo Álbum) ---------- */
 const FOTO_ST = { pendente: ['Aguardando curadoria', 'badge-pend'], publicada: ['Publicada na área aberta', 'badge-disponivel'], recusada: ['Não publicada', 'badge-emprestado'] };
 // Foto do Álbum: antiga (base64 dentro da coleção) ou arquivo no Storage do Supabase (envio em lote, 0012_album_storage.sql).
-const fotoOk = f => f && (/^data:image\//.test(f.foto || '') || /^https:\/\/[^/]+\/storage\/v1\/object\/public\/album\//.test(f.foto || ''));
+// Foto do Álbum: antiga (base64 na coleção) ou arquivo enviado em lote (Cloudflare R2 ou Supabase Storage), com endereço https.
+const fotoOk = f => f && (/^data:image\//.test(f.foto || '') || (/^https:\/\//.test(f.foto || '') && !!f.caminho));
 const miniatura = f => f.thumb && /^https:\/\//.test(f.thumb) ? f.thumb : f.foto;
 const EV_SEED = ['Estacional de Primavera', 'Estacional de Verão', 'Estacional de Outono', 'Estacional de Inverno', 'Reunião de Escola', 'Aniversário Parque'];
 const eventos = () => {
@@ -1089,7 +1090,10 @@ V.album = (me, root) => {
   const passa = f => evF === '*' || (f.evento || '') === evF || (evF === '' && !nomeEv(f.evento));
   const cartao = (f, acoes) => `<figure class="foto-card"><img src="${esc(miniatura(f))}" alt="${esc(f.legenda || 'Foto enviada por ' + (f.autor || 'autor não informado'))}" loading="lazy"><figcaption>${f.legenda ? `<span>${esc(f.legenda)}</span>` : ''}<small class="ev-nome">${esc(nomeEv(f.evento) || 'Sem evento')}</small>${fotoLinha(f)}<small>Nome do autor na área aberta: <strong>${f.mostrarAutor ? 'Sim' : 'Não'}</strong></small><span class="badge-status ${FOTO_ST[f.status][1]}">${FOTO_ST[f.status][0]}</span><span class="acoes">${acoes}</span></figcaption></figure>`;
   const muda = (id, fn) => { const l = db.get('album', []), x = l.find(f => f.id === id); if (x) fn(x); db.set('album', l); draw(); };
-  const apagaArquivos = fs => { const cs = fs.flatMap(f => [f.caminho, f.caminhoThumb]).filter(Boolean); if (cs.length && window.PR_SUPABASE && PR_SUPABASE.apagarArquivos) PR_SUPABASE.apagarArquivos('album', cs).catch(() => {}); };
+  const apagaArquivos = fs => { if (!window.PR_SUPABASE) return; const cs = a => a.flatMap(f => [f.caminho, f.caminhoThumb]).filter(Boolean);
+    const r2 = cs(fs.filter(f => f.armazem === 'r2')), sb = cs(fs.filter(f => f.armazem !== 'r2'));
+    if (r2.length && PR_SUPABASE.funcao) PR_SUPABASE.funcao('album-r2', { acao: 'apagar', caminhos: r2 }).catch(() => {});
+    if (sb.length && PR_SUPABASE.apagarArquivos) PR_SUPABASE.apagarArquivos('album', sb).catch(() => {}); };
   const exclui = id => { if (confirm('Excluir esta foto?')) { const l = db.get('album', []); apagaArquivos(l.filter(f => f.id === id)); db.set('album', l.filter(f => f.id !== id)); draw(); } };
   const liga = el => {
     el.querySelectorAll('[data-x]').forEach(b => b.onclick = () => exclui(b.dataset.x));
@@ -1139,7 +1143,7 @@ V.album = (me, root) => {
     if (!sb) { el.innerHTML = `<h3><i class="fas fa-cloud-upload-alt"></i> Enviar em lote</h3><p class="vazio">O envio em lote guarda as fotos no servidor do Parque (Supabase). Ele só funciona quando a área restrita está ligada ao servidor.</p>`; return; }
     const pct = L.total ? Math.round((L.feitas + L.erros.length) / L.total * 100) : 0, mb = b => (b / 1048576).toFixed(b < 10485760 ? 1 : 0).replace('.', ',');
     el.innerHTML = `<h3><i class="fas fa-cloud-upload-alt"></i> Enviar em lote</h3>
-    <p>Para quem cuida do Álbum: envie <strong>até ${LOTE_MAX} fotos de uma vez</strong> (pode escolher uma pasta inteira). Cada foto é reduzida antes de subir (lado maior com 1600 px, boa para tela e para impressão pequena) e ganha uma miniatura. Elas ficam guardadas no <strong>servidor do Parque (Supabase Storage)</strong>, não no seu computador nem no navegador.</p>
+    <p>Para quem cuida do Álbum: envie <strong>até ${LOTE_MAX} fotos de uma vez</strong> (pode escolher uma pasta inteira). Cada foto é reduzida antes de subir (lado maior com 1600 px, boa para tela e para impressão pequena) e ganha uma miniatura. Elas ficam guardadas na nuvem do Parque (<strong>Cloudflare R2</strong>, ou no Supabase enquanto a R2 não estiver ligada), não no seu computador nem no navegador.</p>
     ${L.rodando ? '' : '<p class="tip-box" role="note" id="lt-uso"><i class="fas fa-hdd" aria-hidden="true"></i> Espaço usado pelo Álbum: calculando…</p>'}
     ${L.rodando || L.total ? `<section class="tip-box" style="display:block" aria-live="polite"><h4 style="margin-top:0">${L.rodando ? (L.pausado ? 'Pausado' : 'Enviando…') : 'Envio concluído'}</h4>
       <div style="background:#e8eef3;border-radius:8px;height:18px;overflow:hidden" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><div style="background:#2e7d32;height:100%;width:${pct}%"></div></div>
@@ -1161,7 +1165,14 @@ V.album = (me, root) => {
       <p class="form-erro" id="l-er" role="alert" hidden></p>
       <button class="btn-visit btn-large"><i class="fas fa-cloud-upload-alt"></i> Enviar o lote</button></form>` : ''}`;
     // espaço usado
-    if (!L.rodando) PR_SUPABASE.rpc('pr_album_uso').then(r => { const u = $('#lt-uso', el); if (!u) return; if (r.status === 200 && r.corpo) { const usado = +r.corpo.bytes || 0; u.innerHTML = `<i class="fas fa-hdd" aria-hidden="true"></i> Espaço usado pelo Álbum: <strong>${mb(usado)} MB</strong> de cerca de 1.024 MB do plano gratuito (${r.corpo.arquivos || 0} arquivo(s)). Cada foto ocupa em média 0,4 MB: cabem cerca de <strong>${Math.max(0, Math.floor((1024 - usado / 1048576) / 0.4)).toLocaleString('pt-BR')}</strong> fotos a mais.`; } else u.innerHTML = '<i class="fas fa-hdd" aria-hidden="true"></i> Espaço usado: não foi possível consultar (rode no Supabase a atualização 0012_album_storage.sql).'; }).catch(() => {});
+    if (!L.rodando) detectaR2().then(async r2 => {
+      const u = $('#lt-uso', el); if (!u) return;
+      const mostra = (onde, usado, limite, n) => { u.innerHTML = `<i class="fas fa-hdd" aria-hidden="true"></i> As fotos vão para: <strong>${onde}</strong>. Espaço usado: <strong>${mb(usado)} MB</strong> de ${limite.toLocaleString('pt-BR')} MB grátis (${n || 0} arquivo(s)). Cada foto ocupa em média 0,4 MB: cabem cerca de <strong>${Math.max(0, Math.floor((limite - usado / 1048576) / 0.4)).toLocaleString('pt-BR')}</strong> fotos a mais sem custo.`; };
+      if (r2) return mostra('Cloudflare R2', +r2.bytes || 0, 10240, r2.arquivos);
+      const r = await PR_SUPABASE.rpc('pr_album_uso');
+      if (r.status === 200 && r.corpo) mostra('Supabase Storage', +r.corpo.bytes || 0, 1024, r.corpo.arquivos);
+      else u.innerHTML = '<i class="fas fa-hdd" aria-hidden="true"></i> Espaço usado: não foi possível consultar.';
+    }).catch(() => {});
     el.querySelectorAll('[data-s2]').forEach(b => b.onclick = () => { sub = b.dataset.s2; draw(); });
     const pb = $('#lt-p', el); if (pb) pb.onclick = () => { L.pausado = !L.pausado; if (!L.pausado) roda(); draw(); };
     const cb = $('#lt-c', el); if (cb) cb.onclick = () => { if (!confirm('Parar o envio? As fotos que já subiram ficam guardadas.')) return; L.fila = []; L.total = L.feitas + L.erros.length; L.pausado = false; };
@@ -1180,7 +1191,7 @@ V.album = (me, root) => {
       if (ev === '__novo') { ev = novoEvento($('#l-n', el).value); if (!ev) return falha('Digite o nome da nova atividade.'); }
       const d = { evento: ev, dataFoto: $('#l-dd', el).value, autor: $('#l-a', el).value.trim(), mostrarAutor: $('#l-m', el).value === '1', legenda: $('#l-l', el).value.trim(), status: $('#l-s', el).value === 'publicada' ? 'publicada' : 'pendente' };
       if (d.mostrarAutor && !d.autor) return falha('Para mostrar o autor, informe o nome do autor.');
-      Object.assign(L, { fila: fs.slice(), feitas: 0, erros: [], total: fs.length, bytes: 0, dados: d, pausado: false });
+      Object.assign(L, { fila: fs.slice(), feitas: 0, erros: [], total: fs.length, bytes: 0, dados: d, pausado: false, r2Velho: true });
       inicia();
     };
   };
@@ -1190,18 +1201,35 @@ V.album = (me, root) => {
     im.onerror = () => { URL.revokeObjectURL(u); no(new Error('arquivo de imagem ilegível')); };
     im.src = u;
   });
+  // Cloudflare R2 (função album-r2 no Supabase) quando estiver configurada; senão, Supabase Storage.
+  const detectaR2 = async () => {
+    if (L.r2 !== undefined && !L.r2Velho) return L.r2;
+    const r = await PR_SUPABASE.funcao('album-r2', { acao: 'uso' }).catch(() => ({ status: 0 }));
+    L.r2 = r.status === 200 && r.corpo ? r.corpo : null; L.r2Velho = false; return L.r2;
+  };
+  const putR2 = async (url, blob) => { try { const r = await fetch(url, { method: 'PUT', body: blob, headers: { 'Content-Type': 'image/jpeg' } }); return r.status; } catch (e) { return 0; } };
   const sobeUma = async file => {
     const [g, p] = [await reduzBlob(file, 1600, 0.82), await reduzBlob(file, 480, 0.72)];
     const id = uid(), pasta = (L.dados.evento || 'sem-atividade').replace(/[^a-z0-9_-]/gi, '').slice(0, 40) || 'sem-atividade', base = `${pasta}/${hoje().slice(0, 7)}/${id}`;
+    if (L.r2) {
+      const a = await PR_SUPABASE.funcao('album-r2', { acao: 'assinar', arquivos: [{ caminho: base + '.jpg' }, { caminho: base + '-mini.jpg' }] });
+      if (a.status !== 200 || !a.corpo || !(a.corpo.arquivos || []).length) throw new Error(a.status === 403 ? 'sem permissão' : a.status === 0 ? 'sem conexão' : 'o servidor não liberou o envio (' + a.status + ')');
+      const [ga, pa] = a.corpo.arquivos, s1 = await putR2(ga.url, g);
+      if (s1 < 200 || s1 >= 300) throw new Error(s1 === 0 ? 'sem conexão com a Cloudflare (confira o CORS do bucket)' : 'a Cloudflare recusou (' + s1 + ')');
+      const s2 = pa ? await putR2(pa.url, p) : 0, okP = s2 >= 200 && s2 < 300;
+      L.bytes += g.size + (okP ? p.size : 0);
+      return { id, foto: ga.publica, thumb: okP ? pa.publica : '', caminho: base + '.jpg', caminhoThumb: okP ? base + '-mini.jpg' : '', armazem: 'r2', nomeOriginal: file.name.slice(0, 120),
+        ...L.dados, email: me.email, data: hoje(), origem: 'lote' };
+    }
     const r1 = await PR_SUPABASE.enviarArquivo('album', base + '.jpg', g); if (r1.status !== 200) throw new Error(r1.status === 403 || r1.status === 400 ? 'sem permissão no servidor (rode a atualização 0012 no Supabase?)' : r1.status === 413 ? 'arquivo grande demais' : r1.status === 0 ? 'sem conexão' : 'erro ' + r1.status);
     const r2 = await PR_SUPABASE.enviarArquivo('album', base + '-mini.jpg', p);
     L.bytes += g.size + p.size;
-    return { id, foto: PR_SUPABASE.urlPublica('album', base + '.jpg'), thumb: r2.status === 200 ? PR_SUPABASE.urlPublica('album', base + '-mini.jpg') : '', caminho: base + '.jpg', caminhoThumb: r2.status === 200 ? base + '-mini.jpg' : '', nomeOriginal: file.name.slice(0, 120),
+    return { id, armazem: 'supabase', foto: PR_SUPABASE.urlPublica('album', base + '.jpg'), thumb: r2.status === 200 ? PR_SUPABASE.urlPublica('album', base + '-mini.jpg') : '', caminho: base + '.jpg', caminhoThumb: r2.status === 200 ? base + '-mini.jpg' : '', nomeOriginal: file.name.slice(0, 120),
       ...L.dados, email: me.email, data: hoje(), origem: 'lote' };
   };
   const salvaNovas = novas => { if (!novas.length) return; const l = db.get('album', []); l.push(...novas.splice(0)); db.set('album', l); };
   const aviso = e => { if (L.rodando) { e.preventDefault(); e.returnValue = ''; } };
-  const inicia = () => { if (L.rodando) return; L.rodando = true; window.addEventListener('beforeunload', aviso); draw(); roda(); };
+  const inicia = async () => { if (L.rodando) return; await detectaR2(); L.rodando = true; window.addEventListener('beforeunload', aviso); draw(); roda(); };
   const roda = async () => {
     if (L.trabalhando) return; L.trabalhando = true; const novas = [];
     const um = async () => { while (L.fila.length && !L.pausado) { const f = L.fila.shift(); try { novas.push(await sobeUma(f)); L.feitas++; } catch (x) { L.erros.push({ file: f, nome: f.name, erro: x.message || 'erro' }); } if (novas.length >= 10) salvaNovas(novas); if (sub === 'lote' && document.getElementById('lt-n')) draw(); } };

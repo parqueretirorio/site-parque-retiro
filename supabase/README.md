@@ -14,3 +14,11 @@ Próximos passos (ver docs/PLANO.md): (1) criar projeto homologação; (2) aplic
 - Função `pr_album_uso()` mostra quantos arquivos e quanto espaço o Álbum ocupa.
 - A área restrita (Álbum Parque Retiro › **Enviar em lote**) reduz cada foto no navegador (1600 px + miniatura de 480 px) e envia até 1000 por lote, 3 por vez.
 - Rodar uma vez no SQL Editor. Resultado esperado: `ok`. **Aplicada em 13/11/2026 (resultado "ok").**
+
+
+## Função album-r2 — fotos do Álbum na Cloudflare R2 (13/11/2026)
+- Arquivo: `supabase/functions/album-r2/index.ts`. Nome da função: **album-r2**, com **Verify JWT desligado** (a função confere o login sozinha: administrador ou função "album").
+- Segredos: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` (parque-retiro-album), `R2_PUBLIC_URL` (https://pub-….r2.dev ou domínio próprio).
+- O navegador pede um endereço de envio assinado (1 hora, só aquele arquivo) e manda a foto direto para a R2; a chave da Cloudflare fica só no servidor.
+- Enquanto a função não estiver configurada (responde 503), o Enviar em lote continua usando o Supabase Storage (0012).
+- No bucket da R2, a política de CORS precisa liberar PUT e GET para https://parqueretirorio.github.io e https://parqueretiro.org.br.
