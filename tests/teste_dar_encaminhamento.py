@@ -36,6 +36,15 @@ async def main():
         ok((await pg.get_attribute('#de-wa', 'href')).startswith('https://wa.me/?text='), "botão Abrir no WhatsApp com o texto")
         print('---\n' + t + '\n---')
         await pg.click('#de-fx')
+        # mensagem com o status de cada ponto (no fim da aba)
+        ok(await pg.locator('#de-st-msg').count() == 1, "opção 'mensagem com o status de cada ponto' no fim da aba")
+        await pg.click('#de-st-msg'); await pg.wait_for_selector('#de-txt')
+        t2 = await pg.input_value('#de-txt')
+        ok(all(f'{k}. ' in t2 for k in range(1, len(abertos) + 1)), f"lista os {len(abertos)} pontos, um por um")
+        ok('sem responsável' in t2 and 'sem data' in t2 and 'próximos 45 dias' in t2, "sinaliza sem responsável, sem data e prazos próximos")
+        print('---\n' + t2[:900] + '\n...')
+        await pg.screenshot(path='/tmp/dar-status.png')
+        await pg.click('#de-fx')
         # dar encaminhamento a um sem responsável e sem data
         box = pg.locator('#de-lista [data-de]').first
         txt = await box.locator('strong').first.inner_text()

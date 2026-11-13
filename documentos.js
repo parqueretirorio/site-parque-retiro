@@ -410,15 +410,26 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
       L.push('', `Quem puder assumir ou já tiver novidade, responda aqui ou atualize em Área restrita › Documentos e Calendários › Dar encaminhamento: ${link}`, '', 'Um forte abraço!');
       return L.join('\n');
     };
+    const mensagemStatus = () => {
+      const L = [`*Status dos encaminhamentos · ${nomeReuniao(DE.r)}*`, `Hoje são *${itens.length}* em aberto: ${nR} sem responsável · ${nD} sem data · ${prox.length} com prazo nos próximos 45 dias.`, ''];
+      itens.forEach((i, n) => {
+        const marcas = [i.semResp ? '🙋 *sem responsável*' : '👤 ' + i.e.resp, i.semData ? '📅 *sem data*' : (i.data < hoje() ? '⚠️ *em atraso* desde ' : '📅 ') + fmtData(i.data)];
+        if (i.data && !i.semResp && i.data >= hoje() && i.data <= addDia(hoje(), 45)) marcas.push('⏳ próximos 45 dias');
+        L.push(`${n + 1}. ${curto(i.e.texto, 110)} [${i.d.codigo}]`, '   ' + marcas.join(' · ') + (i.e.passo ? `\n   ➡️ Próximo passo: ${i.e.passo}` : ''));
+      });
+      L.push('', `Peço a ajuda de todos que participaram da reunião: quem puder assumir um ponto, dar um prazo ou trazer novidade, responda aqui ou atualize em Área restrita › Documentos e Calendários › Dar encaminhamento: ${link}`, '', 'Um forte abraço!');
+      return L.join('\n');
+    };
+    const caixaMsg = (titulo, texto) => `<section class="tip-box" style="display:block"><h4 style="margin-top:0"><i class="fab fa-whatsapp"></i> ${esc(titulo)}</h4><p><small>Confira, ajuste se quiser e envie. Nada é enviado sozinho.</small></p>
+      <textarea id="de-txt" rows="16" style="width:100%;font-family:inherit">${esc(texto)}</textarea>
+      <p><button type="button" class="btn-visit" id="de-cp"><i class="fas fa-copy"></i> Copiar</button> <a class="btn-visit" id="de-wa" href="#" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> Abrir no WhatsApp</a> <button type="button" class="btn-visit" id="de-fx" style="background:#6c7a7b">Fechar</button></p></section>`;
     el.innerHTML = `<h3><i class="fas fa-share-square"></i> Dar encaminhamento</h3>
     <p>Somente o que ficou <strong>pendente da ${esc(nomeReuniao(DE.r) || 'última Reunião de Escola')}</strong>, para nada ficar parado nem cair no esquecimento. Complete quem assume, o prazo e o próximo passo; depois avise o Grupo de Mestres.${pode ? '' : ' Seu acesso é de consulta.'}</p>
     ${reunioes.length > 1 ? `<div class="form-row no-print" style="max-width:360px"><label for="de-r">Reunião</label><select id="de-r">${reunioes.map(k => `<option value="${esc(k)}"${k === DE.r ? ' selected' : ''}>${esc(nomeReuniao(k))} (${esc(k)})</option>`).join('')}</select></div>` : ''}
     ${msg ? `<p class="tip-box" role="status"><i class="fas fa-check-circle"></i> ${esc(msg)}</p>` : ''}
     ${DE.r ? `<p class="tip-box" role="note"><i class="fas fa-tasks"></i> <strong>${itens.length}</strong> em aberto · <strong style="color:#a31d21">${nR}</strong> sem responsável · <strong style="color:#b8620f">${nD}</strong> sem data · <strong>${prox.length}</strong> com prazo nos próximos 45 dias</p>
     <p class="no-print"><button type="button" class="btn-visit btn-large" id="de-msg"><i class="fab fa-whatsapp"></i> Avisar o Grupo de Mestres</button></p>
-    ${DE.msg ? `<section class="tip-box" style="display:block"><h4 style="margin-top:0"><i class="fab fa-whatsapp"></i> Mensagem para o Grupo de Mestres</h4><p><small>Confira, ajuste se quiser e envie. Nada é enviado sozinho.</small></p>
-      <textarea id="de-txt" rows="14" style="width:100%;font-family:inherit">${esc(mensagem())}</textarea>
-      <p><button type="button" class="btn-visit" id="de-cp"><i class="fas fa-copy"></i> Copiar</button> <a class="btn-visit" id="de-wa" href="#" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> Abrir no WhatsApp</a> <button type="button" class="btn-visit" id="de-fx" style="background:#6c7a7b">Fechar</button></p></section>` : ''}
+    ${DE.msg === 'resumo' ? caixaMsg('Mensagem para o Grupo de Mestres', mensagem()) : ''}
     <div id="de-lista">${itens.length ? itens.map((i, n) => `<div class="doc-item" data-de="${esc(i.d.id)}|${esc(i.e.id)}" style="display:block">
       <p style="margin:0 0 6px"><span class="badge-status" style="background:#1d4a7a;color:#fff">${esc(i.d.codigo)}</span>
         ${i.semResp ? '<span class="badge-status" style="background:#a31d21;color:#fff">Sem responsável</span>' : ''} ${i.semData ? '<span class="badge-status" style="background:#b8620f;color:#fff">Sem data</span>' : ''}
@@ -431,9 +442,15 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
         <div style="grid-column:span 2;min-width:170px"><label for="de-ps${n}" style="display:block;font-weight:600;font-size:.85em">Próximo passo</label><input id="de-ps${n}" data-k="passo" maxlength="160" value="${esc(i.e.passo || '')}" placeholder="O que fazer agora para andar"></div>
         <div><label for="de-st${n}" style="display:block;font-weight:600;font-size:.85em">Situação</label><select id="de-st${n}" data-k="status">${opt(ENC_ST, i.e.status)}</select></div>
         <div style="align-self:end"><button type="button" class="btn-visit" data-de-ok><i class="fas fa-save"></i> Salvar</button></div></div>` : ''}</div>`).join('')
-      : '<p class="vazio">Tudo encaminhado: nenhuma pendência desta reunião. 🎉</p>'}</div>` : '<p class="vazio">Nenhuma ata de Reunião de Escola com código (RE-…) cadastrada ainda.</p>'}`;
+      : '<p class="vazio">Tudo encaminhado: nenhuma pendência desta reunião. 🎉</p>'}</div>
+    ${itens.length ? `<div class="no-print" style="border-top:2px solid #dfe6ec;margin-top:16px;padding-top:12px"><h4 style="margin-top:0"><i class="fas fa-clipboard-list"></i> Mensagem com o status de cada ponto</h4>
+      <p>Cria uma mensagem para os Mestres com <strong>todos os ${itens.length} pontos em aberto</strong>, um por um, sinalizando quem assume (ou se está sem responsável), o prazo (ou se está sem data, em atraso ou nos próximos 45 dias) e o próximo passo.</p>
+      <p><button type="button" class="btn-visit btn-large" id="de-st-msg"><i class="fab fa-whatsapp"></i> Criar mensagem com o status de cada ponto</button></p>
+      ${DE.msg === 'status' ? caixaMsg('Status de cada ponto para o Grupo de Mestres', mensagemStatus()) : ''}</div>` : ''}` : '<p class="vazio">Nenhuma ata de Reunião de Escola com código (RE-…) cadastrada ainda.</p>'}`;
     const sel = $('#de-r', el); if (sel) sel.onchange = () => { DE.r = sel.value; DE.msg = false; msg = ''; draw(); };
-    const bm = $('#de-msg', el); if (bm) bm.onclick = () => { DE.msg = true; msg = ''; draw(); const t = $('#de-txt', el); if (t) t.scrollIntoView({ block: 'center' }); };
+    const abre = modo => () => { DE.msg = modo; msg = ''; draw(); const t = $('#de-txt', el); if (t) t.scrollIntoView({ block: 'center' }); };
+    const bm = $('#de-msg', el); if (bm) bm.onclick = abre('resumo');
+    const bs = $('#de-st-msg', el); if (bs) bs.onclick = abre('status');
     const tx = $('#de-txt', el);
     if (tx) {
       const wa = $('#de-wa', el), atual = () => { wa.href = 'https://wa.me/?text=' + encodeURIComponent(tx.value); }; atual(); tx.oninput = atual;
