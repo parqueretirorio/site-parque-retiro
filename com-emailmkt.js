@@ -183,6 +183,8 @@ function abrir(el, h) {
       <fieldset class="funcoes" id="ek-int"${conv ? ' hidden' : ''}><legend>Interesses (para o filtro "só quem tem os interesses")</legend>${INTERESSES.map(i => `<label class="fn"><input type="checkbox" name="ek-i" value="${esc(i)}" ${d.interesses.includes(i) ? 'checked' : ''}> ${esc(i)}</label>`).join('')}</fieldset>
       <div class="form-row"${conv ? ' hidden' : ''}><label for="ek-tema">Tema desta campanha</label><select id="ek-tema"><option value="">— nenhum —</option>${INTERESSES.map(i => `<option ${d.tema === i ? 'selected' : ''}>${esc(i)}</option>`).join('')}</select><small>Quem clicar ganha este interesse no perfil. Com o tempo, as campanhas vão para quem realmente se interessa pelo tema.</small></div>
       <p class="tip-box" id="ek-tot" role="status"></p>
+      ${conv ? `<div class="form-row"><label for="ek-ae">Adicionar alguém ao convite agora</label><div style="display:flex;gap:8px;flex-wrap:wrap"><input id="ek-an" type="text" placeholder="Nome" maxlength="120" style="flex:1 1 160px"><input id="ek-ae" type="email" placeholder="e-mail" maxlength="160" style="flex:2 1 220px"><button type="button" class="btn-visit" id="ek-ab"><i class="fas fa-plus"></i> Adicionar</button></div><small>Entra na lista <strong>Convite área restrita</strong> (a mesma de Listas de e-mail).</small><p class="vazio" id="ek-am" role="status"></p></div>
+      <details id="ek-quem"><summary><strong>Ver quem vai receber</strong></summary><ul id="ek-ql"></ul></details>` : ''}
       <div class="form-row"><label for="ek-as">Assunto *</label><input id="ek-as" maxlength="150" value="${esc(d.assunto)}"><small>Pode usar {{primeiro_nome}} também no assunto.</small></div>
       <div class="form-row"><label for="ek-sa">Saudação (primeira linha)</label><input id="ek-sa" maxlength="120" value="${esc(d.saudacao)}"><small>{{primeiro_nome}} vira o primeiro nome da pessoa. Se não tivermos o nome, fica só "Olá!".</small></div>
       <div class="form-row"><label for="ek-ti">Título *</label><input id="ek-ti" maxlength="150" value="${esc(d.titulo)}"></div>
@@ -209,7 +211,12 @@ function abrir(el, h) {
       c.querySelectorAll('[name=ek-l]').forEach(i => { i.disabled = d.todas; if (d.todas) i.checked = true; });
       pub = montarFila(d);
       const dias = Math.max(1, Math.ceil(pub.length / Math.max(1, limiteHoje())));
-      $('#ek-tot').textContent = conv ? `${pub.length} pessoa(s) vão receber o convite (quem já se cadastrou fica de fora).` : `${pub.length} pessoa(s) vão receber (sem repetir quem está em mais de uma lista). No ritmo atual de aquecimento, cerca de ${dias} dia(s) de envio.`;
+      if (conv) {
+        const listas = d.todas ? Object.keys(E.LISTAS) : (d.listas || []), fora = E.destinatarios(listas).length - pub.length;
+        $('#ek-ql').innerHTML = pub.length ? pub.map(p => `<li>${esc(p.nome || '—')} · ${esc(p.email)}</li>`).join('') : '<li>Ninguém ainda. Adicione acima ou marque outra lista.</li>';
+        c.querySelectorAll('[name=ek-l]').forEach(i => { const sm = i.parentElement.querySelector('small'); if (sm) sm.textContent = '(' + E.membros(i.value).length + ')'; });
+        $('#ek-tot').textContent = `${pub.length} pessoa(s) vão receber o convite.` + (fora > 0 ? ` ${fora} pessoa(s) das listas marcadas já têm cadastro na área restrita e ficam de fora.` : '');
+      } else $('#ek-tot').textContent = conv ? '' : `${pub.length} pessoa(s) vão receber (sem repetir quem está em mais de uma lista). No ritmo atual de aquecimento, cerca de ${dias} dia(s) de envio.`;
       const sel = $('#ek-pv'), atual = sel.value;
       sel.innerHTML = '<option value="">Exemplo: pessoa sem nome</option>' + pub.slice(0, 60).map(p => `<option value="${esc(p.email)}">${esc(p.nome || p.email)}</option>`).join('');
       if ([...sel.options].some(o => o.value === atual)) sel.value = atual; else if (pub[0]) sel.value = pub[0].email;
@@ -219,6 +226,19 @@ function abrir(el, h) {
       $('#ek-p').srcdoc = E.montaHtml(dd);
     };
     c.addEventListener('input', atualiza); c.addEventListener('change', atualiza); atualiza();
+    if (conv) {
+      const add = () => {
+        const em = $('#ek-ae').value.trim(), nm = $('#ek-an').value.trim(), msg = $('#ek-am');
+        const res = E.adicionar('convite', em, nm, 'convite');
+        if (res === 'invalido') { msg.textContent = 'Confira o e-mail: ele parece incompleto.'; return; }
+        if (res === 'erro') { msg.textContent = 'Não consegui salvar agora. Tente de novo.'; return; }
+        const cb = c.querySelector('[name=ek-l][value=convite]'); if (cb && !cb.checked && !d.todas) cb.checked = true;
+        msg.textContent = situacaoCadastro(em) ? `${em} já tem cadastro na área restrita, por isso não recebe o convite.` : res === 'existe' ? `${em} já estava na lista do convite.` : `${em} entrou na lista do convite.`;
+        $('#ek-ae').value = ''; $('#ek-an').value = ''; atualiza(); $('#ek-ae').focus();
+      };
+      $('#ek-ab').onclick = add;
+      $('#ek-ae').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); add(); } });
+    }
     $('#ek-cancel').onclick = () => { S.ed = null; draw(); };
     $('#ek-f').onsubmit = ev => {
       ev.preventDefault(); ler(); const er = $('#ek-err'); er.hidden = false;

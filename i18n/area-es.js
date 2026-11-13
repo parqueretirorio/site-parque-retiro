@@ -2308,5 +2308,14 @@
 "Cliques": "Clics",
 "Enviados": "Enviados",
 "Listas": "Listas",
-"Editar": "Editar"
+"Editar": "Editar",
+"Adicionar alguém ao convite agora": "Agregar a alguien a la invitación ahora",
+"Entra na lista <strong>Convite área restrita</strong> (a mesma de Listas de e-mail).": "Entra en la lista <strong>Invitación área restringida</strong> (la misma de Listas de correo).",
+"Ver quem vai receber": "Ver quién va a recibir",
+"# pessoa(s) vão receber o convite.": "# persona(s) van a recibir la invitación.",
+"# pessoa(s) vão receber o convite. # pessoa(s) das listas marcadas já têm cadastro na área restrita e ficam de fora.": "# persona(s) van a recibir la invitación. # persona(s) de las listas marcadas ya tienen registro en el área restringida y quedan fuera.",
+"Ninguém ainda. Adicione acima ou marque outra lista.": "Nadie todavía. Agrega arriba o marca otra lista.",
+"Confira o e-mail: ele parece incompleto.": "Revisa el correo: parece incompleto.",
+"Não consegui salvar agora. Tente de novo.": "No pude guardar ahora. Intenta de nuevo.",
+"Nome": "Nombre"
 });})();
