@@ -27,6 +27,16 @@ const CALS = [
 const ATIV_CATS = ['Encontro Estacional', 'Reunião de Escola', 'Retiro / Seminário', 'Mutirão / Manutenção', 'Celebração / Evento', 'Outras atividades', 'Campanha'];
 const CORES = ['#2a7ab5', '#a31d21', '#2e7d32', '#b8620f', '#6a3d9a', '#00838f', '#6c7a7b', '#c2185b'];
 const pad = n => String(n).padStart(2, '0');
+// Código padrão das atas (o Parque existe desde 2011; 2 Reuniões de Escola por ano):
+//   RE-AAAA.N  = Reunião de Escola (N = 1ª ou 2ª do ano) · com um sufixo -D1, -D2 quando cada dia da reunião tem ata própria
+//   REX-AAAA.N = Reunião extraordinária · ATA-AAAA.N = outras atas.   Ex.: RE-2026.1, RE-2026.2-D1, RE-2026.2-D2, RE-2011.1
+const PREF_ATA = { 'Reunião de Escola': 'RE', 'Reunião extraordinária': 'REX' };
+const codigoOk = c => /^(RE|REX|ATA)-(19|20)\d{2}\.\d{1,2}(-D\d)?$/.test(c || '');
+const sugereCodigo = (lista, d) => { // próxima numeração livre do ano para o tipo da ata
+  const pre = (PREF_ATA[d.categoria] || 'ATA') + '-' + String(d.data || '').slice(0, 4) + '.';
+  const usados = lista.filter(x => x.id !== d.id && String(x.codigo || '').startsWith(pre)).map(x => parseInt(String(x.codigo).slice(pre.length), 10) || 0);
+  return pre + ((usados.length ? Math.max(...usados) : 0) + 1);
+};
 const addDia = (iso, k) => { const x = new Date(iso + 'T12:00:00'); x.setDate(x.getDate() + k); return x.toISOString().slice(0, 10); };
 const domingoDe = iso => addDia(iso, -new Date(iso + 'T12:00:00').getDay());
 const CAT_FIXA = 'Data fixa anual';
@@ -134,7 +144,7 @@ const gerirFixas = (el, H, pode, aoMudar) => {
 
 const MAX_ARQ = 1024 * 1024; // 1 MB por arquivo anexado (o navegador guarda no máximo ~5 MB no total)
 
-window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, abrir(me, root, H, lugar = 'docs') { // lugar: 'docs' (Documentos e Calendários) ou 'mapa' (Documentação IP)
+window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codigoOk, sugereCodigo, abrir(me, root, H, lugar = 'docs') { // lugar: 'docs' (Documentos e Calendários) ou 'mapa' (Documentação IP)
   const { db, esc, $, uid, hoje, fmtData, norm } = H;
   const pode = H.tem(me, 'documentos'); // administrador ou Responsável pelos Documentos e Calendários
   const anoHoje = +hoje().slice(0, 4);
@@ -206,7 +216,7 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, abri
   const impBloco = p => {
     const ativs0 = ativs(), novaAt = id => !ativs0.some(a => a.id === id), ja = id => docs().some(d => d.id === id);
     return `<section class="tip-box" style="display:block"><h4 style="margin-top:0"><i class="fas fa-file-import"></i> Conferir antes de importar</h4>
-      ${p.atas.map(a => `<div style="border-top:1px solid #dfe6ec;padding:10px 0"><strong>${esc(a.titulo)}</strong> · ${fmtData(a.data)} ${ja(a.id) ? '<span class="badge-status badge-uso">já existe: será atualizada</span>' : '<span class="badge-status badge-aprovado">nova</span>'}
+      ${p.atas.map(a => `<div style="border-top:1px solid #dfe6ec;padding:10px 0">${a.codigo ? `<span class="badge-status" style="background:#1d4a7a;color:#fff">${esc(a.codigo)}</span> ` : ''}<strong>${esc(a.titulo)}</strong> · ${fmtData(a.data)} ${ja(a.id) ? '<span class="badge-status badge-uso">já existe: será atualizada</span>' : '<span class="badge-status badge-aprovado">nova</span>'}
         ${a.descricao ? `<p style="margin:4px 0">${esc(a.descricao)}</p>` : ''}
         <p style="margin:4px 0"><small>${a.arquivo ? '<i class="fas fa-file-pdf"></i> ' + esc(a.arqNome || 'ata') + ' · ' : ''}${(a.anexos || []).length ? (a.anexos || []).length + ' anexo(s) · ' : ''}${(a.videos || []).length} vídeo(s)</small></p>
         ${(a.enc || []).length ? `<ul style="margin:4px 0 0 18px">${a.enc.map(e => `<li>${esc(e.texto)}${e.resp ? ` <em>(${esc(e.resp)})</em>` : ''}${e.data ? ' · ' + fmtData(e.data) : ''} · <span style="color:${encCor(e.status || ENC_ST[0])}">${esc(e.status || ENC_ST[0])}</span>${e.cal && e.data ? ' · <i class="fas fa-calendar-plus" title="vai para o calendário"></i>' : ''}</li>`).join('')}</ul>` : ''}</div>`).join('')}
@@ -222,7 +232,7 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, abri
         if (e.cal && e1.data) { e1.ativ = 'imp-' + e1.id; poeAtiv(e1.ativ, { titulo: e1.texto.slice(0, 120), data: e1.data, categoria: e1.tipo, resp: e1.resp, descricao: e.descricao || '' }); }
         return e1;
       });
-      const dados = { area: 'atas', titulo: a.titulo, data: a.data, ano: +a.data.slice(0, 4), categoria: a.categoria || 'Reunião de Escola', descricao: a.descricao || '', arquivo: a.arquivo || '', arqNome: a.arqNome || '', link: a.link || '', videos: (a.videos || []).filter(v => /^https:\/\//i.test(v.url || '')), anexos: (a.anexos || []).filter(x => H.safeUrl(x.arquivo || '')), enc, origem: 'importacao' };
+      const dados = { area: 'atas', codigo: codigoOk(a.codigo) ? a.codigo : (l.find(d => d.id === a.id) || {}).codigo || '', titulo: a.titulo, data: a.data, ano: +a.data.slice(0, 4), categoria: a.categoria || 'Reunião de Escola', descricao: a.descricao || '', arquivo: a.arquivo || '', arqNome: a.arqNome || '', link: a.link || '', videos: (a.videos || []).filter(v => /^https:\/\//i.test(v.url || '')), anexos: (a.anexos || []).filter(x => H.safeUrl(x.arquivo || '')), enc, origem: 'importacao' };
       const i = l.findIndex(d => d.id === a.id);
       if (i >= 0) l[i] = Object.assign(l[i], dados, { editado: hoje(), editadoPor: me.nome }); else l.push(Object.assign({ id: a.id }, dados, { criado: hoje(), por: me.nome }));
       nAt++;
@@ -246,6 +256,7 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, abri
       <div class="form-row"><label for="d-t">Título *</label><input id="d-t" maxlength="140" value="${esc(ed ? ed.titulo : '')}"></div>
       <div class="form-row"><label for="d-d">Data *</label><input id="d-d" type="date" value="${esc(ed ? ed.data : hoje())}"></div>
       <div class="form-row"><label for="d-a">Ano *</label><input id="d-a" type="number" min="1900" max="2100" value="${esc(ed ? ed.ano : anoHoje)}"><small>Preenchido pela data; pode ser corrigido.</small></div>
+      ${area.id === 'atas' ? `<div class="form-row"><label for="d-cod">Código da ata</label><input id="d-cod" maxlength="16" value="${esc(ed ? ed.codigo || '' : '')}" placeholder="ex.: RE-2026.1 ou RE-2026.2-D1"><small>Padrão: RE-ano.nº da reunião no ano (1 ou 2); -D1, -D2 quando cada dia tem ata própria. Extraordinária: REX-…; outras: ATA-… Em branco, o código é sugerido ao salvar.</small></div>` : ''}
       <div class="form-row"><label for="d-c">Categoria *</label><select id="d-c">${opt(cats, ed ? ed.categoria : cats[0])}<option value="__novo">＋ Nova categoria...</option></select></div>
       <div class="form-row" id="d-cw" hidden><label for="d-cn">Nome da nova categoria *</label><input id="d-cn" maxlength="60"></div>
       <div class="form-row"><label for="d-s">Descrição</label><textarea id="d-s" rows="2" maxlength="400">${esc(ed ? ed.descricao : '')}</textarea></div>
@@ -256,18 +267,18 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, abri
       <button class="btn-visit btn-large"><i class="fas fa-save"></i> ${ed ? 'Salvar alterações' : 'Cadastrar'}</button> <button type="button" class="btn-visit btn-large" id="d-x" style="background:#6c7a7b;margin-left:8px">Cancelar</button></form>` : ''}
     <div class="inv-filtros no-print"><div class="form-row"><label for="l-a">Ano</label><select id="l-a"><option value="">Todos</option>${anos.map(a => `<option${String(a) === F.ano ? ' selected' : ''}>${a}</option>`).join('')}</select></div>
       <div class="form-row"><label for="l-c">Categoria</label><select id="l-c"><option value="">Todas</option>${cats.map(c => `<option${c === F.cat ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select></div>
-      <div class="form-row"><label for="l-q">Buscar</label><input id="l-q" type="search" value="${esc(F.q)}" placeholder="Título ou descrição"></div>
+      <div class="form-row"><label for="l-q">Buscar</label><input id="l-q" type="search" value="${esc(F.q)}" placeholder="Título, código ou descrição"></div>
       ${area.id === 'atas' ? `<div class="form-row"><label><input type="checkbox" id="l-ab"${F.aberto ? ' checked' : ''}> Só atas com encaminhamentos em aberto</label></div>` : ''}</div>
     <div id="l-res"></div>`;
     const lista = () => {
-      const q = norm(F.q), f = todos.filter(d => (!F.ano || String(d.ano) === F.ano) && (!F.cat || d.categoria === F.cat) && (!F.aberto || (d.enc || []).some(e => e.status === 'Em aberto')) && (!q || norm(d.titulo + ' ' + d.descricao).includes(q)));
+      const q = norm(F.q), f = todos.filter(d => (!F.ano || String(d.ano) === F.ano) && (!F.cat || d.categoria === F.cat) && (!F.aberto || (d.enc || []).some(e => e.status === 'Em aberto')) && (!q || norm(d.titulo + ' ' + d.descricao + ' ' + (d.codigo || '')).includes(q)));
       const por = {}; f.forEach(d => { (por[d.ano] = por[d.ano] || []).push(d); });
       $('#l-res', el).innerHTML = f.length ? Object.keys(por).sort((a, b) => b - a).map(a => `<h4>${a} <small>(${por[a].length} documento(s))</small></h4>` + por[a].sort((x, y) => (y.data || '').localeCompare(x.data || '') || x.titulo.localeCompare(y.titulo, 'pt-BR')).map(d => {
         const link = d.arquivo && H.safeUrl(d.arquivo) ? `<a class="btn-visit" href="${esc(d.arquivo)}" download="${esc(d.arqNome || 'documento')}"><i class="fas fa-download"></i> Baixar</a>` : '';
         const ext = (d.link && /^https?:\/\//i.test(d.link) ? `<a class="btn-visit" href="${esc(d.link)}" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i> Abrir link</a>` : '')
           + (d.videos || []).filter(v => /^https:\/\//i.test(v.url || '')).map(v => ` <a class="btn-visit" href="${esc(v.url)}" target="_blank" rel="noopener"><i class="fab fa-youtube"></i> ${esc(v.titulo || 'Vídeo')}</a>`).join('')
           + (d.anexos || []).filter(a => H.safeUrl(a.arquivo || '')).map(a => ` <a class="btn-visit" href="${esc(a.arquivo)}" download="${esc(a.nome || 'anexo')}"><i class="fas fa-paperclip"></i> ${esc(a.rotulo || a.nome || 'Anexo')}</a>`).join('');
-        return `<div class="doc-item"><div class="doc-data">${fmtData(d.data)}</div><div class="doc-corpo"><strong>${esc(d.titulo)}</strong> <span class="badge-status badge-uso">${esc(d.categoria)}</span>${d.descricao ? `<p>${esc(d.descricao)}</p>` : ''}${area.id === 'atas' && (d.enc || []).length ? `<ul class="enc-lista" style="margin:6px 0 6px 18px">${d.enc.map(e => encItem(d, e)).join('')}</ul>` : ''}<span class="acoes">${link}${ext}${!link && !ext ? '<small class="vazio">Sem arquivo anexado</small>' : ''}${pode ? ` <button class="icon-btn" data-ed="${d.id}" aria-label="Editar ${esc(d.titulo)}"><i class="fas fa-edit" style="color:var(--accent-color)"></i></button><button class="icon-btn" data-del="${d.id}" aria-label="Excluir ${esc(d.titulo)}"><i class="fas fa-trash"></i></button>` : ''}</span></div></div>`;
+        return `<div class="doc-item"><div class="doc-data">${fmtData(d.data)}</div><div class="doc-corpo" id="doc-${esc(d.id)}">${d.codigo ? `<span class="badge-status" style="background:#1d4a7a;color:#fff" title="Código da ata">${esc(d.codigo)}</span> ` : ''}<strong>${esc(d.titulo)}</strong> <span class="badge-status badge-uso">${esc(d.categoria)}</span>${d.descricao ? `<p>${esc(d.descricao)}</p>` : ''}${area.id === 'atas' && (d.enc || []).length ? `<ul class="enc-lista" style="margin:6px 0 6px 18px">${d.enc.map(e => encItem(d, e)).join('')}</ul>` : ''}<span class="acoes">${link}${ext}${!link && !ext ? '<small class="vazio">Sem arquivo anexado</small>' : ''}${pode ? ` <button class="icon-btn" data-ed="${d.id}" aria-label="Editar ${esc(d.titulo)}"><i class="fas fa-edit" style="color:var(--accent-color)"></i></button><button class="icon-btn" data-del="${d.id}" aria-label="Excluir ${esc(d.titulo)}"><i class="fas fa-trash"></i></button>` : ''}</span></div></div>`;
       }).join('')).join('') : `<p class="vazio">${todos.length ? 'Nenhum documento com esses filtros.' : 'Nenhum documento cadastrado ainda.'}</p>`;
       el.querySelectorAll('[data-es]').forEach(x => x.onchange = () => { if (!pode) return; const [di, ei] = x.dataset.es.split('|'), l = docs(), d = l.find(y => y.id === di), e = d && (d.enc || []).find(y => y.id === ei); if (!e) return; e.status = x.value; db.set('docs', l); msg = 'Situação do encaminhamento atualizada.'; draw(); });
       el.querySelectorAll('[data-ed]').forEach(b => b.onclick = () => { form = b.dataset.ed; msg = ''; draw(); window.scrollTo(0, 0); });
@@ -321,10 +332,56 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, abri
       }
       const l = docs(), dados = { area: area.id, titulo: t, data: dt, ano, categoria: cat, descricao: g('d-s'), arquivo, arqNome, link };
       if (enc) dados.enc = enc;
+      if (area.id === 'atas') {
+        let cod = g('d-cod').toUpperCase().replace(/\s+/g, '');
+        if (cod && !codigoOk(cod)) return falha('Código fora do padrão. Use, por exemplo, RE-2026.1 ou RE-2026.2-D1.');
+        if (cod && l.some(d => d.codigo === cod && (!ed || d.id !== ed.id))) return falha(`O código ${cod} já é de outra ata.`);
+        dados.codigo = cod || sugereCodigo(l, { id: ed && ed.id, categoria: cat, data: dt });
+      }
       if (ed) Object.assign(l.find(d => d.id === ed.id), dados, { editado: hoje(), editadoPor: me.nome }); else l.push({ id: uid(), ...dados, criado: hoje(), por: me.nome });
       if (!db.set('docs', l)) return falha('Sem espaço no navegador. Use o link do arquivo em vez de anexar.');
       msg = (ed ? 'Documento atualizado.' : 'Documento cadastrado.') + (novasAt ? ` ${novasAt} atividade(s) criada(s) no calendário.` : ''); form = null; draw();
     };
+  };
+
+  /* ---------- Pendências: todos os encaminhamentos em aberto das atas, com o código da ata de origem ----------
+     Sinaliza os que estão sem data e sem responsável ("A definir" conta como sem responsável). */
+  const P = { f: '', q: '' };
+  const semResp = r => !String(r || '').trim() || /^a definir$/i.test(String(r).trim());
+  const pendencias = () => {
+    const al = ativs(), out = [];
+    docs().filter(d => d.area === 'atas').forEach(d => (d.enc || []).forEach(e => {
+      if (e.status !== 'Em aberto') return;
+      const at = e.ativ ? al.find(a => a.id === e.ativ) : null, data = at ? at.data : e.data || '';
+      out.push({ d, e, data, semData: !data, semResp: semResp(e.resp), atraso: !!data && data < hoje() });
+    }));
+    return out.sort((x, y) => (x.data ? 0 : 1) - (y.data ? 0 : 1) || (x.data || '').localeCompare(y.data || '') || (x.d.codigo || x.d.data).localeCompare(y.d.codigo || y.d.data));
+  };
+  const pendArea = el => {
+    const todas = pendencias(), n = k => todas.filter(p => p[k]).length;
+    const FIL = [['', 'Todas', todas.length], ['semData', 'Sem data', n('semData')], ['semResp', 'Sem responsável', n('semResp')], ['atraso', 'Em atraso', n('atraso')]];
+    el.innerHTML = `<h3><i class="fas fa-tasks"></i> O que ainda está pendente</h3>
+    <p>Todos os encaminhamentos em aberto das atas, cada um com o <strong>código da ata de origem</strong> (clique para abrir a ata). Quando algo for resolvido, marque <strong>Feito</strong> aqui mesmo ou na ata.${pode ? '' : ' Seu acesso é de consulta.'}</p>
+    ${msg ? `<p class="tip-box" role="status"><i class="fas fa-check-circle"></i> ${esc(msg)}</p>` : ''}
+    <p class="no-print" role="group" aria-label="Filtrar pendências">${FIL.map(([k, t, c]) => `<button type="button" class="btn-visit${P.f === k ? '' : ' btn-sec'}" data-pf="${k}" aria-pressed="${P.f === k}" style="margin:0 6px 6px 0${P.f === k ? '' : ';background:#e8eef3;color:#1d4a7a'}">${esc(t)} <strong>${c}</strong></button>`).join('')}</p>
+    <div class="inv-filtros no-print"><div class="form-row"><label for="p-q">Buscar</label><input id="p-q" type="search" value="${esc(P.q)}" placeholder="Texto, responsável ou código da ata"></div></div>
+    <div id="p-res"></div>
+    <p class="vazio"><small>Código das atas: RE-ano.nº da reunião no ano (ex.: RE-2026.1 = 1ª Reunião de Escola de 2026); -D1, -D2 quando cada dia da reunião tem ata própria. REX = reunião extraordinária; ATA = outras atas.</small></p>`;
+    const lista = () => {
+      const q = norm(P.q), f = todas.filter(p => (!P.f || p[P.f]) && (!q || norm([p.e.texto, p.e.resp, p.d.codigo, p.d.titulo].join(' ')).includes(q)));
+      $('#p-res', el).innerHTML = f.length ? `<div style="overflow-x:auto"><table class="doc-table"><thead><tr><th>Origem</th><th>O que está pendente</th><th>Responsável</th><th>Prazo</th><th>Situação</th></tr></thead><tbody>${f.map(p => `<tr>
+        <td><a href="#" data-pa="${esc(p.d.id)}" title="${esc(p.d.titulo)}"><span class="badge-status" style="background:#1d4a7a;color:#fff">${esc(p.d.codigo || 'sem código')}</span></a><br><small>${esc(p.d.titulo)}</small></td>
+        <td>${esc(p.e.texto)}${p.e.ativ ? ' <small title="Está nos calendários"><i class="fas fa-calendar-check" aria-hidden="true"></i></small>' : ''}</td>
+        <td>${p.semResp ? `<span class="badge-status" style="background:#a31d21;color:#fff">Sem responsável</span>${p.e.resp ? ` <small>(${esc(p.e.resp)})</small>` : ''}` : `<small>${respHtml(p.e.resp)}</small>`}</td>
+        <td>${p.semData ? '<span class="badge-status" style="background:#b8620f;color:#fff">Sem data</span>' : `${fmtData(p.data)}${p.atraso ? ' <span class="badge-status" style="background:#a31d21;color:#fff">Em atraso</span>' : ''}`}</td>
+        <td>${pode ? `<select data-ps="${esc(p.d.id)}|${esc(p.e.id)}" aria-label="Situação">${opt(ENC_ST, p.e.status)}</select>` : esc(p.e.status)}</td></tr>`).join('')}</tbody></table></div>`
+        : `<p class="vazio">${todas.length ? 'Nenhuma pendência com esse filtro.' : 'Nenhuma pendência: todos os encaminhamentos das atas estão resolvidos.'}</p>`;
+      el.querySelectorAll('[data-pa]').forEach(a => a.onclick = ev => { ev.preventDefault(); const d = docs().find(x => x.id === a.dataset.pa); sub = 'atas'; form = null; msg = ''; F.ano = ''; F.cat = ''; F.aberto = false; F.q = d ? d.codigo || d.titulo : ''; draw(); const alvo = document.getElementById('doc-' + a.dataset.pa); if (alvo) alvo.scrollIntoView({ block: 'center' }); });
+      el.querySelectorAll('[data-ps]').forEach(x => x.onchange = () => { if (!pode) return; const [di, ei] = x.dataset.ps.split('|'), l = docs(), d = l.find(y => y.id === di), e = d && (d.enc || []).find(y => y.id === ei); if (!e) return; e.status = x.value; db.set('docs', l); msg = `Situação atualizada: "${e.texto.slice(0, 60)}" agora está ${x.value}.`; draw(); });
+    };
+    el.querySelectorAll('[data-pf]').forEach(b => b.onclick = () => { P.f = b.dataset.pf; msg = ''; draw(); });
+    $('#p-q', el).oninput = e => { P.q = e.target.value.trim(); lista(); };
+    lista();
   };
 
   /* ---------- Calendários (uma única lista de atividades alimenta todas as visões: semanal, mensal, trimestral, semestral e anual) ---------- */
@@ -423,12 +480,12 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, abri
   };
 
   /* ---------- Estrutura da aba ---------- */
-  const SUB = areas.map(a => [a.id, a.nome]).concat(cals.map(c => [c.id, c.nome]));
+  const SUB = areas.map(a => [a.id, a.nome]).concat(areas.some(a => a.id === 'atas') ? [['pend', 'Pendências']] : [], cals.map(c => [c.id, c.nome]));
   const draw = () => {
     root.innerHTML = `${SUB.length > 1 ? `<div class="tabs sub no-print" role="tablist">${SUB.map(t => `<button class="tab-btn${t[0] === sub ? ' active' : ''}" data-s="${t[0]}">${esc(t[1])}</button>`).join('')}</div>` : ''}<div id="doc-sub"></div>`;
     root.querySelectorAll('[data-s]').forEach(b => b.onclick = () => { sub = b.dataset.s; form = null; msg = ''; F.ano = F.cat = F.q = ''; F.aberto = false; draw(); });
     const area = areas.find(a => a.id === sub), cal = cals.find(c => c.id === sub);
-    if (area) docArea($('#doc-sub', root), area); else calendario($('#doc-sub', root), cal);
+    if (area) docArea($('#doc-sub', root), area); else if (sub === 'pend') pendArea($('#doc-sub', root)); else calendario($('#doc-sub', root), cal);
   };
   draw();
 } };

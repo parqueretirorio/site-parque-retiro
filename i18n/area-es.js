@@ -2335,5 +2335,22 @@
 "(sem cadastro)": "(sin registro)",
 "Responsável:": "Responsable:",
 "Nome(s), mesmo de quem ainda não tem cadastro": "Nombre(s), incluso de quien aún no tiene registro",
-"toda semana desde": "cada semana desde"
+"toda semana desde": "cada semana desde",
+"Pendências": "Pendientes",
+"O que ainda está pendente": "Lo que aún está pendiente",
+"Todas": "Todas",
+"Sem data": "Sin fecha",
+"Sem responsável": "Sin responsable",
+"Em atraso": "Atrasado",
+"Origem": "Origen",
+"O que está pendente": "Lo que está pendiente",
+"sem código": "sin código",
+"Código da ata": "Código del acta",
+"Texto, responsável ou código da ata": "Texto, responsable o código del acta",
+"Título, código ou descrição": "Título, código o descripción",
+"Nenhuma pendência com esse filtro.": "Ningún pendiente con ese filtro.",
+"Nenhuma pendência: todos os encaminhamentos das atas estão resolvidos.": "Sin pendientes: todos los encaminamientos de las actas están resueltos.",
+"Código das atas: RE-ano.nº da reunião no ano (ex.: RE-2026.1 = 1ª Reunião de Escola de 2026); -D1, -D2 quando cada dia da reunião tem ata própria. REX = reunião extraordinária; ATA = outras atas.": "Código de las actas: RE-año.nº de la reunión en el año (ej.: RE-2026.1 = 1ª Reunión de Escuela de 2026); -D1, -D2 cuando cada día de la reunión tiene acta propia. REX = reunión extraordinaria; ATA = otras actas.",
+"Padrão: RE-ano.nº da reunião no ano (1 ou 2); -D1, -D2 quando cada dia tem ata própria. Extraordinária: REX-…; outras: ATA-… Em branco, o código é sugerido ao salvar.": "Patrón: RE-año.nº de la reunión en el año (1 o 2); -D1, -D2 cuando cada día tiene acta propia. Extraordinaria: REX-…; otras: ATA-… En blanco, el código se sugiere al guardar.",
+"Código fora do padrão. Use, por exemplo, RE-2026.1 ou RE-2026.2-D1.": "Código fuera del patrón. Use, por ejemplo, RE-2026.1 o RE-2026.2-D1."
 });})();

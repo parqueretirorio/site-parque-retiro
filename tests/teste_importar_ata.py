@@ -6,7 +6,7 @@ SITE = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); PORT = 8861
 PAC = sys.argv[1] if len(sys.argv) > 1 else '/tmp/pacote_teste.json'
 if not os.path.exists(PAC):
     json.dump({'tipo': 'pr-atas', 'versao': 1, 'atas': [{'id': 'ata-x', 'titulo': 'Reunião X', 'data': '2026-11-01', 'videos': [{'titulo': 'Vídeo do dia', 'url': 'https://youtu.be/abc'}],
-               'enc': [{'id': 'e1', 'texto': 'Fazer a Fonte', 'resp': 'Ana', 'data': '2027-03-01', 'cal': True}, {'id': 'e2', 'texto': 'Comprar geladeira', 'status': 'Feito'}]}],
+               'codigo': 'RE-2026.2', 'enc': [{'id': 'e1', 'texto': 'Fazer a Fonte', 'resp': 'Ana', 'data': '2027-03-01', 'cal': True}, {'id': 'e2', 'texto': 'Comprar geladeira', 'status': 'Feito'}]}],
                'atividades': [{'id': 't1', 'titulo': 'Almoço', 'data': '2026-11-22', 'categoria': 'Celebração / Evento'}]}, open(PAC, 'w'))
 srv = subprocess.Popen(["python3", "-m", "http.server", str(PORT), "-d", SITE], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL); time.sleep(1)
 U = f"http://localhost:{PORT}/"
@@ -47,6 +47,25 @@ async def main():
         ok('fa-user-check' in html, "quem tem cadastro aparece marcado (✓) como responsável")
         ok('(sem cadastro)' in html or 'Fulano' in html, "quem não tem cadastro aparece pelo nome")
         await pg.screenshot(path='/tmp/importar-calendario.png', full_page=True)
+        # Pendências: encaminhamentos em aberto com o código da ata de origem, sem data e sem responsável
+        pend = [(a, e) for a in p0['atas'] for e in a.get('enc', []) if e.get('status', 'Em aberto') == 'Em aberto']
+        await pg.evaluate("document.querySelector('#tab [data-s=pend]').click()"); await pg.wait_for_timeout(300)
+        ok(await pg.locator('#p-res tbody tr').count() == len(pend), f"Pendências lista os {len(pend)} encaminhamentos em aberto")
+        if any(a.get('codigo') for a, e in pend): ok(await pg.locator('#p-res [data-pa] .badge-status').first.inner_text() in {a.get('codigo') for a, e in pend}, "cada pendência mostra o código da ata de origem")
+        nsd = sum(1 for a, e in pend if not e.get('data'))
+        await pg.click('[data-pf=semData]'); await pg.wait_for_timeout(200)
+        ok(await pg.locator('#p-res tbody tr').count() == nsd, f"filtro 'Sem data' ({nsd})")
+        nsr = sum(1 for a, e in pend if not (e.get('resp') or '').strip() or e['resp'].strip().lower() == 'a definir')
+        await pg.click('[data-pf=semResp]'); await pg.wait_for_timeout(200)
+        ok(await pg.locator('#p-res tbody tr').count() == nsr, f"filtro 'Sem responsável' ({nsr})")
+        await pg.screenshot(path='/tmp/pendencias.png', full_page=True)
+        await pg.click('[data-pf=""]'); await pg.wait_for_timeout(200)
+        await pg.select_option('#p-res select >> nth=0', 'Feito'); await pg.wait_for_timeout(200)
+        ok(await pg.locator('#p-res tbody tr').count() == len(pend) - 1, "marcar Feito tira da lista de pendências")
+        await pg.evaluate("(()=>{const l=PR_DADOS.db.get('docs',[]);l.forEach(d=>(d.enc||[]).forEach(e=>{if(e.status==='Feito'&&e.id==='%s')e.status='Em aberto'}));PR_DADOS.db.set('docs',l)})()" % pend[0][1]['id'])
+        await pg.evaluate("document.querySelector('#tab [data-s=pend]').click()"); await pg.wait_for_timeout(300)
+        await pg.locator('#p-res [data-pa]').first.click(); await pg.wait_for_timeout(300)
+        ok(await pg.locator('#d-imp').count() == 1 and await pg.locator('#l-res .doc-item').count() >= 1, "clicar no código abre a ata de origem")
         await pg.evaluate("document.querySelector('#tab [data-s=atas]').click()"); await pg.wait_for_timeout(300)
         nAtiv = await pg.evaluate("PR_DADOS.db.get('ativ',[]).length")
         await pg.set_input_files('#d-imp', PAC); await pg.wait_for_selector('#imp-ok')
