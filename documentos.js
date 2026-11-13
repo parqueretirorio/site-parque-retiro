@@ -163,6 +163,42 @@ const darEncaminhamento = (db, h, r) => {
   return { r, nome: nomeReuniao(r), reunioes, itens, nR: itens.filter(i => i.semResp).length, nD: itens.filter(i => i.semData).length,
     atrasados: itens.filter(i => i.atraso), prox: itens.filter(i => i.prox45) };
 };
+// ---------- Transcrição de reunião (Zoom .vtt, YouTube .vtt/.srt ou texto) -> rascunho de ata ----------
+// Zoom: "Nome: fala" em cada trecho; YouTube (legenda automática): sem nomes, com marcações <00:00:01.234><c>…</c>
+// e linhas repetidas que "rolam" – tudo isso é limpo aqui.
+const segs = t => { const m = /(?:(\d+):)?(\d{1,2}):(\d{2})[.,](\d{1,3})/.exec(t || ''); return m ? (+(m[1] || 0)) * 3600 + (+m[2]) * 60 + (+m[3]) : 0; };
+const hhmm = s => { const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = Math.floor(s % 60); return (h ? h + ':' + String(m).padStart(2, '0') : String(m)) + ':' + String(x).padStart(2, '0'); };
+const lerTranscricao = (texto, nomeArq = '') => {
+  const t = String(texto || '').replace(/^﻿/, '').replace(/\r/g, '');
+  const tipo = /^WEBVTT/.test(t) ? 'vtt' : /-->/.test(t) ? 'srt' : 'texto';
+  const cues = [];
+  if (tipo === 'texto') t.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean).forEach(b => cues.push({ ini: 0, fim: 0, txt: b.replace(/\n/g, ' ') }));
+  else t.split(/\n\s*\n/).forEach(b => {
+    const ls = b.split('\n'), i = ls.findIndex(l => /-->/.test(l)); if (i < 0) return;
+    const [a, z] = ls[i].split('-->');
+    const txt = ls.slice(i + 1).join(' ').replace(/<\d{2}:\d{2}:\d{2}[.,]\d{3}>/g, '').replace(/<\/?[a-z][^>]*>/gi, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+    if (txt) cues.push({ ini: segs(a), fim: segs(z), txt });
+  });
+  // tira repetições da legenda automática (cada trecho repete o fim do anterior)
+  const limpos = [];
+  cues.forEach(c => { const p = limpos[limpos.length - 1]; if (p && (p.txt === c.txt || p.txt.endsWith(c.txt))) { p.fim = Math.max(p.fim, c.fim); return; }
+    if (p && c.txt.startsWith(p.txt)) { p.txt = c.txt; p.fim = Math.max(p.fim, c.fim); return; } limpos.push(Object.assign({}, c)); });
+  const falas = [];
+  limpos.forEach(c => {
+    const m = /^([A-ZÀ-Ýa-zà-ÿ][^:]{0,60}):\s+(.+)$/.exec(c.txt), quem = m && !/^https?$/i.test(m[1]) ? m[1].trim() : '', txt = m ? m[2] : c.txt;
+    const p = falas[falas.length - 1];
+    if (p && p.quem === quem && (quem || c.ini - p.ini < 60) && p.txt.length < 1500) { p.txt += ' ' + txt; p.fim = c.fim; } else falas.push({ quem, ini: c.ini, fim: c.fim, txt });
+  });
+  const participantes = [...new Set(falas.map(f => f.quem).filter(Boolean))];
+  const duracao = Math.max(0, ...limpos.map(c => c.fim));
+  let data = '', md = /GMT(\d{4})(\d{2})(\d{2})-(\d{2})/.exec(nomeArq);
+  if (md) { const d = new Date(Date.UTC(+md[1], +md[2] - 1, +md[3], +md[4]) - 3 * 3600e3); data = d.toISOString().slice(0, 10); } // horário de Brasília
+  else if ((md = /(\d{4})-(\d{2})-(\d{2})/.exec(nomeArq))) data = md[0];
+  const origem = /GMT\d{8}|zoom|transcript/i.test(nomeArq) || participantes.length ? 'Zoom' : tipo === 'texto' ? 'texto' : 'YouTube';
+  const corpo = falas.map(f => `[${hhmm(f.ini)}] ${f.quem ? f.quem + ': ' : ''}${f.txt}`).join('\n\n');
+  return { tipo, origem, data, falas, participantes, duracao, texto: corpo, palavras: corpo.split(/\s+/).filter(Boolean).length };
+};
+
 // Grava o encaminhamento (quem assume, prazo, próximo passo, situação); prazo novo de item em aberto entra no calendário.
 const salvarEnc = (db, di, ei, v, por, h) => {
   const l = db.get('docs', []) || [], d = l.find(y => y.id === di), e = d && (d.enc || []).find(y => y.id === ei); if (!e) return null;
@@ -220,12 +256,12 @@ const msgStatus = (D, link, lang = 'pt') => {
   L.push('', T.fimS(link), '', T.abraco);
   return L.join('\n');
 };
-window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codigoOk, sugereCodigo, darEncaminhamento, msgResumo, msgStatus, salvarEnc, curto, abrir(me, root, H, lugar = 'docs') { // lugar: 'docs' (Documentos e Calendários) ou 'mapa' (Documentação IP)
+window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codigoOk, sugereCodigo, darEncaminhamento, msgResumo, msgStatus, salvarEnc, curto, lerTranscricao, abrir(me, root, H, lugar = 'docs') { // lugar: 'docs' (Documentos e Calendários) ou 'mapa' (Documentação IP)
   const { db, esc, $, uid, hoje, fmtData, norm } = H;
   const pode = H.tem(me, 'documentos'); // administrador ou Responsável pelos Documentos e Calendários
   const anoHoje = +hoje().slice(0, 4);
   const areas = AREAS.filter(a => a.lugar === lugar), cals = lugar === 'docs' ? CALS : [];
-  let sub = (areas[0] || cals[0]).id, form = null, msg = '', imp = null; // imp: pacote de atas sendo conferido antes de importar
+  let sub = (areas[0] || cals[0]).id, form = null, msg = '', imp = null, trs = null; // trs: transcrição sendo conferida // imp: pacote de atas sendo conferido antes de importar
   const F = { ano: '', cat: '', q: '', aberto: false };                       // filtros da lista de documentos
   const mesHoje = +hoje().slice(5, 7) - 1;
   const W = { ini: domingoDe(hoje()) }; // semana mostrada no calendário semanal (domingo)
@@ -289,6 +325,20 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
     for (const t of p.atividades || []) if (!t.id || !t.titulo || !okData(t.data)) return 'Uma das datas do pacote está incompleta.';
     return p;
   };
+  const trsBloco = (r, area) => {
+    const cats = catsDe(area), cat = cats.find(c => c !== 'Reunião de Escola') || cats[0]; // Reunião de Escola só quando escolhida (ganha o código RE)
+    return `<section class="tip-box" style="display:block" id="trs-box"><h4 style="margin-top:0"><i class="fas fa-closed-captioning"></i> Ata a partir da transcrição: conferir</h4>
+      <p><small>Arquivo <strong>${esc(r.arquivo)}</strong> · ${esc(r.origem)} · ${r.duracao ? 'duração ' + hhmm(r.duracao) + ' · ' : ''}${r.falas.length} trecho(s) · ${r.palavras.toLocaleString('pt-BR')} palavras</small></p>
+      ${r.participantes.length ? `<p><strong>Quem falou (${r.participantes.length}):</strong> ${r.participantes.map(esc).join(', ')}</p>` : '<p><small>Esta transcrição não traz os nomes de quem falou (a legenda do YouTube não tem nomes). Escreva os presentes na descrição, se quiser.</small></p>'}
+      <div class="form-row"><label for="tr-t">Título da ata *</label><input id="tr-t" maxlength="140" value="${esc(r.titulo)}"></div>
+      <div class="form-row"><label for="tr-d">Data da reunião *</label><input id="tr-d" type="date" value="${esc(r.data || hoje())}"></div>
+      <div class="form-row"><label for="tr-c">Categoria *</label><select id="tr-c">${opt(cats, cat)}</select><small>Escolha "Reunião de Escola" só para a Reunião de Escola: ela ganha o código RE-ano.nº e entra em Dar encaminhamento.</small></div>
+      <div class="form-row"><label for="tr-v">Link do vídeo no YouTube (opcional)</label><input id="tr-v" type="url" placeholder="https://youtu.be/..." value="${esc(r.video || '')}"></div>
+      <details open><summary>Ver a transcrição (${r.falas.length} trechos)</summary><pre style="white-space:pre-wrap;max-height:320px;overflow:auto;background:#fff;border:1px solid #dfe6ec;padding:10px;border-radius:8px;font-family:inherit">${esc(r.texto.slice(0, 60000))}${r.texto.length > 60000 ? '\n…' : ''}</pre></details>
+      <p class="form-erro" id="tr-er" role="alert" hidden></p>
+      <p><button type="button" class="btn-visit btn-large" id="tr-ok"><i class="fas fa-check"></i> Criar a ata com esta transcrição</button> <button type="button" class="btn-visit" id="tr-x">Cancelar</button></p>
+      <p><small>A ata é criada com a transcrição completa guardada nela. Em seguida abre a edição, para você escrever o resumo e os encaminhamentos.</small></p></section>`;
+  };
   const impBloco = p => {
     const ativs0 = ativs(), novaAt = id => !ativs0.some(a => a.id === id), ja = id => docs().some(d => d.id === id);
     return `<section class="tip-box" style="display:block"><h4 style="margin-top:0"><i class="fas fa-file-import"></i> Conferir antes de importar</h4>
@@ -333,8 +383,9 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
     <p>Documentos organizados por ano e, dentro de cada ano, pela data (do mais recente ao mais antigo).${pode ? '' : ' Seu acesso é de consulta.'}</p>
     ${area.id === 'atas' ? (() => { const ab = todos.reduce((n, d) => n + (d.enc || []).filter(e => e.status === 'Em aberto').length, 0); return `<p class="tip-box" role="note"><i class="fas fa-tasks"></i> <strong>${ab}</strong> encaminhamento(s) em aberto nas atas. Decisões que precisam de data podem ser levadas ao calendário direto da ata.</p>`; })() : ''}
     ${msg ? `<p class="tip-box" role="status"><i class="fas fa-check-circle"></i> ${esc(msg)}</p>` : ''}
-    ${pode && !form && !imp ? `<p><button class="btn-visit btn-large" id="d-novo"><i class="fas fa-plus-circle"></i> Novo documento</button>${area.id === 'atas' ? ` <label class="btn-visit btn-large" for="d-imp" style="cursor:pointer"><i class="fas fa-file-import"></i> Importar ata preparada</label><input id="d-imp" type="file" accept=".json,application/json" hidden>` : ''}</p>${area.id === 'atas' ? '<p class="vazio"><small>"Importar ata preparada": arquivo .json montado pelo Claude a partir da ata, com datas, encaminhamentos e vídeos. Você confere tudo antes de gravar.</small></p>' : ''}` : ''}
+    ${pode && !form && !imp && !trs ? `<p><button class="btn-visit btn-large" id="d-novo"><i class="fas fa-plus-circle"></i> Novo documento</button>${area.id === 'atas' ? ` <label class="btn-visit btn-large" for="d-imp" style="cursor:pointer"><i class="fas fa-file-import"></i> Importar ata preparada</label><input id="d-imp" type="file" accept=".json,application/json" hidden> <label class="btn-visit btn-large" for="d-trs" style="cursor:pointer"><i class="fas fa-closed-captioning"></i> Ata a partir da transcrição</label><input id="d-trs" type="file" accept=".vtt,.srt,.txt,text/vtt,text/plain" hidden>` : ''}</p>${area.id === 'atas' ? '<p class="vazio"><small>"Importar ata preparada": arquivo .json montado pelo Claude a partir da ata, com datas, encaminhamentos e vídeos. "Ata a partir da transcrição": o arquivo de transcrição do Zoom (.vtt) ou a legenda baixada do YouTube Studio (.vtt ou .srt) vira o rascunho da ata, com participantes e o link do vídeo. Você confere tudo antes de gravar.</small></p>' : ''}` : ''}
     ${pode && imp ? impBloco(imp) : ''}
+    ${pode && trs ? trsBloco(trs, area) : ''}
     ${pode && form ? `<form id="fd" class="form-reserva" novalidate><h4 style="margin-top:0">${ed ? 'Editar documento' : 'Cadastrar documento'}</h4>
       <div class="form-row"><label for="d-t">Título *</label><input id="d-t" maxlength="140" value="${esc(ed ? ed.titulo : '')}"></div>
       <div class="form-row"><label for="d-d">Data *</label><input id="d-d" type="date" value="${esc(ed ? ed.data : hoje())}"></div>
@@ -361,10 +412,11 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
         const ext = (d.link && /^https?:\/\//i.test(d.link) ? `<a class="btn-visit" href="${esc(d.link)}" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i> Abrir link</a>` : '')
           + (d.videos || []).filter(v => /^https:\/\//i.test(v.url || '')).map(v => ` <a class="btn-visit" href="${esc(v.url)}" target="_blank" rel="noopener"><i class="fab fa-youtube"></i> ${esc(v.titulo || 'Vídeo')}</a>`).join('')
           + (d.anexos || []).filter(a => H.safeUrl(a.arquivo || '')).map(a => ` <a class="btn-visit" href="${esc(a.arquivo)}" download="${esc(a.nome || 'anexo')}"><i class="fas fa-paperclip"></i> ${esc(a.rotulo || a.nome || 'Anexo')}</a>`).join('');
-        return `<div class="doc-item"><div class="doc-data">${fmtData(d.data)}</div><div class="doc-corpo" id="doc-${esc(d.id)}">${d.codigo ? `<span class="badge-status" style="background:#1d4a7a;color:#fff" title="Código da ata">${esc(d.codigo)}</span> ` : ''}<strong>${esc(d.titulo)}</strong> <span class="badge-status badge-uso">${esc(d.categoria)}</span>${d.descricao ? `<p>${esc(d.descricao)}</p>` : ''}${area.id === 'atas' && (d.enc || []).length ? `<ul class="enc-lista" style="margin:6px 0 6px 18px">${d.enc.map(e => encItem(d, e)).join('')}</ul>` : ''}<span class="acoes">${link}${ext}${!link && !ext ? '<small class="vazio">Sem arquivo anexado</small>' : ''}${pode ? ` <button class="icon-btn" data-ed="${d.id}" aria-label="Editar ${esc(d.titulo)}"><i class="fas fa-edit" style="color:var(--accent-color)"></i></button><button class="icon-btn" data-del="${d.id}" aria-label="Excluir ${esc(d.titulo)}"><i class="fas fa-trash"></i></button>` : ''}</span></div></div>`;
+        return `<div class="doc-item"><div class="doc-data">${fmtData(d.data)}</div><div class="doc-corpo" id="doc-${esc(d.id)}">${d.codigo ? `<span class="badge-status" style="background:#1d4a7a;color:#fff" title="Código da ata">${esc(d.codigo)}</span> ` : ''}<strong>${esc(d.titulo)}</strong> <span class="badge-status badge-uso">${esc(d.categoria)}</span>${d.descricao ? `<p>${esc(d.descricao)}</p>` : ''}${area.id === 'atas' && (d.enc || []).length ? `<ul class="enc-lista" style="margin:6px 0 6px 18px">${d.enc.map(e => encItem(d, e)).join('')}</ul>` : ''}${d.transcricao ? `<details style="margin:6px 0"><summary><i class="fas fa-closed-captioning" aria-hidden="true"></i> Ler a transcrição da reunião</summary><pre style="white-space:pre-wrap;max-height:360px;overflow:auto;background:#fff;border:1px solid #dfe6ec;padding:10px;border-radius:8px;font-family:inherit">${esc(d.transcricao)}</pre><button type="button" class="btn-visit" data-trb="${esc(d.id)}"><i class="fas fa-download"></i> Baixar a transcrição (.txt)</button></details>` : ''}<span class="acoes">${link}${ext}${!link && !ext && !d.transcricao ? '<small class="vazio">Sem arquivo anexado</small>' : ''}${pode ? ` <button class="icon-btn" data-ed="${d.id}" aria-label="Editar ${esc(d.titulo)}"><i class="fas fa-edit" style="color:var(--accent-color)"></i></button><button class="icon-btn" data-del="${d.id}" aria-label="Excluir ${esc(d.titulo)}"><i class="fas fa-trash"></i></button>` : ''}</span></div></div>`;
       }).join('')).join('') : `<p class="vazio">${todos.length ? 'Nenhum documento com esses filtros.' : 'Nenhum documento cadastrado ainda.'}</p>`;
       el.querySelectorAll('[data-es]').forEach(x => x.onchange = () => { if (!pode) return; const [di, ei] = x.dataset.es.split('|'), l = docs(), d = l.find(y => y.id === di), e = d && (d.enc || []).find(y => y.id === ei); if (!e) return; e.status = x.value; db.set('docs', l); msg = 'Situação do encaminhamento atualizada.'; draw(); });
       el.querySelectorAll('[data-ed]').forEach(b => b.onclick = () => { form = b.dataset.ed; msg = ''; draw(); window.scrollTo(0, 0); });
+      el.querySelectorAll('[data-trb]').forEach(b => b.onclick = () => { const d = docs().find(x => x.id === b.dataset.trb); if (!d) return; const u = URL.createObjectURL(new Blob([d.titulo + '\n' + fmtData(d.data) + '\n\n' + d.transcricao], { type: 'text/plain;charset=utf-8' })), a = document.createElement('a'); a.href = u; a.download = 'transcricao-' + d.data + '.txt'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 1000); });
       el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if (!pode || !confirm('Excluir este documento?')) return; db.set('docs', docs().filter(d => d.id !== b.dataset.del)); msg = 'Documento excluído.'; draw(); });
     };
     $('#l-a', el).onchange = e => { F.ano = e.target.value; lista(); }; $('#l-c', el).onchange = e => { F.cat = e.target.value; lista(); }; $('#l-q', el).oninput = e => { F.q = e.target.value.trim(); lista(); }; const lab = $('#l-ab', el); if (lab) lab.onchange = () => { F.aberto = lab.checked; lista(); };
@@ -372,6 +424,24 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
     const nv = $('#d-novo', el); if (nv) nv.onclick = () => { form = 'novo'; msg = ''; draw(); };
     const fi = $('#d-imp', el); if (fi) fi.onchange = () => { const f = fi.files[0]; if (!f) return; const rd = new FileReader();
       rd.onload = () => { const v = validaPacote(rd.result); if (typeof v === 'string') { msg = v; draw(); return; } imp = v; msg = ''; draw(); window.scrollTo(0, 0); }; rd.readAsText(f); };
+    const ft = $('#d-trs', el); if (ft) ft.onchange = () => { const f = ft.files[0]; if (!f) return; if (f.size > 3e6) { msg = 'Arquivo grande demais para uma transcrição (máximo 3 MB).'; draw(); return; } const rd = new FileReader();
+      rd.onload = () => { const r = lerTranscricao(rd.result, f.name); if (!r.falas.length) { msg = 'Não encontrei texto de transcrição neste arquivo. Use o .vtt do Zoom ou a legenda (.vtt/.srt) baixada do YouTube Studio.'; draw(); return; }
+        const dt = r.data || hoje(); trs = Object.assign(r, { arquivo: f.name.slice(0, 120), titulo: 'Reunião de ' + fmtData(dt), video: '' }); msg = ''; draw(); const bx = $('#trs-box', el); if (bx) bx.scrollIntoView({ block: 'start' }); }; rd.readAsText(f); };
+    if (trs) {
+      $('#tr-x', el).onclick = () => { trs = null; draw(); };
+      $('#tr-ok', el).onclick = () => {
+        const er = $('#tr-er', el), falha = m => { er.textContent = m; er.hidden = false; }, t = $('#tr-t', el).value.trim(), dt = $('#tr-d', el).value, cat = $('#tr-c', el).value, v = $('#tr-v', el).value.trim();
+        if (!t) return falha('Escreva o título da ata.'); if (!okData(dt)) return falha('Informe a data da reunião.'); if (v && !/^https:\/\//i.test(v)) return falha('O link do vídeo precisa começar com https://');
+        const l = docs(), id = uid(), r = trs, dur = r.duracao ? ` · ${hhmm(r.duracao)}` : '';
+        const d = { id, area: 'atas', titulo: t, data: dt, ano: +dt.slice(0, 4), categoria: cat, codigo: '', arquivo: '', arqNome: '', link: '',
+          descricao: `Rascunho a partir da transcrição automática (${r.origem}${dur}${r.participantes.length ? ' · ' + r.participantes.length + ' participante(s) com fala' : ''}). Falta revisar, resumir e registrar os encaminhamentos.`.slice(0, 400),
+          videos: v ? [{ titulo: 'Vídeo da reunião', url: v }] : [], anexos: [], enc: [], participantes: r.participantes.slice(0, 200),
+          transcricao: r.texto.slice(0, 400000), transcricaoOrigem: r.origem + ' · ' + r.arquivo, origem: 'transcricao', criado: hoje(), por: me.nome };
+        if (cat === 'Reunião de Escola') d.codigo = sugereCodigo(l, d);
+        l.push(d); if (!db.set('docs', l)) return falha('Não foi possível salvar (espaço cheio?).');
+        trs = null; form = id; msg = 'Ata criada a partir da transcrição. Agora escreva o resumo e os encaminhamentos e salve.'; draw(); window.scrollTo(0, 0);
+      };
+    }
     if (imp) { $('#imp-x', el).onclick = () => { imp = null; draw(); }; $('#imp-ok', el).onclick = () => { msg = importa(imp); imp = null; draw(); }; }
     if (!form || !pode) return;
     $('#d-x', el).onclick = () => { form = null; draw(); };
@@ -396,7 +466,7 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
         try { arquivo = await lerArq(file); } catch (x) { return falha('Não foi possível ler o arquivo.'); }
         if (!H.safeUrl(arquivo)) return falha('Tipo de arquivo não aceito.'); arqNome = file.name;
       }
-      if (!arquivo && !link) return falha('Anexe o arquivo ou informe o link.');
+      if (!arquivo && !link && !(ed && (ed.transcricao || (ed.videos || []).length || (ed.anexos || []).length))) return falha('Anexe o arquivo ou informe o link.');
       let enc = null, al = null, novasAt = 0;
       if (area.id === 'atas') {
         enc = []; al = ativs(); const antes = (ed && ed.enc) || [];

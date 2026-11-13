@@ -2395,5 +2395,14 @@
 "já aparecem no Álbum da área aberta": "ya aparecen en el Álbum del área abierta",
 "Legenda (opcional, vale para todas do lote)": "Leyenda (opcional, vale para todas las del lote)",
 "Mostrar o nome do autor na área aberta?": "¿Mostrar el nombre del autor en el área abierta?",
-"Nome de quem fotografou (se for uma pessoa só)": "Nombre de quien fotografió (si es una sola persona)"
+"Nome de quem fotografou (se for uma pessoa só)": "Nombre de quien fotografió (si es una sola persona)",
+"Ata a partir da transcrição": "Acta a partir de la transcripción",
+"Ata a partir da transcrição: conferir": "Acta a partir de la transcripción: revisar",
+"Título da ata *": "Título del acta *",
+"Data da reunião *": "Fecha de la reunión *",
+"Link do vídeo no YouTube (opcional)": "Enlace del video en YouTube (opcional)",
+"Criar a ata com esta transcrição": "Crear el acta con esta transcripción",
+"Ler a transcrição da reunião": "Leer la transcripción de la reunión",
+"Baixar a transcrição (.txt)": "Descargar la transcripción (.txt)",
+"A ata é criada com a transcrição completa guardada nela. Em seguida abre a edição, para você escrever o resumo e os encaminhamentos.": "El acta se crea con la transcripción completa guardada en ella. Luego se abre la edición para escribir el resumen y los encaminamientos."
 });})();
