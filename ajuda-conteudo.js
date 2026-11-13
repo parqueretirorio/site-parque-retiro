@@ -278,7 +278,7 @@ window.PR_AJUDA_CONTEUDO = {
    "categoria": "navegacao",
    "ordem": 1,
    "titulo": "O menu do site e onde encontrar cada assunto",
-   "resumo": "Guia do menu do topo: O Parque, Reservas, Silo, Centro de Estudo, Ajude o Parque, Parques no Mundo e Blogger.",
+   "resumo": "Guia do menu do topo: O Parque, Reservas, Silo, Centro de Estudo, Ajude o Parque, Parques no Mundo e Notícias.",
    "publico": "todos",
    "status": "publicado",
    "palavras": [
@@ -299,7 +299,7 @@ window.PR_AJUDA_CONTEUDO = {
      "**Silo**: Mensagem de Silo, Comunidades da Mensagem e Organismos do Movimento.",
      "**Centro de Estudo**: Escola (e Nivelação), Biblioteca do Parque, Produções de Escola, Livros, Áudios e App, e Ofícios.",
      "**Ajude o Parque**: Doação, Pagar online, Livraria, Lojinha, Rifa Solidária, Vaquinha Coletiva, Voluntário e Comissões.",
-     "**Parques no Mundo** e **Blogger** completam o menu. No rodapé ficam as redes sociais e o cadastro no Comunicado por e-mail."
+     "**Parques no Mundo** e **Notícias** (Blog e CONecta Retiro, com as novidades da plataforma a cada semana) completam o menu. No rodapé ficam as redes sociais e o cadastro no Comunicado por e-mail."
     ],
     "exemplos": [],
     "cuidados": [
@@ -3548,7 +3548,15 @@ window.PR_AJUDA_CONTEUDO = {
   ],
   "menu.blogger": [
    "Blog",
-   "Publicações e notícias do Parque no blog."
+   "Matérias selecionadas sobre paz e não violência (dentro de Notícias)."
+  ],
+  "menu.noticias": [
+   "Notícias",
+   "Novidades do Parque: o Blog e o CONecta Retiro, com o que muda na plataforma a cada semana."
+  ],
+  "menu.noticias-conecta": [
+   "CONecta Retiro",
+   "O que mudou na plataforma do Parque nesta semana; as semanas anteriores ficam na lista ao lado, pela data."
   ],
   "menu.movimento-humanista": [
    "Movimento Humanista",

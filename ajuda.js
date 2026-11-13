@@ -392,11 +392,12 @@ function criaUI() {
     '<i class="fas fa-question" aria-hidden="true"></i><span class="pr-aj-botao-tx">Ajuda</span>');
   const vivo = mk('div', { class: 'pr-aj-ui pr-aj-sr', 'aria-live': 'polite' });
   document.body.append(tip, fundo, card, painel, faixa, vivo);
-  // Posição: item do menu principal, logo à esquerda de "Blogger" (ou no fim do menu, se a página não tiver o item).
+  // Posição: item do menu principal, logo à esquerda de "Notícias" (antes, "Blogger") (ou no fim do menu, se a página não tiver o item).
   // Sem menu (páginas sem cabeçalho), continua flutuante no canto inferior esquerdo.
   const menu = document.querySelector('body > header nav');
   if (menu) {
-    const blog = menu.querySelector(':scope > a[href="blogger.html"]');
+    const not = menu.querySelector(':scope > .nav-dropdown > a[href="noticias.html"]');
+    const blog = not ? not.parentElement : menu.querySelector(':scope > a[href="blogger.html"]'); // "Notícias" (com Blog e CONecta Retiro) ocupa o lugar do antigo "Blog"
     // Item de menu comum: sem o "?" e sem a classe do botão flutuante, para valerem as mesmas regras de fonte, cor e espaço dos demais itens
     botao.className = 'pr-aj-ui no-menu'; const ic = botao.querySelector('i'); if (ic) ic.remove(); botao.querySelector('span').className = '';
     if (/(^|\/)ajuda\.html$/.test(location.pathname)) { botao.classList.add('active'); botao.setAttribute('aria-current', 'page'); }

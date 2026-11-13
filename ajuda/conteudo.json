@@ -273,7 +273,7 @@
    "categoria": "navegacao",
    "ordem": 1,
    "titulo": "O menu do site e onde encontrar cada assunto",
-   "resumo": "Guia do menu do topo: O Parque, Reservas, Silo, Centro de Estudo, Ajude o Parque, Parques no Mundo e Blogger.",
+   "resumo": "Guia do menu do topo: O Parque, Reservas, Silo, Centro de Estudo, Ajude o Parque, Parques no Mundo e Notícias.",
    "publico": "todos",
    "status": "publicado",
    "palavras": [
@@ -294,7 +294,7 @@
      "**Silo**: Mensagem de Silo, Comunidades da Mensagem e Organismos do Movimento.",
      "**Centro de Estudo**: Escola (e Nivelação), Biblioteca do Parque, Produções de Escola, Livros, Áudios e App, e Ofícios.",
      "**Ajude o Parque**: Doação, Pagar online, Livraria, Lojinha, Rifa Solidária, Vaquinha Coletiva, Voluntário e Comissões.",
-     "**Parques no Mundo** e **Blogger** completam o menu. No rodapé ficam as redes sociais e o cadastro no Comunicado por e-mail."
+     "**Parques no Mundo** e **Notícias** (Blog e CONecta Retiro, com as novidades da plataforma a cada semana) completam o menu. No rodapé ficam as redes sociais e o cadastro no Comunicado por e-mail."
     ],
     "exemplos": [],
     "cuidados": [
@@ -3677,7 +3677,7 @@
   {
    "id": "menu.blogger",
    "titulo": "Blog",
-   "texto": "Publicações e notícias do Parque no blog.",
+   "texto": "Matérias selecionadas sobre paz e não violência (dentro de Notícias).",
    "artigo": null
   },
   {
@@ -3822,6 +3822,18 @@
    "id": "menu.nivelamento",
    "titulo": "Nivelação",
    "texto": "Material e orientações da Nivelação.",
+   "artigo": null
+  },
+  {
+   "id": "menu.noticias",
+   "titulo": "Notícias",
+   "texto": "Novidades do Parque: o Blog e o CONecta Retiro, com o que muda na plataforma a cada semana.",
+   "artigo": null
+  },
+  {
+   "id": "menu.noticias-conecta",
+   "titulo": "CONecta Retiro",
+   "texto": "O que mudou na plataforma do Parque nesta semana; as semanas anteriores ficam na lista ao lado, pela data.",
    "artigo": null
   },
   {
