@@ -184,3 +184,12 @@ input[type=email], input[type=password], input[type=text], input[type=search] { 
 .lista-b2 li a { color: var(--texto); text-decoration: none; display: block; }
 .atraso { color: var(--alerta); font-weight: 700; }
 .acoes { display: flex; flex-direction: column; gap: 0; }
+
+/* Dar encaminhamento */
+.etq { display: inline-block; font-size: .78em; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: #1d4a7a; color: #fff; margin: 0 4px 4px 0; }
+.etq-alerta { background: #a31d21; }
+.etq-aviso { background: #b8620f; }
+.resumo-b2 { background: #fff8e6; border-radius: 10px; padding: 10px 12px; line-height: 1.6; }
+.resumo-b2 .atraso { color: #a31d21; }
+.cartao-b2 details summary { cursor: pointer; font-weight: 700; color: #1d4a7a; padding: 8px 0; min-height: 44px; display: flex; align-items: center; }
+.cartao-b2 textarea { font: inherit; padding: 10px; border: 1px solid #c8d3dc; border-radius: 8px; }

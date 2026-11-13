@@ -144,7 +144,59 @@ const gerirFixas = (el, H, pode, aoMudar) => {
 
 const MAX_ARQ = 1024 * 1024; // 1 MB por arquivo anexado (o navegador guarda no máximo ~5 MB no total)
 
-window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codigoOk, sugereCodigo, abrir(me, root, H, lugar = 'docs') { // lugar: 'docs' (Documentos e Calendários) ou 'mapa' (Documentação IP)
+// ---------- Dar encaminhamento (usado pela área restrita e pelo app) ----------
+const semRespM = r => !String(r || '').trim() || /^a definir$/i.test(String(r).trim());
+const chaveReuniao = d => { const m = /^(RE-\d{4}\.\d+)/.exec(d.codigo || ''); return m ? m[1] : ''; };
+const nomeReuniao = k => { const m = /^RE-(\d{4})\.(\d+)$/.exec(k); return m ? `${m[2]}ª Reunião de Escola ${m[1]}` : k; };
+const curto = (t, n = 95) => { t = String(t || '').replace(/\s*\(Documento Oficial CONecta Retiro, (?:item|itens) [^)]*\)/, '').replace(/\s*·\s*a verificar/, ''); return t.length > n ? t.slice(0, n - 1) + '…' : t; };
+const fmtBR = iso => iso ? iso.split('-').reverse().join('/') : '';
+// Pendentes de UMA Reunião de Escola (r = 'RE-AAAA.N'; vazio = a mais recente), na ordem: sem responsável, sem data, por prazo.
+const darEncaminhamento = (db, h, r) => {
+  const atas = (db.get('docs', []) || []).filter(d => d.area === 'atas' && chaveReuniao(d)), al = db.get('ativ', []) || [];
+  const reunioes = [...new Set(atas.slice().sort((a, b) => b.data.localeCompare(a.data)).map(chaveReuniao))];
+  if (!r || !reunioes.includes(r)) r = reunioes[0] || '';
+  const dias = iso => iso ? Math.max(0, Math.round((new Date(h + 'T12:00:00') - new Date(iso + 'T12:00:00')) / 864e5)) : 0, lim = addDia(h, 45), itens = [];
+  atas.filter(d => chaveReuniao(d) === r).forEach(d => (d.enc || []).forEach(e => { if (e.status !== 'Em aberto') return;
+    const at = e.ativ ? al.find(a => a.id === e.ativ) : null, data = at ? at.data : e.data || '';
+    itens.push({ d, e, data, semResp: semRespM(e.resp), semData: !data, atraso: !!data && data < h, prox45: !!data && data >= h && data <= lim, parado: dias(e.atualizado || d.data) }); }));
+  itens.sort((x, y) => (y.semResp - x.semResp) || (y.semData - x.semData) || (x.data || '').localeCompare(y.data || '') || (x.d.codigo || '').localeCompare(y.d.codigo || ''));
+  return { r, nome: nomeReuniao(r), reunioes, itens, nR: itens.filter(i => i.semResp).length, nD: itens.filter(i => i.semData).length,
+    atrasados: itens.filter(i => i.atraso), prox: itens.filter(i => i.prox45) };
+};
+// Grava o encaminhamento (quem assume, prazo, próximo passo, situação); prazo novo de item em aberto entra no calendário.
+const salvarEnc = (db, di, ei, v, por, h) => {
+  const l = db.get('docs', []) || [], d = l.find(y => y.id === di), e = d && (d.enc || []).find(y => y.id === ei); if (!e) return null;
+  const al = db.get('ativ', []) || [], at = e.ativ ? al.find(a => a.id === e.ativ) : null; let novoCal = false;
+  e.resp = String(v.resp || '').trim().slice(0, 80) || (semRespM(e.resp) ? e.resp : '');
+  if (v.passo !== undefined) e.passo = String(v.passo || '').trim().slice(0, 160);
+  if (v.status) e.status = v.status;
+  if (v.data !== undefined) e.data = v.data || '';
+  e.atualizado = h; e.atualizadoPor = por;
+  if (at) { if (e.data) at.data = e.data; at.resp = e.resp; }
+  else if (e.data && e.status === 'Em aberto') { const id = 'enc-' + e.id; al.push({ id, titulo: e.texto.slice(0, 120), data: e.data, fim: '', hora: '', categoria: e.tipo || 'Outras atividades', local: '', descricao: `Encaminhamento da ata ${d.codigo || d.titulo}.`, resp: e.resp, criado: h, por, origem: 'ata' }); e.ativ = id; novoCal = true; }
+  if (!db.set('ativ', al) || !db.set('docs', l)) return null;
+  return { d, e, novoCal };
+};
+const msgResumo = (D, link) => {
+  const it = D.itens, L = [`*Dar encaminhamento · ${D.nome}*`, `Ainda temos *${it.length}* encaminhamento(s) em aberto da nossa reunião. Para nada ficar parado nem cair no esquecimento:`];
+  const sr = it.filter(i => i.semResp); if (sr.length) { L.push('', `🙋 *Precisam de alguém que assuma (${sr.length})*`); sr.forEach(i => L.push(`• ${curto(i.e.texto)} [${i.d.codigo}]`)); }
+  const sd = it.filter(i => i.semData && !i.semResp); if (sd.length) { L.push('', `📅 *Precisam de prazo (${sd.length})*`); sd.forEach(i => L.push(`• ${curto(i.e.texto)} – ${i.e.resp}`)); }
+  if (D.atrasados.length) { L.push('', '⚠️ *Em atraso*'); D.atrasados.forEach(i => L.push(`• ${fmtBR(i.data)} · ${curto(i.e.texto)} – ${semRespM(i.e.resp) ? 'sem responsável' : i.e.resp}`)); }
+  const px = D.prox.filter(i => !i.semResp); if (px.length) { L.push('', '⏳ *Próximos prazos*'); px.forEach(i => L.push(`• ${fmtBR(i.data)} · ${curto(i.e.texto)} – ${i.e.resp}`)); }
+  L.push('', `Quem puder assumir ou já tiver novidade, responda aqui ou atualize em Área restrita › Documentos e Calendários › Dar encaminhamento: ${link}`, '', 'Um forte abraço!');
+  return L.join('\n');
+};
+const msgStatus = (D, link) => {
+  const L = [`*Status dos encaminhamentos · ${D.nome}*`, `Hoje são *${D.itens.length}* em aberto: ${D.nR} sem responsável · ${D.nD} sem data · ${D.prox.length} com prazo nos próximos 45 dias${D.atrasados.length ? ` · ${D.atrasados.length} em atraso` : ''}.`, ''];
+  D.itens.forEach((i, n) => {
+    const marcas = [i.semResp ? '🙋 *sem responsável*' : '👤 ' + i.e.resp, i.semData ? '📅 *sem data*' : (i.atraso ? '⚠️ *em atraso* desde ' : '📅 ') + fmtBR(i.data)];
+    if (i.prox45) marcas.push('⏳ próximos 45 dias');
+    L.push(`${n + 1}. ${curto(i.e.texto, 110)} [${i.d.codigo}]`, '   ' + marcas.join(' · ') + (i.e.passo ? `\n   ➡️ Próximo passo: ${i.e.passo}` : ''));
+  });
+  L.push('', `Peço a ajuda de todos que participaram da reunião: quem puder assumir um ponto, dar um prazo ou trazer novidade, responda aqui ou atualize em Área restrita › Documentos e Calendários › Dar encaminhamento: ${link}`, '', 'Um forte abraço!');
+  return L.join('\n');
+};
+window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codigoOk, sugereCodigo, darEncaminhamento, msgResumo, msgStatus, salvarEnc, curto, abrir(me, root, H, lugar = 'docs') { // lugar: 'docs' (Documentos e Calendários) ou 'mapa' (Documentação IP)
   const { db, esc, $, uid, hoje, fmtData, norm } = H;
   const pode = H.tem(me, 'documentos'); // administrador ou Responsável pelos Documentos e Calendários
   const anoHoje = +hoje().slice(0, 4);
@@ -347,7 +399,7 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
   /* ---------- Pendências: todos os encaminhamentos em aberto das atas, com o código da ata de origem ----------
      Sinaliza os que estão sem data e sem responsável ("A definir" conta como sem responsável). */
   const P = { f: '', q: '' };
-  const semResp = r => !String(r || '').trim() || /^a definir$/i.test(String(r).trim());
+  const semResp = semRespM;
   const pendencias = () => {
     const al = ativs(), out = [];
     docs().filter(d => d.area === 'atas').forEach(d => (d.enc || []).forEach(e => {
@@ -387,39 +439,11 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
   /* ---------- Dar encaminhamento: só o que ficou pendente de UMA Reunião de Escola (por padrão a mais recente),
      para nada ficar parado: completar responsável, prazo e próximo passo, e avisar o Grupo de Mestres. ---------- */
   const DE = { r: '', msg: false };
-  const chaveReuniao = d => { const m = /^(RE-\d{4}\.\d+)/.exec(d.codigo || ''); return m ? m[1] : ''; };
-  const nomeReuniao = k => { const m = /^RE-(\d{4})\.(\d+)$/.exec(k); return m ? `${m[2]}ª Reunião de Escola ${m[1]}` : k; };
-  const diasDesde = iso => iso ? Math.max(0, Math.round((new Date(hoje() + 'T12:00:00') - new Date(iso + 'T12:00:00')) / 864e5)) : 0;
-  const curto = (t, n = 95) => { t = String(t || '').replace(/\s*\(Documento Oficial CONecta Retiro, (?:item|itens) [^)]*\)/, '').replace(/\s*·\s*a verificar/, ''); return t.length > n ? t.slice(0, n - 1) + '…' : t; };
   const encArea = el => {
-    const atas = docs().filter(d => d.area === 'atas' && chaveReuniao(d)), al = ativs();
-    const reunioes = [...new Set(atas.slice().sort((a, b) => b.data.localeCompare(a.data)).map(chaveReuniao))];
-    if (!DE.r || !reunioes.includes(DE.r)) DE.r = reunioes[0] || '';
-    const itens = [];
-    atas.filter(d => chaveReuniao(d) === DE.r).forEach(d => (d.enc || []).forEach(e => { if (e.status !== 'Em aberto') return;
-      const at = e.ativ ? al.find(a => a.id === e.ativ) : null, data = at ? at.data : e.data || '';
-      itens.push({ d, e, data, semResp: semResp(e.resp), semData: !data, parado: diasDesde(e.atualizado || d.data) }); }));
-    itens.sort((x, y) => (y.semResp - x.semResp) || (y.semData - x.semData) || (x.data || '').localeCompare(y.data || '') || (x.d.codigo || '').localeCompare(y.d.codigo || ''));
-    const nR = itens.filter(i => i.semResp).length, nD = itens.filter(i => i.semData).length, prox = itens.filter(i => i.data && !i.semResp && i.data <= addDia(hoje(), 45));
+    const D = darEncaminhamento(db, hoje(), DE.r); DE.r = D.r;
+    const { reunioes, itens, nR, nD, prox } = D;
     const link = new URL('.', document.baseURI).href + 'area-restrita.html';
-    const mensagem = () => {
-      const L = [`*Dar encaminhamento · ${nomeReuniao(DE.r)}*`, `Ainda temos *${itens.length}* encaminhamento(s) em aberto da nossa reunião. Para nada ficar parado nem cair no esquecimento:`];
-      const sr = itens.filter(i => i.semResp); if (sr.length) { L.push('', `🙋 *Precisam de alguém que assuma (${sr.length})*`); sr.forEach(i => L.push(`• ${curto(i.e.texto)} [${i.d.codigo}]`)); }
-      const sd = itens.filter(i => i.semData && !i.semResp); if (sd.length) { L.push('', `📅 *Precisam de prazo (${sd.length})*`); sd.forEach(i => L.push(`• ${curto(i.e.texto)} – ${i.e.resp}`)); }
-      if (prox.length) { L.push('', '⏳ *Próximos prazos*'); prox.forEach(i => L.push(`• ${fmtData(i.data)} · ${curto(i.e.texto)} – ${i.e.resp}`)); }
-      L.push('', `Quem puder assumir ou já tiver novidade, responda aqui ou atualize em Área restrita › Documentos e Calendários › Dar encaminhamento: ${link}`, '', 'Um forte abraço!');
-      return L.join('\n');
-    };
-    const mensagemStatus = () => {
-      const L = [`*Status dos encaminhamentos · ${nomeReuniao(DE.r)}*`, `Hoje são *${itens.length}* em aberto: ${nR} sem responsável · ${nD} sem data · ${prox.length} com prazo nos próximos 45 dias.`, ''];
-      itens.forEach((i, n) => {
-        const marcas = [i.semResp ? '🙋 *sem responsável*' : '👤 ' + i.e.resp, i.semData ? '📅 *sem data*' : (i.data < hoje() ? '⚠️ *em atraso* desde ' : '📅 ') + fmtData(i.data)];
-        if (i.data && !i.semResp && i.data >= hoje() && i.data <= addDia(hoje(), 45)) marcas.push('⏳ próximos 45 dias');
-        L.push(`${n + 1}. ${curto(i.e.texto, 110)} [${i.d.codigo}]`, '   ' + marcas.join(' · ') + (i.e.passo ? `\n   ➡️ Próximo passo: ${i.e.passo}` : ''));
-      });
-      L.push('', `Peço a ajuda de todos que participaram da reunião: quem puder assumir um ponto, dar um prazo ou trazer novidade, responda aqui ou atualize em Área restrita › Documentos e Calendários › Dar encaminhamento: ${link}`, '', 'Um forte abraço!');
-      return L.join('\n');
-    };
+    const mensagem = () => msgResumo(D, link), mensagemStatus = () => msgStatus(D, link);
     const caixaMsg = (titulo, texto) => `<section class="tip-box" style="display:block"><h4 style="margin-top:0"><i class="fab fa-whatsapp"></i> ${esc(titulo)}</h4><p><small>Confira, ajuste se quiser e envie. Nada é enviado sozinho.</small></p>
       <textarea id="de-txt" rows="16" style="width:100%;font-family:inherit">${esc(texto)}</textarea>
       <p><button type="button" class="btn-visit" id="de-cp"><i class="fas fa-copy"></i> Copiar</button> <a class="btn-visit" id="de-wa" href="#" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> Abrir no WhatsApp</a> <button type="button" class="btn-visit" id="de-fx" style="background:#6c7a7b">Fechar</button></p></section>`;
@@ -459,14 +483,9 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
     }
     el.querySelectorAll('[data-de-ok]').forEach(b => b.onclick = () => {
       if (!pode) return; const box = b.closest('[data-de]'), [di, ei] = box.dataset.de.split('|'), v = k => box.querySelector(`[data-k="${k}"]`).value.trim();
-      const l = docs(), d = l.find(y => y.id === di), e = d && (d.enc || []).find(y => y.id === ei); if (!e) return;
-      const al2 = ativs(), at = e.ativ ? al2.find(a => a.id === e.ativ) : null;
-      e.resp = v('resp') || (semResp(e.resp) ? e.resp : ''); e.passo = v('passo'); e.status = v('status'); e.atualizado = hoje(); e.atualizadoPor = me.nome;
-      const nd = v('data'); e.data = nd;
-      if (at) { if (nd) at.data = nd; at.resp = e.resp; }
-      else if (nd && e.status === 'Em aberto') { const id = 'enc-' + e.id; al2.push({ id, titulo: e.texto.slice(0, 120), data: nd, fim: '', hora: '', categoria: e.tipo || 'Outras atividades', local: '', descricao: `Encaminhamento da ata ${d.codigo || d.titulo}.`, resp: e.resp, criado: hoje(), por: me.nome, origem: 'ata' }); e.ativ = id; }
-      if (!db.set('ativ', al2) || !db.set('docs', l)) { msg = 'Não foi possível salvar.'; draw(); return; }
-      msg = e.status === 'Em aberto' ? `Encaminhamento atualizado${nd && !at ? ' e colocado no calendário' : ''}: "${curto(e.texto, 60)}".` : `"${curto(e.texto, 60)}" marcado como ${e.status}.`; draw();
+      const r = salvarEnc(db, di, ei, { resp: v('resp'), data: v('data'), passo: v('passo'), status: v('status') }, me.nome, hoje());
+      if (!r) { msg = 'Não foi possível salvar.'; draw(); return; }
+      msg = r.e.status === 'Em aberto' ? `Encaminhamento atualizado${r.novoCal ? ' e colocado no calendário' : ''}: "${curto(r.e.texto, 60)}".` : `"${curto(r.e.texto, 60)}" marcado como ${r.e.status}.`; draw();
     });
   };
 

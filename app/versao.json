@@ -1,8 +1,8 @@
 {
-  "versao": "1.5.0",
+  "versao": "1.6.0",
   "data": "2026-11-13",
   "novidades": [
-    "Todas as ferramentas da área restrita abrem dentro do app, com a barra do app no topo",
-    "Telas ajustadas ao celular: abas que deslizam para o lado, campos e botões maiores, tabelas sem estourar a tela"
+    "Nova tela Dar encaminhamento (em Documentos e Calendários e no início): pendentes da última Reunião de Escola, com quem assume, prazo e próximo passo",
+    "Mensagens prontas para o Grupo de Mestres: resumo e status de cada ponto, para copiar ou abrir no WhatsApp"
   ]
 }
