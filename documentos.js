@@ -328,26 +328,42 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
     return p;
   };
   // Gravações na nuvem do Zoom (função zoom no Supabase): criar ata pela transcrição e apagar da nuvem
-  const ZM = { aberto: false, ate: '', lista: null, erro: '', carregando: false };
+  const ZM = { aberto: false, ate: '', lista: null, erro: '', carregando: false, ano: false, prog: 0 };
+  const ZM_JANELAS = 13;
   const zoomBloco = () => {
-    const ate = ZM.ate || hoje(), de = addDia(ate, -30), mb = b => (b / 1048576).toLocaleString('pt-BR', { maximumFractionDigits: b < 10485760 ? 1 : 0 });
-    const tot = (ZM.lista || []).reduce((n, m) => n + (m.tamanho || 0), 0);
+    const ate = ZM.ano ? hoje() : (ZM.ate || hoje()), de = addDia(ate, ZM.ano ? -30 * ZM_JANELAS : -30), mb = b => (b / 1048576).toLocaleString('pt-BR', { maximumFractionDigits: b < 10485760 ? 1 : 0 });
+    const tot = (ZM.lista || []).reduce((n, m) => n + (m.tamanho || 0), 0), gb = (tot / 1073741824).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
     return `<section class="tip-box" style="display:block" id="zm-box"><h4 style="margin-top:0"><i class="fas fa-video"></i> Gravações na nuvem do Zoom</h4>
-      <p><small>De ${fmtData(de)} a ${fmtData(ate)}. ${ZM.lista ? `${ZM.lista.length} gravação(ões), ocupando ${mb(tot)} MB dos 10 GB da nuvem.` : ''}</small></p>
-      ${ZM.carregando ? '<p>Buscando no Zoom…</p>' : ZM.erro ? `<p class="form-erro" role="alert">${esc(ZM.erro)}</p>` : ZM.lista && !ZM.lista.length ? '<p class="vazio">Nenhuma gravação neste período.</p>' : ZM.lista ? `<div style="overflow-x:auto"><table class="doc-table"><thead><tr><th>Data</th><th>Reunião</th><th>Duração</th><th>Tamanho</th><th></th></tr></thead><tbody>${ZM.lista.map((m, i) => `<tr>
+      <p><small>${ZM.ano ? 'Últimos 12 meses' : 'Período'}: de ${fmtData(de)} a ${fmtData(ate)}. ${ZM.lista ? (ZM.ano ? `<b>${ZM.lista.length} gravação(ões), ocupando ${tot >= 1073741824 ? gb + ' GB' : mb(tot) + ' MB'} dos 10 GB da nuvem.</b> Da maior para a menor: apagar as do topo libera mais espaço.` : `${ZM.lista.length} gravação(ões) neste período, ocupando ${mb(tot)} MB.`) : ''}</small></p>
+      ${ZM.carregando ? `<p>Buscando no Zoom…${ZM.ano ? ` (${ZM.prog} de ${ZM_JANELAS} meses)` : ''}</p>` : ZM.erro ? `<p class="form-erro" role="alert">${esc(ZM.erro)}</p>` : ZM.lista && !ZM.lista.length ? '<p class="vazio">Nenhuma gravação neste período.</p>' : ZM.lista ? `<div style="overflow-x:auto"><table class="doc-table"><thead><tr><th>Data</th><th>Reunião</th><th>Duração</th><th>Tamanho</th><th></th></tr></thead><tbody>${ZM.lista.map((m, i) => `<tr>
         <td>${esc(fmtData(isoBR(m.inicio)))}<br><small>${esc(horaBR(m.inicio))}</small></td><td>${esc(m.topico || 'Reunião')}${m.transcricao ? ' <span class="badge-status" style="background:#2e7d32;color:#fff">com transcrição</span>' : ' <span class="badge-status badge-uso">sem transcrição</span>'}</td>
         <td>${m.duracao || 0} min</td><td>${mb(m.tamanho || 0)} MB</td>
         <td style="white-space:nowrap">${m.transcricao ? `<button type="button" class="btn-visit" data-zma="${i}"><i class="fas fa-file-alt"></i> Criar ata</button> ` : ''}${m.link ? `<a class="btn-visit" href="${esc(m.link)}" target="_blank" rel="noopener" style="background:#6c7a7b">Ver/baixar no Zoom</a> ` : ''}<button type="button" class="icon-btn" data-zmx="${i}" title="Apagar de vez da nuvem do Zoom" aria-label="Apagar do Zoom: ${esc(m.topico || '')}"><i class="fas fa-trash"></i></button></td></tr>`).join('')}</tbody></table></div>` : ''}
-      <p><button type="button" class="btn-visit" id="zm-ant"><i class="fas fa-chevron-left"></i> 30 dias antes</button>${ZM.ate ? ' <button type="button" class="btn-visit" id="zm-dep">30 dias depois <i class="fas fa-chevron-right"></i></button>' : ''} <button type="button" class="btn-visit" id="zm-x" style="background:#6c7a7b">Fechar</button></p>
+      <p>${ZM.ano ? '<button type="button" class="btn-visit" id="zm-mes"><i class="fas fa-calendar-alt"></i> Ver por período de 30 dias</button>' : `<button type="button" class="btn-visit" id="zm-ano"><i class="fas fa-search"></i> Buscar os últimos 12 meses</button> <button type="button" class="btn-visit" id="zm-ant"><i class="fas fa-chevron-left"></i> 30 dias antes</button>${ZM.ate ? ' <button type="button" class="btn-visit" id="zm-dep">30 dias depois <i class="fas fa-chevron-right"></i></button>' : ''}`} <button type="button" class="btn-visit" id="zm-x" style="background:#6c7a7b">Fechar</button></p>
       <p><small>Antes de apagar: se o vídeo for importante, baixe ou publique no YouTube (não listado). Apagar libera o espaço na hora e não tem volta.</small></p></section>`;
   };
   const isoBR = z => { const d = new Date(z); return isNaN(d) ? '' : new Date(d.getTime() - 3 * 3600e3).toISOString().slice(0, 10); };
   const horaBR = z => { const d = new Date(z); return isNaN(d) ? '' : new Date(d.getTime() - 3 * 3600e3).toISOString().slice(11, 16); };
-  const carregaZoom = () => { ZM.carregando = true; ZM.erro = ''; draw();
+  const erroZoom = r => r.status === 503 ? 'A ligação com o Zoom ainda não foi configurada no Supabase (função zoom e os códigos ZOOM_*).' : (r.corpo && r.corpo.erro) || 'Não foi possível falar com o Zoom (' + r.status + ').';
+  const carregaAno = async () => { ZM.carregando = true; ZM.erro = ''; ZM.prog = 0; draw();
+    const vistos = new Map(); let falha = null;
+    for (let i = 0; i < ZM_JANELAS && !falha; i += 3) {
+      const lote = [];
+      for (let j = i; j < Math.min(i + 3, ZM_JANELAS); j++) { const ate = addDia(hoje(), -30 * j);
+        lote.push(PR_SUPABASE.funcao('zoom', { acao: 'gravacoes', de: addDia(ate, -30), ate })); }
+      for (const r of await Promise.all(lote)) {
+        if (r.status === 200 && r.corpo) (r.corpo.reunioes || []).forEach(m => vistos.set(m.uuid || m.inicio + m.topico, m));
+        else falha = falha || r; }
+      ZM.prog = Math.min(i + 3, ZM_JANELAS); if (ZM.carregando) draw(); }
+    ZM.carregando = false;
+    if (falha) { ZM.lista = null; ZM.erro = erroZoom(falha); }
+    else ZM.lista = [...vistos.values()].sort((a, b) => (b.tamanho || 0) - (a.tamanho || 0));
+    draw(); };
+  const carregaZoom = () => { if (ZM.ano) return carregaAno(); ZM.carregando = true; ZM.erro = ''; draw();
     const ate = ZM.ate || hoje();
     PR_SUPABASE.funcao('zoom', { acao: 'gravacoes', de: addDia(ate, -30), ate }).then(r => { ZM.carregando = false;
       if (r.status === 200 && r.corpo) ZM.lista = (r.corpo.reunioes || []).sort((a, b) => String(b.inicio).localeCompare(String(a.inicio)));
-      else { ZM.lista = null; ZM.erro = r.status === 503 ? 'A ligação com o Zoom ainda não foi configurada no Supabase (função zoom e os códigos ZOOM_*).' : (r.corpo && r.corpo.erro) || 'Não foi possível falar com o Zoom (' + r.status + ').'; }
+      else { ZM.lista = null; ZM.erro = erroZoom(r); }
       draw(); }); };
   const trsBloco = (r, area) => {
     const cats = catsDe(area), cat = cats.find(c => c !== 'Reunião de Escola') || cats[0]; // Reunião de Escola só quando escolhida (ganha o código RE)
@@ -452,13 +468,15 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
     const ft = $('#d-trs', el); if (ft) ft.onchange = () => { const f = ft.files[0]; if (!f) return; if (f.size > 3e6) { msg = 'Arquivo grande demais para uma transcrição (máximo 3 MB).'; draw(); return; } const rd = new FileReader();
       rd.onload = () => { const r = lerTranscricao(rd.result, f.name); if (!r.falas.length) { msg = 'Não encontrei texto de transcrição neste arquivo. Use o .vtt do Zoom ou a legenda (.vtt/.srt) baixada do YouTube Studio.'; draw(); return; }
         const dt = r.data || hoje(); trs = Object.assign(r, { arquivo: f.name.slice(0, 120), titulo: 'Reunião de ' + fmtData(dt), video: '' }); msg = ''; draw(); const bx = $('#trs-box', el); if (bx) bx.scrollIntoView({ block: 'start' }); }; rd.readAsText(f); };
-    const bz = $('#d-zoom', el); if (bz) bz.onclick = () => { ZM.aberto = true; ZM.ate = ''; carregaZoom(); };
+    const bz = $('#d-zoom', el); if (bz) bz.onclick = () => { ZM.aberto = true; ZM.ate = ''; ZM.ano = false; carregaZoom(); };
     if (ZM.aberto && $('#zm-box', el)) {
       $('#zm-x', el).onclick = () => { ZM.aberto = false; draw(); };
-      $('#zm-ant', el).onclick = () => { ZM.ate = addDia(ZM.ate || hoje(), -30); carregaZoom(); };
+      const za = $('#zm-ano', el); if (za) za.onclick = () => { ZM.ano = true; carregaZoom(); };
+      const zme = $('#zm-mes', el); if (zme) zme.onclick = () => { ZM.ano = false; ZM.ate = ''; carregaZoom(); };
+      const zan = $('#zm-ant', el); if (zan) zan.onclick = () => { ZM.ate = addDia(ZM.ate || hoje(), -30); carregaZoom(); };
       const dp = $('#zm-dep', el); if (dp) dp.onclick = () => { const n = addDia(ZM.ate, 30); ZM.ate = n >= hoje() ? '' : n; carregaZoom(); };
-      el.querySelectorAll('[data-zma]').forEach(b => b.onclick = () => { const m = ZM.lista[+b.dataset.zma], ate = ZM.ate || hoje(); b.disabled = true; b.textContent = 'Buscando…';
-        PR_SUPABASE.funcao('zoom', { acao: 'transcricao', uuid: m.uuid, de: addDia(ate, -30), ate }).then(r => {
+      el.querySelectorAll('[data-zma]').forEach(b => b.onclick = () => { const m = ZM.lista[+b.dataset.zma], dm = isoBR(m.inicio) || hoje(); b.disabled = true; b.textContent = 'Buscando…';
+        PR_SUPABASE.funcao('zoom', { acao: 'transcricao', uuid: m.uuid, de: addDia(dm, -2), ate: addDia(dm, 2) }).then(r => {
           if (r.status !== 200 || !r.corpo) { ZM.erro = (r.corpo && r.corpo.erro) || 'Não foi possível buscar a transcrição (' + r.status + ').'; draw(); return; }
           const x = lerTranscricao(r.corpo.texto, ''), dt = isoBR(m.inicio) || hoje();
           if (!x.falas.length) { ZM.erro = 'A transcrição desta reunião veio vazia.'; draw(); return; }
