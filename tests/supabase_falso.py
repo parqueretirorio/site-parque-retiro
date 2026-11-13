@@ -17,6 +17,12 @@ create table if not exists auth.users (id uuid primary key, email text unique, r
 create or replace function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.uid', true), '')::uuid $$;
 grant usage on schema public, auth to anon, authenticated;
 create extension if not exists pgcrypto;
+create schema if not exists storage;
+create table if not exists storage.buckets (id text primary key, name text, public boolean default false, file_size_limit bigint, allowed_mime_types text[]);
+create table if not exists storage.objects (id uuid primary key default gen_random_uuid(), bucket_id text, name text, owner uuid, metadata jsonb default '{}'::jsonb, created_at timestamptz default now(), unique (bucket_id, name));
+alter table storage.objects enable row level security;
+grant usage on schema storage to anon, authenticated;
+grant select, insert, update, delete on storage.objects to authenticated;
 """
 GRANTS = "grant select, insert, update on all tables in schema public to authenticated; grant usage, select on all sequences in schema public to authenticated;"
 
@@ -63,6 +69,8 @@ class SupabaseFalso:
         self.seq = itertools.count(1)
         self.log = []
         self.enviados = []      # e-mails "enviados" (confirmação, recuperação)
+        self.arquivos = {}      # Storage: 'bucket/caminho' -> {bytes, tipo}
+        self.ultimo_binario = None
 
     # ---------- dados de teste ----------
     def criar_conta(self, email, senha, nome, confirmado=True, nivel=None, status=None, funcoes=None, whatsapp=''):
@@ -91,6 +99,13 @@ class SupabaseFalso:
         req = route.request
         u = urlparse(req.url)
         caminho, q = u.path, parse_qs(u.query)
+        if caminho.startswith('/storage/v1/object/public/'):  # arquivo público (foto do Álbum)
+            chave = caminho[len('/storage/v1/object/public/'):]
+            b = self.arquivos.get(chave)
+            await route.fulfill(status=200 if b else 404, content_type=(b or {}).get('tipo', 'text/plain'), headers={'Access-Control-Allow-Origin': '*'}, body=(b or {}).get('bytes', b'nao encontrado'))
+            return
+        if caminho.startswith('/storage/v1/object/') and req.method == 'POST':
+            self.ultimo_binario = req.post_data_buffer
         corpo = None
         try:
             corpo = json.loads(req.post_data) if req.post_data else None
@@ -105,6 +120,8 @@ class SupabaseFalso:
     def rotear(self, m, caminho, q, corpo, uid, tok):
         if m == 'OPTIONS':
             return 200, None
+        if caminho.startswith('/storage/v1/'):
+            return self.storage(m, caminho[len('/storage/v1/'):], corpo, uid)
         if caminho == '/auth/v1/token' and q.get('grant_type') == ['password']:
             c = self.contas.get(str(corpo.get('email', '')).lower())
             if not c or c['senha'] != corpo.get('password'):
@@ -188,9 +205,36 @@ class SupabaseFalso:
             elif fn == 'pr_ler_publico':
                 nomes = '{' + ','.join('"' + n.replace('"', '') + '"' for n in (corpo or {}).get('p_nomes', [])) + '}'
                 r = psql(f"select pr_ler_publico({lit(nomes)}::text[])", self.db, 'authenticated', uid)
+            elif fn == 'pr_album_uso':
+                r = psql("select pr_album_uso()", self.db, 'authenticated', uid)
             elif fn == 'pr_excluir_colecao':
                 r = psql(f"select pr_excluir_colecao({lit(corpo['p_nome'])}, {int(corpo['p_versao_base'])})", self.db, 'authenticated', uid)
             else:
                 return 404, {'message': 'função desconhecida'}
             return 200, json.loads(r[-1])
         return 404, {'message': 'rota REST desconhecida: ' + rota}
+
+    # ---------- Storage (só o que o Álbum usa); as permissões vêm das políticas reais de storage.objects ----------
+    def storage(self, m, resto, corpo, uid):
+        if m == 'POST' and resto.startswith('object/'):
+            chave = resto[len('object/'):]
+            bucket, nome = chave.split('/', 1)
+            if not uid: return 400, {'error': 'Unauthorized', 'message': 'Invalid JWT'}
+            dados = self.ultimo_binario or b''
+            if len(dados) > 5242880: return 413, {'error': 'Payload too large'}
+            try:
+                psql(f"insert into storage.objects(bucket_id,name,owner,metadata) values ({lit(bucket)},{lit(nome)},'{uid}',{lit({'size': len(dados)})}::jsonb)", self.db, papel='authenticated', uid=uid)
+            except ErroBanco as e:
+                if 'duplicate' in str(e): return 409, {'error': 'Duplicate', 'message': 'The resource already exists'}
+                return 403, {'error': 'Unauthorized', 'message': 'new row violates row-level security policy'}
+            self.arquivos[chave] = {'bytes': dados, 'tipo': 'image/jpeg'}
+            return 200, {'Key': chave}
+        if m == 'DELETE' and resto.startswith('object/'):
+            bucket = resto[len('object/'):].strip('/')
+            nomes = (corpo or {}).get('prefixes', [])
+            apagados = []
+            for n in nomes:
+                r = psql(f"delete from storage.objects where bucket_id={lit(bucket)} and name={lit(n)} returning name", self.db, papel='authenticated', uid=uid)
+                if r: apagados.append({'name': n}); self.arquivos.pop(bucket + '/' + n, None)
+            return 200, apagados
+        return 404, {'error': 'not found'}

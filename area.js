@@ -1065,7 +1065,9 @@ V.estela = (me, root) => {
 
 /* ---------- Álbum Parque Retiro (Responsável pelo Álbum) ---------- */
 const FOTO_ST = { pendente: ['Aguardando curadoria', 'badge-pend'], publicada: ['Publicada na área aberta', 'badge-disponivel'], recusada: ['Não publicada', 'badge-emprestado'] };
-const fotoOk = f => f && /^data:image\//.test(f.foto || '');
+// Foto do Álbum: antiga (base64 dentro da coleção) ou arquivo no Storage do Supabase (envio em lote, 0012_album_storage.sql).
+const fotoOk = f => f && (/^data:image\//.test(f.foto || '') || /^https:\/\/[^/]+\/storage\/v1\/object\/public\/album\//.test(f.foto || ''));
+const miniatura = f => f.thumb && /^https:\/\//.test(f.thumb) ? f.thumb : f.foto;
 const EV_SEED = ['Estacional de Primavera', 'Estacional de Verão', 'Estacional de Outono', 'Estacional de Inverno', 'Reunião de Escola', 'Aniversário Parque'];
 const eventos = () => {
   let l = db.get('eventos', null);
@@ -1081,13 +1083,14 @@ const baixar = f => `<a class="btn-visit" href="${esc(f.foto)}" download="foto-p
 V.album = (me, root) => {
   const cur = tem(me, 'album');
   let sub = 'minhas', filtro = 'pendente', evF = '*', msg = '';
-  const SUB = [['minhas', 'Enviar e minhas fotos'], ['todas', 'Fotos por atividade']].concat(cur ? [['cur', 'Curadoria'], ['evs', 'Atividades']] : []);
+  const SUB = [['minhas', 'Enviar e minhas fotos'], ['todas', 'Fotos por atividade']].concat(cur ? [['lote', 'Enviar em lote'], ['cur', 'Curadoria'], ['evs', 'Atividades']] : []);
   const todas = () => db.get('album', []).filter(fotoOk);
   const evFiltro = () => `<div class="form-row"><label for="a-ev">Atividade</label><select id="a-ev"><option value="*">Todas as atividades</option>${eventos().map(e => `<option value="${e.id}"${evF === e.id ? ' selected' : ''}>${esc(e.nome)}</option>`).join('')}<option value=""${evF === '' ? ' selected' : ''}>Sem evento</option></select></div>`;
   const passa = f => evF === '*' || (f.evento || '') === evF || (evF === '' && !nomeEv(f.evento));
-  const cartao = (f, acoes) => `<figure class="foto-card"><img src="${esc(f.foto)}" alt="${esc(f.legenda || 'Foto enviada por ' + (f.autor || 'autor não informado'))}" loading="lazy"><figcaption>${f.legenda ? `<span>${esc(f.legenda)}</span>` : ''}<small class="ev-nome">${esc(nomeEv(f.evento) || 'Sem evento')}</small>${fotoLinha(f)}<small>Nome do autor na área aberta: <strong>${f.mostrarAutor ? 'Sim' : 'Não'}</strong></small><span class="badge-status ${FOTO_ST[f.status][1]}">${FOTO_ST[f.status][0]}</span><span class="acoes">${acoes}</span></figcaption></figure>`;
+  const cartao = (f, acoes) => `<figure class="foto-card"><img src="${esc(miniatura(f))}" alt="${esc(f.legenda || 'Foto enviada por ' + (f.autor || 'autor não informado'))}" loading="lazy"><figcaption>${f.legenda ? `<span>${esc(f.legenda)}</span>` : ''}<small class="ev-nome">${esc(nomeEv(f.evento) || 'Sem evento')}</small>${fotoLinha(f)}<small>Nome do autor na área aberta: <strong>${f.mostrarAutor ? 'Sim' : 'Não'}</strong></small><span class="badge-status ${FOTO_ST[f.status][1]}">${FOTO_ST[f.status][0]}</span><span class="acoes">${acoes}</span></figcaption></figure>`;
   const muda = (id, fn) => { const l = db.get('album', []), x = l.find(f => f.id === id); if (x) fn(x); db.set('album', l); draw(); };
-  const exclui = id => { if (confirm('Excluir esta foto?')) { db.set('album', db.get('album', []).filter(f => f.id !== id)); draw(); } };
+  const apagaArquivos = fs => { const cs = fs.flatMap(f => [f.caminho, f.caminhoThumb]).filter(Boolean); if (cs.length && window.PR_SUPABASE && PR_SUPABASE.apagarArquivos) PR_SUPABASE.apagarArquivos('album', cs).catch(() => {}); };
+  const exclui = id => { if (confirm('Excluir esta foto?')) { const l = db.get('album', []); apagaArquivos(l.filter(f => f.id === id)); db.set('album', l.filter(f => f.id !== id)); draw(); } };
   const liga = el => {
     el.querySelectorAll('[data-x]').forEach(b => b.onclick = () => exclui(b.dataset.x));
     const s = $('#a-ev', el); if (s) s.onchange = () => { evF = s.value; draw(); };
@@ -1124,6 +1127,88 @@ V.album = (me, root) => {
       if (!db.set('album', l)) return falha('Sem espaço no navegador. Exclua fotos antigas ou envie menos fotos.');
       msg = `${ok} foto(s) enviada(s). Elas aparecem na área aberta depois da curadoria.`; draw();
     };
+  };
+
+  /* Envio em lote (administrador e Responsável pelo Álbum): muitas fotos de uma vez, direto para o Storage do Supabase.
+     Cada foto é reduzida no navegador (lado maior 1600 px, JPEG) e ganha uma miniatura (480 px); vão 3 por vez,
+     com barra de progresso, pausa e nova tentativa para as que falharem. Na coleção "album" fica só o endereço. */
+  const LOTE_MAX = 1000;
+  const L = window.PR_LOTE_ALBUM || (window.PR_LOTE_ALBUM = { fila: [], feitas: 0, erros: [], rodando: false, pausado: false, dados: null, total: 0, bytes: 0 });
+  const lote = el => {
+    const sb = window.PR_SUPABASE && PR_SUPABASE.ligado && PR_SUPABASE.ligado() && PR_SUPABASE.enviarArquivo;
+    if (!sb) { el.innerHTML = `<h3><i class="fas fa-cloud-upload-alt"></i> Enviar em lote</h3><p class="vazio">O envio em lote guarda as fotos no servidor do Parque (Supabase). Ele só funciona quando a área restrita está ligada ao servidor.</p>`; return; }
+    const pct = L.total ? Math.round((L.feitas + L.erros.length) / L.total * 100) : 0, mb = b => (b / 1048576).toFixed(b < 10485760 ? 1 : 0).replace('.', ',');
+    el.innerHTML = `<h3><i class="fas fa-cloud-upload-alt"></i> Enviar em lote</h3>
+    <p>Para quem cuida do Álbum: envie <strong>até ${LOTE_MAX} fotos de uma vez</strong> (pode escolher uma pasta inteira). Cada foto é reduzida antes de subir (lado maior com 1600 px, boa para tela e para impressão pequena) e ganha uma miniatura. Elas ficam guardadas no <strong>servidor do Parque (Supabase Storage)</strong>, não no seu computador nem no navegador.</p>
+    ${L.rodando ? '' : '<p class="tip-box" role="note" id="lt-uso"><i class="fas fa-hdd" aria-hidden="true"></i> Espaço usado pelo Álbum: calculando…</p>'}
+    ${L.rodando || L.total ? `<section class="tip-box" style="display:block" aria-live="polite"><h4 style="margin-top:0">${L.rodando ? (L.pausado ? 'Pausado' : 'Enviando…') : 'Envio concluído'}</h4>
+      <div style="background:#e8eef3;border-radius:8px;height:18px;overflow:hidden" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><div style="background:#2e7d32;height:100%;width:${pct}%"></div></div>
+      <p><strong id="lt-n">${L.feitas}</strong> de ${L.total} enviada(s)${L.erros.length ? ` · <strong style="color:#a31d21">${L.erros.length} com erro</strong>` : ''} · ${mb(L.bytes)} MB${L.rodando ? '. <strong>Não feche esta página</strong> até terminar.' : ''}</p>
+      ${L.rodando ? `<p><button type="button" class="btn-visit" id="lt-p">${L.pausado ? '<i class="fas fa-play"></i> Continuar' : '<i class="fas fa-pause"></i> Pausar'}</button> <button type="button" class="btn-visit" id="lt-c" style="background:#6c7a7b">Parar o envio</button></p>` : ''}
+      ${!L.rodando && L.erros.length ? `<details><summary>Ver as ${L.erros.length} que falharam</summary><ul>${L.erros.slice(0, 200).map(x => `<li>${esc(x.nome)}: ${esc(x.erro)}</li>`).join('')}</ul></details><p><button type="button" class="btn-visit" id="lt-r"><i class="fas fa-redo"></i> Tentar de novo as que falharam</button></p>` : ''}
+      ${!L.rodando ? `<p><button type="button" class="btn-visit" id="lt-novo"><i class="fas fa-plus"></i> Novo lote</button> <button type="button" class="btn-visit" data-s2="cur"><i class="fas fa-photo-video"></i> Ir para a Curadoria</button></p>` : ''}</section>` : ''}
+    ${!L.rodando && !L.total ? `<form id="fl" class="form-reserva" novalidate>
+      <div class="form-row"><label for="l-f">Fotos (até ${LOTE_MAX} por lote) *</label><input id="l-f" type="file" accept="image/png,image/jpeg,image/webp" multiple>
+        <small>Ou escolha uma pasta inteira: <label for="l-d" style="display:inline;text-decoration:underline;cursor:pointer">escolher pasta</label><input id="l-d" type="file" webkitdirectory multiple hidden></small>
+        <small id="l-q" aria-live="polite"></small></div>
+      <div class="form-row"><label for="l-e">Atividade *</label><select id="l-e">${evOpts('')}<option value="__novo">＋ Criar nova atividade...</option></select></div>
+      <div class="form-row" id="l-nw" hidden><label for="l-n">Nome da nova atividade *</label><input id="l-n" maxlength="80"></div>
+      <div class="form-row"><label for="l-dd">Dia em que as fotos foram tiradas</label><input id="l-dd" type="date" max="${hoje()}"></div>
+      <div class="form-row"><label for="l-a">Autor das fotos</label><input id="l-a" maxlength="80" placeholder="Nome de quem fotografou (se for uma pessoa só)"></div>
+      <div class="form-row"><label for="l-m">Mostrar o nome do autor na área aberta?</label><select id="l-m"><option value="0">Não</option><option value="1">Sim</option></select></div>
+      <div class="form-row"><label for="l-l">Legenda (opcional, vale para todas do lote)</label><input id="l-l" maxlength="120"></div>
+      <div class="form-row"><label for="l-s">Depois de enviar, as fotos…</label><select id="l-s"><option value="pendente">ficam na Curadoria, para escolher quais publicar</option><option value="publicada">já aparecem no Álbum da área aberta</option></select></div>
+      <p class="form-erro" id="l-er" role="alert" hidden></p>
+      <button class="btn-visit btn-large"><i class="fas fa-cloud-upload-alt"></i> Enviar o lote</button></form>` : ''}`;
+    // espaço usado
+    if (!L.rodando) PR_SUPABASE.rpc('pr_album_uso').then(r => { const u = $('#lt-uso', el); if (!u) return; if (r.status === 200 && r.corpo) { const usado = +r.corpo.bytes || 0; u.innerHTML = `<i class="fas fa-hdd" aria-hidden="true"></i> Espaço usado pelo Álbum: <strong>${mb(usado)} MB</strong> de cerca de 1.024 MB do plano gratuito (${r.corpo.arquivos || 0} arquivo(s)). Cada foto ocupa em média 0,4 MB: cabem cerca de <strong>${Math.max(0, Math.floor((1024 - usado / 1048576) / 0.4)).toLocaleString('pt-BR')}</strong> fotos a mais.`; } else u.innerHTML = '<i class="fas fa-hdd" aria-hidden="true"></i> Espaço usado: não foi possível consultar (rode no Supabase a atualização 0012_album_storage.sql).'; }).catch(() => {});
+    el.querySelectorAll('[data-s2]').forEach(b => b.onclick = () => { sub = b.dataset.s2; draw(); });
+    const pb = $('#lt-p', el); if (pb) pb.onclick = () => { L.pausado = !L.pausado; if (!L.pausado) roda(); draw(); };
+    const cb = $('#lt-c', el); if (cb) cb.onclick = () => { if (!confirm('Parar o envio? As fotos que já subiram ficam guardadas.')) return; L.fila = []; L.total = L.feitas + L.erros.length; L.pausado = false; };
+    const rb = $('#lt-r', el); if (rb) rb.onclick = () => { L.fila = L.erros.map(x => x.file); L.total = L.feitas + L.fila.length; L.erros = []; inicia(); };
+    const nb = $('#lt-novo', el); if (nb) nb.onclick = () => { Object.assign(L, { fila: [], feitas: 0, erros: [], total: 0, bytes: 0, dados: null }); draw(); };
+    const fm = $('#fl', el); if (!fm) return;
+    const conta = () => { const n = [...$('#l-f', el).files, ...$('#l-d', el).files].filter(f => /^image\/(jpeg|png|webp)$/.test(f.type)).length; $('#l-q', el).textContent = n ? `${n} foto(s) escolhida(s).` : ''; };
+    $('#l-f', el).onchange = conta; $('#l-d', el).onchange = conta;
+    $('#l-e', el).onchange = e => { $('#l-nw', el).hidden = e.target.value !== '__novo'; };
+    fm.onsubmit = e => {
+      e.preventDefault(); const er = $('#l-er', el), falha = m => { er.textContent = m; er.hidden = false; }; er.hidden = true;
+      const fs = [...$('#l-f', el).files, ...$('#l-d', el).files].filter(f => /^image\/(jpeg|png|webp)$/.test(f.type));
+      if (!fs.length) return falha('Escolha as fotos (JPG, PNG ou WEBP) ou uma pasta com fotos.');
+      if (fs.length > LOTE_MAX) return falha(`São ${fs.length} fotos. Envie no máximo ${LOTE_MAX} por lote: divida em partes (por exemplo, uma pasta por atividade).`);
+      let ev = $('#l-e', el).value;
+      if (ev === '__novo') { ev = novoEvento($('#l-n', el).value); if (!ev) return falha('Digite o nome da nova atividade.'); }
+      const d = { evento: ev, dataFoto: $('#l-dd', el).value, autor: $('#l-a', el).value.trim(), mostrarAutor: $('#l-m', el).value === '1', legenda: $('#l-l', el).value.trim(), status: $('#l-s', el).value === 'publicada' ? 'publicada' : 'pendente' };
+      if (d.mostrarAutor && !d.autor) return falha('Para mostrar o autor, informe o nome do autor.');
+      Object.assign(L, { fila: fs.slice(), feitas: 0, erros: [], total: fs.length, bytes: 0, dados: d, pausado: false });
+      inicia();
+    };
+  };
+  const reduzBlob = (file, max, q) => new Promise((ok, no) => {
+    const u = URL.createObjectURL(file), im = new Image();
+    im.onload = () => { const k = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement('canvas'); c.width = Math.max(1, Math.round(im.width * k)); c.height = Math.max(1, Math.round(im.height * k)); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(u); c.toBlob(b => b ? ok(b) : no(new Error('não foi possível converter')), 'image/jpeg', q); };
+    im.onerror = () => { URL.revokeObjectURL(u); no(new Error('arquivo de imagem ilegível')); };
+    im.src = u;
+  });
+  const sobeUma = async file => {
+    const [g, p] = [await reduzBlob(file, 1600, 0.82), await reduzBlob(file, 480, 0.72)];
+    const id = uid(), pasta = (L.dados.evento || 'sem-atividade').replace(/[^a-z0-9_-]/gi, '').slice(0, 40) || 'sem-atividade', base = `${pasta}/${hoje().slice(0, 7)}/${id}`;
+    const r1 = await PR_SUPABASE.enviarArquivo('album', base + '.jpg', g); if (r1.status !== 200) throw new Error(r1.status === 403 || r1.status === 400 ? 'sem permissão no servidor (rode a atualização 0012 no Supabase?)' : r1.status === 413 ? 'arquivo grande demais' : r1.status === 0 ? 'sem conexão' : 'erro ' + r1.status);
+    const r2 = await PR_SUPABASE.enviarArquivo('album', base + '-mini.jpg', p);
+    L.bytes += g.size + p.size;
+    return { id, foto: PR_SUPABASE.urlPublica('album', base + '.jpg'), thumb: r2.status === 200 ? PR_SUPABASE.urlPublica('album', base + '-mini.jpg') : '', caminho: base + '.jpg', caminhoThumb: r2.status === 200 ? base + '-mini.jpg' : '', nomeOriginal: file.name.slice(0, 120),
+      ...L.dados, email: me.email, data: hoje(), origem: 'lote' };
+  };
+  const salvaNovas = novas => { if (!novas.length) return; const l = db.get('album', []); l.push(...novas.splice(0)); db.set('album', l); };
+  const aviso = e => { if (L.rodando) { e.preventDefault(); e.returnValue = ''; } };
+  const inicia = () => { if (L.rodando) return; L.rodando = true; window.addEventListener('beforeunload', aviso); draw(); roda(); };
+  const roda = async () => {
+    if (L.trabalhando) return; L.trabalhando = true; const novas = [];
+    const um = async () => { while (L.fila.length && !L.pausado) { const f = L.fila.shift(); try { novas.push(await sobeUma(f)); L.feitas++; } catch (x) { L.erros.push({ file: f, nome: f.name, erro: x.message || 'erro' }); } if (novas.length >= 10) salvaNovas(novas); if (sub === 'lote' && document.getElementById('lt-n')) draw(); } };
+    await Promise.all([um(), um(), um()]);
+    salvaNovas(novas); L.trabalhando = false;
+    if (!L.fila.length) { L.rodando = false; window.removeEventListener('beforeunload', aviso); }
+    if (sub === 'lote' && document.getElementById('sub')) draw();
   };
 
   const porEvento = el => {
@@ -1172,7 +1257,7 @@ V.album = (me, root) => {
   const draw = () => {
     root.innerHTML = `<div class="tabs sub" role="tablist">${SUB.map(t => `<button class="tab-btn${t[0] === sub ? ' active' : ''}" data-s="${t[0]}">${t[1]}</button>`).join('')}</div><div id="sub"></div>`;
     root.querySelectorAll('[data-s]').forEach(b => b.onclick = () => { sub = b.dataset.s; msg = ''; draw(); });
-    ({ minhas, todas: porEvento, cur: curadoria, evs })[sub]($('#sub', root));
+    ({ minhas, todas: porEvento, lote, cur: curadoria, evs })[sub]($('#sub', root));
   };
   draw();
 };
@@ -1723,7 +1808,7 @@ function fotosPag() {
   const outras = fs.filter(f => !ordem.includes(f.evento)); if (outras.length) grupos.push(['Outros momentos', outras]);
   const lista = []; // ordem de exibição para o lightbox
   el.innerHTML = grupos.length ? grupos.map(([nome, ps]) => `<h3 class="subsection-title">${esc(nome)}</h3><div class="album-grid">${ps.map(f => { lista.push(f); const i = lista.length - 1;
-    return `<figure class="foto-card"><button class="foto-abre" data-i="${i}" aria-label="Ampliar foto${f.legenda ? ': ' + esc(f.legenda) : ''}"><img src="${esc(f.foto)}" alt="${esc(f.legenda || 'Foto do Parque Retiro')}" loading="lazy" draggable="false" oncontextmenu="return false"></button><figcaption>${f.legenda ? `<span>${esc(f.legenda)}</span>` : ''}${f.dataFoto ? `<small>Dia ${fmtData(f.dataFoto)}</small>` : ''}${f.mostrarAutor && f.autor ? `<small>Foto: ${esc(f.autor)}</small>` : ''}</figcaption></figure>`; }).join('')}</div>`).join('') : '<p class="vazio">As fotos selecionadas pela curadoria aparecerão aqui.</p>';
+    return `<figure class="foto-card"><button class="foto-abre" data-i="${i}" aria-label="Ampliar foto${f.legenda ? ': ' + esc(f.legenda) : ''}"> <img src="${esc(miniatura(f))}" alt="${esc(f.legenda || 'Foto do Parque Retiro')}" loading="lazy" draggable="false" oncontextmenu="return false"></button><figcaption>${f.legenda ? `<span>${esc(f.legenda)}</span>` : ''}${f.dataFoto ? `<small>Dia ${fmtData(f.dataFoto)}</small>` : ''}${f.mostrarAutor && f.autor ? `<small>Foto: ${esc(f.autor)}</small>` : ''}</figcaption></figure>`; }).join('')}</div>`).join('') : '<p class="vazio">As fotos selecionadas pela curadoria aparecerão aqui.</p>';
   const box = document.createElement('div'); box.className = 'lightbox'; box.hidden = true; box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'Foto ampliada');
   box.innerHTML = '<button class="lb-x" aria-label="Fechar"><i class="fas fa-times"></i></button><img alt="" draggable="false" oncontextmenu="return false">'; document.body.appendChild(box);
   const fecha = () => { box.hidden = true; };

@@ -156,6 +156,25 @@ async function funcao(nome, corpo) {
   const s = await sessaoValida(); if (!s) return { status: 401, corpo: { erro: 'Sua sessão terminou. Entre de novo.' } };
   return http('POST', '/functions/v1/' + nome, corpo, s.access_token);
 }
+// Storage (arquivos): envia um arquivo (Blob) para bucket/caminho com a sessão de quem está logado.
+async function enviarArquivo(bucket, caminho, blob) {
+  const s = await sessaoValida(); if (!s) return { status: 401, corpo: { erro: 'Sua sessão terminou. Entre de novo.' } };
+  try {
+    const h = { apikey: conf().chavePublica, Authorization: 'Bearer ' + s.access_token, 'Content-Type': blob.type || 'application/octet-stream', 'x-upsert': 'false', 'cache-control': '31536000' };
+    const r = await fetch(base() + '/storage/v1/object/' + bucket + '/' + caminho.split('/').map(encodeURIComponent).join('/'), { method: 'POST', headers: h, body: blob });
+    let j = null; try { j = await r.json(); } catch (e) { /* vazio */ }
+    return { status: r.status, corpo: j };
+  } catch (e) { return { status: 0, corpo: null }; }
+}
+const urlPublica = (bucket, caminho) => base() + '/storage/v1/object/public/' + bucket + '/' + caminho.split('/').map(encodeURIComponent).join('/');
+async function apagarArquivos(bucket, caminhos) {
+  const s = await sessaoValida(); if (!s || !caminhos.length) return { status: s ? 200 : 401, corpo: [] };
+  return http('DELETE', '/storage/v1/object/' + bucket, { prefixes: caminhos }, s.access_token);
+}
+async function rpc(nome, corpo) {
+  const s = await sessaoValida(); if (!s) return { status: 401, corpo: null };
+  return http('POST', '/rest/v1/rpc/' + nome, corpo || {}, s.access_token);
+}
 async function sair() {
   const s = sessao(); limpaSessao();
   if (s) await http('POST', '/auth/v1/logout', {}, s.access_token, { keepalive: true });
@@ -349,5 +368,5 @@ function criarArmazenamento(opc) {
   return arm;
 }
 
-window.PR_SUPABASE = { ligado, funcao, paginaRestrita, sessao, entrar, cadastrar, recuperar, lerRetornoDoEmail, novaSenha, sair, criarArmazenamento, guardaSessao };
+window.PR_SUPABASE = { ligado, funcao, enviarArquivo, urlPublica, apagarArquivos, rpc, paginaRestrita, sessao, entrar, cadastrar, recuperar, lerRetornoDoEmail, novaSenha, sair, criarArmazenamento, guardaSessao };
 })();
