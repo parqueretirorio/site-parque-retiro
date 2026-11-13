@@ -1,8 +1,7 @@
 {
-  "versao": "1.6.3",
+  "versao": "1.6.4",
   "data": "2026-11-13",
   "novidades": [
-    "Dar encaminhamento: mensagem para os Mestres também em espanhol (Português | Español)",
-    "Campo \"Em espanhol\" em cada ponto"
+    "Dar encaminhamento: novo início padrão das mensagens para os Mestres (português e espanhol)"
   ]
 }

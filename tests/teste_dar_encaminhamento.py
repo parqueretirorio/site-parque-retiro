@@ -32,13 +32,13 @@ async def main():
         # a mensagem com o status de cada ponto já aparece pronta no topo
         ok(await pg.locator('#de-txt').count() == 1, "mensagem para os Mestres já aberta no topo da aba")
         t2 = await pg.input_value('#de-txt')
-        ok(t2.startswith('*Status dos encaminhamentos') and all(f'{k}. ' in t2 for k in range(1, len(abertos) + 1)), f"cada um dos {len(abertos)} pontos, um por um")
+        ok(t2.startswith('*Pendências que ficaram para decidir e fazer encaminhamento em relação à 2ª Reunião de Escola 2026*') and all(f'{k}. ' in t2 for k in range(1, len(abertos) + 1)), f"cada um dos {len(abertos)} pontos, um por um")
         ok('sem responsável' in t2 and 'sem data' in t2 and 'próximos 45 dias' in t2, "sinaliza sem responsável, sem data e prazos próximos")
         ok((await pg.get_attribute('#de-wa', 'href')).startswith('https://wa.me/?text='), "botão Abrir no WhatsApp com o texto")
         print('---\n' + t2[:700] + '\n...')
         await pg.click('[data-dm=resumo]'); await pg.wait_for_timeout(200)
         t = await pg.input_value('#de-txt')
-        ok('Dar encaminhamento' in t and 'Precisam de alguém' in t and 'area-restrita.html' in t, "versão curta (resumo) disponível")
+        ok(t.startswith('*Pendências que ficaram') and 'Precisam de alguém' in t and 'area-restrita.html' in t, "versão curta (resumo) disponível")
         await pg.click('[data-dm=status]'); await pg.wait_for_timeout(200)
         # dar encaminhamento a um sem responsável e sem data
         box = pg.locator('#de-lista [data-de]').first
@@ -53,7 +53,7 @@ async def main():
         # mensagem em espanhol
         await pg.click('[data-dl=es]'); await pg.wait_for_timeout(200)
         te = await pg.input_value('#de-txt')
-        ok(te.startswith('*Estado de los encaminamientos') and 'Reunión de Escuela' in te and 'sin responsable' in te and 'Un fuerte abrazo' in te, "mensagem em espanhol")
+        ok(te.startswith('*Pendientes que quedaron por decidir y encaminar en relación con la 2ª Reunión de Escuela 2026*') and 'Reunión de Escuela' in te and 'sin responsable' in te and 'Un fuerte abrazo' in te, "mensagem em espanhol")
         if all(e.get('es') for a, e in abertos): ok('(sem cadastro)' not in te and 'Precisam' not in te and any(e['es'][:30] in te for a, e in abertos), "pontos com o texto em espanhol")
         print('--- ES ---\n' + te[:600] + '\n...')
         await pg.click('[data-dl=pt]'); await pg.wait_for_timeout(200)

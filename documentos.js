@@ -180,13 +180,13 @@ const salvarEnc = (db, di, ei, v, por, h) => {
 };
 // Mensagens para os Mestres em português ('pt') ou espanhol ('es'). Em espanhol usa o texto traduzido do ponto (e.es) quando houver.
 const MSG = {
-  pt: { reuniao: (n, a) => `${n}ª Reunião de Escola ${a}`, titR: 'Dar encaminhamento', introR: n => `Ainda temos *${n}* encaminhamento(s) em aberto da nossa reunião. Para nada ficar parado nem cair no esquecimento:`,
+  pt: { topo: r => `*Pendências que ficaram para decidir e fazer encaminhamento em relação à ${r}*`, reuniao: (n, a) => `${n}ª Reunião de Escola ${a}`, titR: 'Dar encaminhamento', introR: n => `Ainda temos *${n}* encaminhamento(s) em aberto da nossa reunião. Para nada ficar parado nem cair no esquecimento:`,
     precisaResp: n => `🙋 *Precisam de alguém que assuma (${n})*`, precisaData: n => `📅 *Precisam de prazo (${n})*`, atraso: '⚠️ *Em atraso*', proximos: '⏳ *Próximos prazos*', semResp: 'sem responsável',
     fimR: l => `Quem puder assumir ou já tiver novidade, responda aqui ou atualize em Área restrita › Documentos e Calendários › Dar encaminhamento: ${l}`, abraco: 'Um forte abraço!',
     titS: 'Status dos encaminhamentos', introS: (t, r, d, p, a) => `Hoje são *${t}* em aberto: ${r} sem responsável · ${d} sem data · ${p} com prazo nos próximos 45 dias${a ? ` · ${a} em atraso` : ''}.`,
     mSemResp: '🙋 *sem responsável*', mSemData: '📅 *sem data*', mAtraso: '⚠️ *em atraso* desde ', mProx: '⏳ próximos 45 dias', passo: 'Próximo passo',
     fimS: l => `Peço a ajuda de todos que participaram da reunião: quem puder assumir um ponto, dar um prazo ou trazer novidade, responda aqui ou atualize em Área restrita › Documentos e Calendários › Dar encaminhamento: ${l}` },
-  es: { reuniao: (n, a) => `${n}ª Reunión de Escuela ${a}`, titR: 'Dar seguimiento', introR: n => `Todavía tenemos *${n}* encaminamiento(s) abiertos de nuestra reunión. Para que nada quede parado ni caiga en el olvido:`,
+  es: { topo: r => `*Pendientes que quedaron por decidir y encaminar en relación con la ${r}*`, reuniao: (n, a) => `${n}ª Reunión de Escuela ${a}`, titR: 'Dar seguimiento', introR: n => `Todavía tenemos *${n}* encaminamiento(s) abiertos de nuestra reunión. Para que nada quede parado ni caiga en el olvido:`,
     precisaResp: n => `🙋 *Necesitan a alguien que los asuma (${n})*`, precisaData: n => `📅 *Necesitan plazo (${n})*`, atraso: '⚠️ *Atrasados*', proximos: '⏳ *Próximos plazos*', semResp: 'sin responsable',
     fimR: l => `Quien pueda asumir o ya tenga novedades, responda aquí o actualice en Área restringida › Documentos y Calendarios › Dar seguimiento: ${l}`, abraco: '¡Un fuerte abrazo!',
     titS: 'Estado de los encaminamientos', introS: (t, r, d, p, a) => `Hoy hay *${t}* abiertos: ${r} sin responsable · ${d} sin fecha · ${p} con plazo en los próximos 45 días${a ? ` · ${a} atrasados` : ''}.`,
@@ -200,7 +200,7 @@ const textoLang = (e, lang) => lang === 'es' && e.es ? e.es : e.texto;
 const nomeLang = (D, lang) => { const m = /^RE-(\d{4})\.(\d+)$/.exec(D.r); return m ? MSG[lang].reuniao(m[2], m[1]) : D.nome; };
 const msgResumo = (D, link, lang = 'pt') => {
   const T = MSG[lang] || MSG.pt, it = D.itens, tx = i => curto(textoLang(i.e, lang)), rs = i => respLang(i.e.resp, lang);
-  const L = [`*${T.titR} · ${nomeLang(D, lang)}*`, T.introR(it.length)];
+  const L = [T.topo(nomeLang(D, lang)), T.introR(it.length)];
   const sr = it.filter(i => i.semResp); if (sr.length) { L.push('', T.precisaResp(sr.length)); sr.forEach(i => L.push(`• ${tx(i)} [${i.d.codigo}]`)); }
   const sd = it.filter(i => i.semData && !i.semResp); if (sd.length) { L.push('', T.precisaData(sd.length)); sd.forEach(i => L.push(`• ${tx(i)} – ${rs(i)}`)); }
   if (D.atrasados.length) { L.push('', T.atraso); D.atrasados.forEach(i => L.push(`• ${fmtBR(i.data)} · ${tx(i)} – ${semRespM(i.e.resp) ? T.semResp : rs(i)}`)); }
@@ -209,7 +209,7 @@ const msgResumo = (D, link, lang = 'pt') => {
   return L.join('\n');
 };
 const msgStatus = (D, link, lang = 'pt') => {
-  const T = MSG[lang] || MSG.pt, L = [`*${T.titS} · ${nomeLang(D, lang)}*`, T.introS(D.itens.length, D.nR, D.nD, D.prox.length, D.atrasados.length), ''];
+  const T = MSG[lang] || MSG.pt, L = [T.topo(nomeLang(D, lang)), T.introS(D.itens.length, D.nR, D.nD, D.prox.length, D.atrasados.length), ''];
   D.itens.forEach((i, n) => {
     const marcas = [i.semResp ? T.mSemResp : '👤 ' + respLang(i.e.resp, lang), i.semData ? T.mSemData : (i.atraso ? T.mAtraso : '📅 ') + fmtBR(i.data)];
     if (i.prox45) marcas.push(T.mProx);
