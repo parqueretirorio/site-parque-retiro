@@ -22,3 +22,4 @@ Próximos passos (ver docs/PLANO.md): (1) criar projeto homologação; (2) aplic
 - O navegador pede um endereço de envio assinado (1 hora, só aquele arquivo) e manda a foto direto para a R2; a chave da Cloudflare fica só no servidor.
 - Enquanto a função não estiver configurada (responde 503), o Enviar em lote continua usando o Supabase Storage (0012).
 - No bucket da R2, a política de CORS precisa liberar PUT e GET para https://parqueretirorio.github.io e https://parqueretiro.org.br.
+- **Situação em 13/11:** conta Cloudflare criada (Gmail do Parque); ativação da R2 adiada até haver o cartão virtual do Parque. Até lá o Enviar em lote usa o Supabase Storage (0012).
