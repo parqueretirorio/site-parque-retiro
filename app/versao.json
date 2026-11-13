@@ -1,8 +1,8 @@
 {
-  "versao": "1.6.1",
+  "versao": "1.6.2",
   "data": "2026-11-13",
   "novidades": [
-    "Dar encaminhamento: a mensagem para os Mestres com cada ponto e o seu status já abre pronta no topo e se atualiza a cada ponto salvo",
-    "Versão curta (resumo) a um toque; copiar ou abrir no WhatsApp"
+    "Atualizar o app ficou mais confiável: o botão agora busca sempre os arquivos novos",
+    "Dar encaminhamento: mensagem para os Mestres com cada ponto e o seu status, pronta no topo"
   ]
 }

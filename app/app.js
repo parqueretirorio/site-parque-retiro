@@ -24,7 +24,7 @@ let me = null;
 // Mensagens do login vêm em português do adaptador; aqui viram o idioma do app.
 const traduzErro = m => /incorretos/.test(m) ? t('errCred') : /confirmar seu e-mail/.test(m) ? t('errConf') : /Sem conexão/.test(m) ? t('errRede') : /Muitas tentativas/.test(m) ? t('errMuitas') : m;
 
-const VERSAO = '1.6.1', DATA_VERSAO = '13/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
+const VERSAO = '1.6.2', DATA_VERSAO = '13/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 
 /* ---------- Instalar o app e atualizações ---------- */
@@ -35,7 +35,7 @@ let fechouInstalar = false; try { fechouInstalar = sessionStorage.getItem('app-i
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); pedidoInstalar = e; desenhaAvisos(); });
 window.addEventListener('appinstalled', () => { pedidoInstalar = null; desenhaAvisos(); });
 const cmp = (a, b) => { const x = String(a).split('.').map(Number), y = String(b).split('.').map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) - (y[i] || 0); } return 0; };
-fetch('versao.json?t=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(v => { if (v && cmp(v.versao, VERSAO) > 0) { novaVersao = v; desenhaAvisos(); } }).catch(() => {});
+fetch('versao.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null).then(v => { if (v && cmp(v.versao, VERSAO) > 0) { novaVersao = v; desenhaAvisos(); } }).catch(() => {});
 function cartaoInstalar() {
   if (instalado() || fechouInstalar) return '';
   const como = pedidoInstalar ? `<button type="button" class="bt bt-principal" id="bt-instalar"><i class="fas fa-download" aria-hidden="true"></i> ${t('baixar')}</button>`
@@ -47,6 +47,10 @@ function cartaoInstalar() {
 }
 function faixaAtualizar() {
   if (!novaVersao) return '';
+  // Já tentou atualizar para esta versão e ela ainda não chegou: o servidor do site leva alguns minutos para entregar os arquivos novos.
+  let tentou = ''; try { tentou = sessionStorage.getItem('pr_atualizou') || ''; } catch (e) { /* segue */ }
+  if (tentou === novaVersao.versao) return `<section class="atualizar" role="status"><p><i class="fas fa-hourglass-half" aria-hidden="true"></i> <b>${t('nova', { v: esc(novaVersao.versao) })}</b><br><small>${t('atualizaDepois')}</small></p>
+    <button type="button" class="bt bt-principal" id="bt-atualizar"><i class="fas fa-redo" aria-hidden="true"></i> ${t('atualizar')}</button></section>`;
   return `<section class="atualizar" role="status"><p><i class="fas fa-sync-alt" aria-hidden="true"></i> <b>${t('nova', { v: esc(novaVersao.versao) })}</b>${(novaVersao.novidades || []).length ? '<br><small>' + novaVersao.novidades.map(esc).join(' · ') + '</small>' : ''}</p>
     <button type="button" class="bt bt-principal" id="bt-atualizar"><i class="fas fa-download" aria-hidden="true"></i> ${t('atualizar')}</button></section>`;
 }
@@ -57,7 +61,8 @@ function ajustaAjuda() { const a = $('#ajuda'); if (a) { a.innerHTML = `<i class
 ajustaAjuda();
 async function atualizar() {
   const b = $('#bt-atualizar'); if (b) { b.disabled = true; b.textContent = t('atualizando'); }
-  try { if (navigator.serviceWorker) { const r = await navigator.serviceWorker.getRegistration(); if (r) { await r.update(); if (r.waiting) r.waiting.postMessage('atualizar'); } } } catch (e) { /* segue */ }
+  try { sessionStorage.setItem('pr_atualizou', novaVersao ? novaVersao.versao : ''); } catch (e) { /* segue */ }
+  try { if (navigator.serviceWorker) { const r = await navigator.serviceWorker.getRegistration(); if (r) { await r.update(); const w = r.waiting || r.installing; if (w) { await new Promise(ok => { navigator.serviceWorker.addEventListener('controllerchange', ok, { once: true }); w.postMessage('atualizar'); setTimeout(ok, 4000); }); } } } } catch (e) { /* segue */ }
   try { if (window.caches) { const ks = await caches.keys(); await Promise.all(ks.map(k => caches.delete(k))); } } catch (e) { /* segue */ }
   location.reload();
 }
