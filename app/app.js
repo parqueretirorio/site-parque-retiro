@@ -24,7 +24,7 @@ let me = null;
 // Mensagens do login vêm em português do adaptador; aqui viram o idioma do app.
 const traduzErro = m => /incorretos/.test(m) ? t('errCred') : /confirmar seu e-mail/.test(m) ? t('errConf') : /Sem conexão/.test(m) ? t('errRede') : /Muitas tentativas/.test(m) ? t('errMuitas') : m;
 
-const VERSAO = '1.6.0', DATA_VERSAO = '13/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
+const VERSAO = '1.6.1', DATA_VERSAO = '13/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 
 /* ---------- Instalar o app e atualizações ---------- */
@@ -450,7 +450,7 @@ function inventario(itemId) {
 }
 
 /* --- Documentos e Calendários: encaminhamentos das atas e nova atividade --- */
-let darR = '', darMsg = ''; // Dar encaminhamento: reunião escolhida e mensagem aberta
+let darR = '', darMsg = 'status'; // Dar encaminhamento: reunião escolhida e mensagem aberta
 function documentos(sub) {
   if (!temAba('documentos')) return inicio();
   // Como na ferramenta do site: todos consultam; só o Responsável pelos Documentos e Calendários (ou o administrador) altera.
@@ -460,9 +460,9 @@ function documentos(sub) {
   const SUBS = [['enc', t('b2_encAberto', { n: '' }).replace(/\s*\(\)\s*$/, '')], ['dar', t('b2_dar')]].concat(pode ? [['nova', t('b2_novaAtiv')]] : []);
   const PD = window.PR_DOCUMENTOS, DAR = sub === 'dar' && PD && PD.darEncaminhamento ? PD.darEncaminhamento(db, hoje(), darR) : null;
   const linkArea = new URL('../area-restrita.html', location.href).href;
-  const caixaMsg = (tit, txt) => `<section class="cartao-b2" id="dmsg"><h3><i class="fab fa-whatsapp" aria-hidden="true"></i> ${esc(tit)}</h3><p class="nota">${t('b2_darConfira')}</p>
+  const caixaMsg = (tit, txt) => `<section class="cartao-b2" id="dmsg"><h3><i class="fab fa-whatsapp" aria-hidden="true"></i> ${esc(tit)}</h3><nav class="sub" aria-label="${esc(tit)}"><a href="#" data-dm="status" class="${darMsg === 'status' ? 'on' : ''}">${t('b2_darCada')}</a><a href="#" data-dm="resumo" class="${darMsg === 'resumo' ? 'on' : ''}">${t('b2_darCurta')}</a></nav><p class="nota">${t('b2_darConfira')}</p>
     <textarea id="dtxt" rows="14" style="width:100%">${esc(txt)}</textarea>
-    <div class="acoes"><button type="button" class="bt bt-principal" id="dcp"><i class="fas fa-copy" aria-hidden="true"></i> ${t('b2_darCopiar')}</button><a class="bt bt-claro" id="dwa" href="#" target="_blank" rel="noopener"><i class="fab fa-whatsapp" aria-hidden="true"></i> ${t('b2_darWhats')}</a><button type="button" class="bt bt-texto" id="dfx">${t('b2_darFechar')}</button></div></section>`;
+    <div class="acoes"><button type="button" class="bt bt-principal" id="dcp"><i class="fas fa-copy" aria-hidden="true"></i> ${t('b2_darCopiar')}</button><a class="bt bt-claro" id="dwa" href="#" target="_blank" rel="noopener"><i class="fab fa-whatsapp" aria-hidden="true"></i> ${t('b2_darWhats')}</a></div></section>`;
   let corpo = '';
   if (sub === 'enc') {
     const h = hoje(), ab = [];
@@ -483,8 +483,7 @@ function documentos(sub) {
       corpo = `<p class="nota">${t('b2_darDica', { r: D.nome })}</p>
       ${D.reunioes.length > 1 ? `<label for="dr">${t('b2_darReuniao')}</label><select id="dr">${D.reunioes.map(k => `<option value="${esc(k)}"${k === D.r ? ' selected' : ''}>${esc(k)}</option>`).join('')}</select>` : ''}
       <p class="resumo-b2"><b>${D.itens.length}</b> ${t('b2_darAbertos')} · <b class="atraso">${D.nR}</b> ${t('b2_darSemResp')} · <b>${D.nD}</b> ${t('b2_darSemData')} · <b>${D.prox.length}</b> ${t('b2_darProx')}</p>
-      <button type="button" class="bt bt-principal" id="dres"><i class="fab fa-whatsapp" aria-hidden="true"></i> ${t('b2_darAvisar')}</button>
-      ${darMsg === 'resumo' ? caixaMsg(t('b2_darAvisar'), PD.msgResumo(D, linkArea)) : ''}
+      ${D.itens.length ? caixaMsg(t('b2_darMsgTit'), darMsg === 'resumo' ? PD.msgResumo(D, linkArea) : PD.msgStatus(D, linkArea)) + `<h2>${t('b2_darAtualizar')}</h2>` : ''}
       ${D.itens.length ? D.itens.map((i, n) => `<article class="cartao-b2${i.atraso ? ' atrasado' : ''}" data-de="${esc(i.d.id)}|${esc(i.e.id)}">
         <p><span class="etq">${esc(i.d.codigo)}</span> ${i.semResp ? `<span class="etq etq-alerta">${t('b2_darSemResp1')}</span>` : ''} ${i.semData ? `<span class="etq etq-aviso">${t('b2_darSemData1')}</span>` : ''} ${i.atraso ? `<span class="etq etq-alerta">${t('b2_emAtraso')}</span>` : ''}</p>
         <h3>${esc(i.e.texto)}</h3>
@@ -496,10 +495,7 @@ function documentos(sub) {
           <label for="dd${n}">${t('b2_darPrazo')}</label><input id="dd${n}" data-k="data" type="date" value="${esc(i.data)}">
           <label for="dp${n}">${t('b2_darPasso')}</label><input id="dp${n}" data-k="passo" maxlength="160" value="${esc(i.e.passo || '')}">
           <div class="acoes"><button type="button" class="bt bt-principal" data-dok><i class="fas fa-save" aria-hidden="true"></i> ${t('b2_darSalvar')}</button><button type="button" class="bt bt-claro" data-dfeito><i class="fas fa-check" aria-hidden="true"></i> ${t('b2_feito')}</button></div></div></details>` : ''}
-      </article>`).join('') : `<p class="vazio">${t('b2_semEnc')}</p>`}
-      ${D.itens.length ? `<section class="cartao-b2"><h3><i class="fas fa-clipboard-list" aria-hidden="true"></i> ${t('b2_darStatusTit')}</h3><p class="nota">${t('b2_darStatusDica', { n: D.itens.length })}</p>
-        <button type="button" class="bt bt-principal" id="dsta"><i class="fab fa-whatsapp" aria-hidden="true"></i> ${t('b2_darStatusBt')}</button>
-        ${darMsg === 'status' ? caixaMsg(t('b2_darStatusTit'), PD.msgStatus(D, linkArea)) : ''}</section>` : ''}`;
+      </article>`).join('') : `<p class="vazio">${t('b2_semEnc')}</p>`}`;
     }
   } else {
     const cats = ['Encontro Estacional', 'Reunião de Escola', 'Retiro / Seminário', 'Mutirão / Manutenção', 'Celebração / Evento', 'Outras atividades', 'Campanha'].concat(db.get('ativ_cats', []) || []);
@@ -515,15 +511,13 @@ function documentos(sub) {
   tela.innerHTML = topo(nomeAba('documentos'), true) + aviso() + `<main class="b2">${abasSub(SUBS, sub, 'documentos')}${mostraFlash()}${corpo}<a class="bt bt-claro" href="#agenda"><i class="fas fa-calendar-alt" aria-hidden="true"></i> ${t('b2_verAgenda')}</a>${rodapeFerr('documentos')}</main>`;
   if (sub === 'dar' && DAR) {
     const dr = $('#dr'); if (dr) dr.onchange = () => { darR = dr.value; darMsg = ''; documentos('dar'); };
-    const abre = m => () => { darMsg = m; documentos('dar'); const x = $('#dmsg'); if (x) x.scrollIntoView({ block: 'start' }); };
-    if ($('#dres')) $('#dres').onclick = abre('resumo'); if ($('#dsta')) $('#dsta').onclick = abre('status');
+    tela.querySelectorAll('[data-dm]').forEach(a => a.onclick = ev => { ev.preventDefault(); darMsg = a.dataset.dm; documentos('dar'); const x = $('#dmsg'); if (x) x.scrollIntoView({ block: 'start' }); });
     const tx = $('#dtxt');
     if (tx) { const wa = $('#dwa'), at = () => { wa.href = 'https://wa.me/?text=' + encodeURIComponent(tx.value); }; at(); tx.oninput = at;
-      $('#dcp').onclick = async () => { try { await navigator.clipboard.writeText(tx.value); } catch (x) { tx.select(); try { document.execCommand('copy'); } catch (y) {} } $('#dcp').textContent = t('b2_darCopiado'); };
-      $('#dfx').onclick = () => { darMsg = ''; documentos('dar'); }; }
+      $('#dcp').onclick = async () => { try { await navigator.clipboard.writeText(tx.value); } catch (x) { tx.select(); try { document.execCommand('copy'); } catch (y) {} } $('#dcp').textContent = t('b2_darCopiado'); }; }
     if (pode) tela.querySelectorAll('[data-de]').forEach(c => {
       const [di, ei] = c.dataset.de.split('|'), v = k => c.querySelector(`[data-k="${k}"]`).value.trim();
-      const salva = st => { const r = PD.salvarEnc(db, di, ei, { resp: v('resp'), data: v('data'), passo: v('passo'), status: st }, me.nome, hoje()); if (!r) { alert(t('b2_erroSalvar')); return; } flash = t('b2_okEnc'); documentos('dar'); };
+      const salva = st => { const r = PD.salvarEnc(db, di, ei, { resp: v('resp'), data: v('data'), passo: v('passo'), status: st }, me.nome, hoje()); if (!r) { alert(t('b2_erroSalvar')); return; } const y = window.scrollY; flash = t('b2_okEnc'); documentos('dar'); window.scrollTo(0, y); };
       const ok = c.querySelector('[data-dok]'); if (ok) ok.onclick = () => salva('Em aberto');
       const fe = c.querySelector('[data-dfeito]'); if (fe) fe.onclick = () => salva('Feito');
     });

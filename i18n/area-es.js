@@ -2367,5 +2367,10 @@
 "Reunião": "Reunión",
 "Nome(s)": "Nombre(s)",
 "Nenhuma ata de Reunião de Escola com código (RE-…) cadastrada ainda.": "Aún no hay actas de Reunión de Escuela con código (RE-…).",
-"Tudo encaminhado: nenhuma pendência desta reunião. 🎉": "Todo encaminado: ningún pendiente de esta reunión. 🎉"
+"Tudo encaminhado: nenhuma pendência desta reunião. 🎉": "Todo encaminado: ningún pendiente de esta reunión. 🎉",
+"Cada ponto com o status": "Cada punto con su estado",
+"Versão curta (resumo)": "Versión corta (resumen)",
+"Mensagem para os Mestres": "Mensaje para los Maestros",
+"Atualizar o status de cada ponto": "Actualizar el estado de cada punto",
+"A mensagem se atualiza sozinha quando você salva um ponto. Confira, ajuste se quiser e envie: nada é enviado sozinho.": "El mensaje se actualiza solo cuando guarda un punto. Revise, ajuste si quiere y envíe: nada se envía solo."
 });})();

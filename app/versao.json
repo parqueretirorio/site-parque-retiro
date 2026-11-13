@@ -1,8 +1,8 @@
 {
-  "versao": "1.6.0",
+  "versao": "1.6.1",
   "data": "2026-11-13",
   "novidades": [
-    "Nova tela Dar encaminhamento (em Documentos e Calendários e no início): pendentes da última Reunião de Escola, com quem assume, prazo e próximo passo",
-    "Mensagens prontas para o Grupo de Mestres: resumo e status de cada ponto, para copiar ou abrir no WhatsApp"
+    "Dar encaminhamento: a mensagem para os Mestres com cada ponto e o seu status já abre pronta no topo e se atualiza a cada ponto salvo",
+    "Versão curta (resumo) a um toque; copiar ou abrir no WhatsApp"
   ]
 }

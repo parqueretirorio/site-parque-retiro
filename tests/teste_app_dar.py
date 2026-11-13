@@ -1,4 +1,4 @@
-# Teste: app CONecta Retiro (1.6.0) > "Dar encaminhamento" (atalho no início e aba em Documentos e Calendários),
+# Teste: app CONecta Retiro (1.6.1) > "Dar encaminhamento" (atalho no início e aba em Documentos e Calendários),
 # contra o PostgreSQL local com as migrações do Supabase.  Rodar:  python3 tests/teste_app_dar.py [pacote.json]
 import asyncio, subprocess, time, os, sys, json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -34,18 +34,19 @@ async def main():
         ok(await pg.locator('nav.sub a[href="#documentos/dar"].on').count() == 1, "aba Dar encaminhamento dentro de Documentos e Calendários")
         ok(await pg.locator('[data-de]').count() == n0, f"lista os {n0} pontos da última Reunião de Escola")
         await pg.screenshot(path='/tmp/app-dar.png')
-        await pg.click('#dsta'); await pg.wait_for_selector('#dtxt')
+        ok(await pg.locator('#dtxt').count() == 1, "mensagem para os Mestres já aberta no topo")
         t = await pg.input_value('#dtxt')
-        ok(t.startswith('*Status dos encaminhamentos') and f'{n0}. ' in t and 'sem responsável' in t, "mensagem com o status de cada ponto")
+        ok(t.startswith('*Status dos encaminhamentos') and f'{n0}. ' in t and 'sem responsável' in t, "cada ponto com o status")
         ok((await pg.get_attribute('#dwa', 'href')).startswith('https://wa.me/?text='), "abre no WhatsApp")
         ok(f'{B}/area-restrita.html' in t, "link da mensagem leva à área restrita do site")
-        await pg.screenshot(path='/tmp/app-dar-msg.png')
-        await pg.click('#dfx'); await pg.click('#dres'); await pg.wait_for_selector('#dtxt')
-        ok('Dar encaminhamento' in await pg.input_value('#dtxt'), "mensagem resumo para o Grupo de Mestres")
-        await pg.click('#dfx')
+        await pg.click('[data-dm=resumo]'); await pg.wait_for_selector('#dtxt')
+        ok('Dar encaminhamento' in await pg.input_value('#dtxt'), "versão curta disponível")
+        await pg.click('[data-dm=status]'); await pg.wait_for_selector('#dtxt')
         c = pg.locator('[data-de]').first; await c.locator('summary').click()
         await c.locator('[data-k=resp]').fill('Leonidas França'); await c.locator('[data-k=data]').fill('2026-12-05'); await c.locator('[data-k=passo]').fill('Chamar no grupo'); await c.locator('[data-dok]').click(); await pg.wait_for_timeout(500)
         ok(await pg.evaluate("PR_DADOS.db.get('docs',[]).flatMap(d=>d.enc||[]).some(e=>e.resp==='Leonidas França'&&e.data==='2026-12-05'&&e.passo&&e.atualizado)"), "salvar no app grava quem assume, prazo e próximo passo")
+        ok('Chamar no grupo' in await pg.input_value('#dtxt'), "a mensagem se atualiza com o novo status")
+        await pg.screenshot(path='/tmp/app-dar-msg.png')
         c = pg.locator('[data-de]').first; await c.locator('summary').click(); await c.locator('[data-dfeito]').click(); await pg.wait_for_timeout(500)
         ok(await pg.locator('[data-de]').count() == n0 - 1, "Feito tira da lista")
         ok(not errs, "sem erros de JavaScript " + str(errs[:3]))
