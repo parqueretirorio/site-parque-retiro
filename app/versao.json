@@ -1,9 +1,8 @@
 {
-  "versao": "1.4.0",
-  "data": "2026-11-11",
+  "versao": "1.5.0",
+  "data": "2026-11-13",
   "novidades": [
-    "Telas próprias do Alojamento: pedidos, camas, ocupação e novo pedido",
-    "Inventário: procurar item, ficha e o que está emprestado",
-    "Documentos e Calendários: encaminhamentos das atas e nova atividade"
+    "Todas as ferramentas da área restrita abrem dentro do app, com a barra do app no topo",
+    "Telas ajustadas ao celular: abas que deslizam para o lado, campos e botões maiores, tabelas sem estourar a tela"
   ]
 }

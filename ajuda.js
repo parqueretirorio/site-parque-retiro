@@ -111,7 +111,7 @@ const artigo = id => artigos().find(a => a.id === id) || null;
 const categoria = id => exib().categorias.find(c => c.id === id) || null;
 
 /* ---------------------------------------------------------------- contexto ---------------------------------------------------------------- */
-const pagina = () => ((location.pathname.split('/').pop() || 'index.html').replace(/\.html?$/i, '') || 'index');
+const pagina = () => document.body && document.body.dataset.page === 'painel' ? 'area-restrita' : ((location.pathname.split('/').pop() || 'index.html').replace(/\.html?$/i, '') || 'index'); // a área restrita também abre como app/ferramenta.html
 function ctx() {
   const p = pagina();
   if (p === 'area-restrita') { const a = document.querySelector('#areas .tab-btn.active[data-tab]'); return 'r.' + (a ? a.dataset.tab : 'painel'); }

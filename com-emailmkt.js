@@ -32,7 +32,7 @@ const CONVITE = {
 };
 const dataBR = iso => /^\d{4}-\d{2}-\d{2}$/.test(iso || '') ? iso.slice(8, 10) + '/' + iso.slice(5, 7) + '/' + iso.slice(0, 4) : (iso || '');
 const ehConvite = c => !!c && c.tipo === 'convite';
-const linkCadastro = () => location.protocol.startsWith('http') ? location.origin + location.pathname.replace(/[^/]*$/, '') + 'login.html#criar-conta' : 'https://parqueretiro.org.br/login.html#criar-conta';
+const linkCadastro = () => location.protocol.startsWith('http') ? new URL('.', document.baseURI).href + 'login.html#criar-conta' : 'https://parqueretiro.org.br/login.html#criar-conta';
 // Situação do cadastro de um e-mail na área restrita: 'aprovado', 'pendente', 'outro' (não aprovado) ou '' (ainda não se cadastrou).
 function situacaoCadastro(email, users) {
   const e = String(email || '').toLowerCase(), u = (users || (H.db ? H.db.get('users', []) : [])).find(x => String(x.email || '').toLowerCase() === e);
@@ -53,7 +53,7 @@ function personaliza(t, pessoa) {
 }
 function dadosPessoa(c, pessoa) {
   const sau = personaliza(c.saudacao, pessoa).trim();
-  const base = location.protocol.startsWith('http') ? location.origin + location.pathname.replace(/[^/]*$/, '') : '';
+  const base = location.protocol.startsWith('http') ? new URL('.', document.baseURI).href : '';
   const conv = ehConvite(c), M = CONVITE[c.lang === 'es' ? 'es' : 'pt'];
   return {
     assunto: (conv && c.lembrete ? M.lembrete : '') + personaliza(c.assunto, pessoa), titulo: personaliza(c.titulo, pessoa), lang: c.lang || 'pt',

@@ -46,7 +46,7 @@ function cobertura(item, lista) {
   lista.filter(ativa).forEach(e => { const antes = acum; acum += e.qtd; out[e.id] = acum <= item.lancEstoque ? 'total' : antes >= item.lancEstoque ? 'espera' : 'parcial'; });
   return out;
 }
-const link = id => { const base = location.protocol.startsWith('http') ? location.origin + location.pathname.replace(/[^/]*$/, '') : ''; return base + 'encomenda.html?livro=' + encodeURIComponent(id); };
+const link = id => { const base = location.protocol.startsWith('http') ? new URL('.', document.baseURI).href : ''; return base + 'encomenda.html?livro=' + encodeURIComponent(id); };
 function textoWhats(i) {
   const l = [`Pré-lançamento: "${i.titulo}"${i.autor ? ' de ' + i.autor : ''}.`];
   if (i.preTexto) l.push(i.preTexto);

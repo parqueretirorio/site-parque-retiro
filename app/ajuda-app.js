@@ -53,11 +53,11 @@ const GUIA = {
       '<b>Minhas responsabilidades:</b> as ferramentas das funções que você tem no Parque (por exemplo, Alojamento ou Inventário).',
       '<b>Ver todas as áreas:</b> todas as ferramentas que você pode abrir, separadas em Comissões e Administração.',
       'O <b>?</b> ao lado de cada ferramenta abre a explicação dela.'], 'Os números em destaque mostram quantas coisas novas há (por exemplo, cadastros esperando aprovação).', 'inicio tela principal responsabilidades areas ferramentas'],
-    ['ferramentas', 'fa-tools', 'Abrir uma ferramenta e voltar ao app', 'Algumas ferramentas abrem a área restrita completa, já no lugar certo.', [
+    ['ferramentas', 'fa-tools', 'Abrir uma ferramenta e voltar ao app', 'As ferramentas abrem dentro do app, já no lugar certo, com a barra azul do app no alto.', [
       'Toque no nome da ferramenta.',
       'Use a ferramenta normalmente. As explicações de cada campo aparecem ao tocar no ícone de ajuda da página.',
-      'Para voltar, toque em <b>Voltar ao app</b>, no alto da tela.',
-      'O que você salva fica guardado no servidor do Parque e aparece para a equipe em qualquer celular ou computador.'], 'Toque em <b>Ajuda</b>, ao lado de "Voltar ao app", para ler a explicação da ferramenta que está aberta.', 'ferramenta abrir voltar salvar area restrita'],
+      'Para voltar, toque em <b>Início</b>, no canto de cima à esquerda.',
+      'O que você salva fica guardado no servidor do Parque e aparece para a equipe em qualquer celular ou computador.'], 'Toque em <b>Ajuda</b>, no canto de cima à direita, para ler a explicação da ferramenta que está aberta.', 'ferramenta abrir voltar salvar area restrita'],
     ['agenda', 'fa-calendar-alt', 'Avisos, agenda e biblioteca', 'Duas telas feitas para o celular, para consultar rápido.', [
       '<b>Avisos e agenda:</b> mostra as datas do Parque, as atividades e as reuniões dos próximos 90 dias. O dia de hoje fica em destaque.',
       'Para ver o calendário inteiro, toque em <b>Calendário completo</b>.',
@@ -94,11 +94,11 @@ const GUIA = {
       '<b>Mis responsabilidades:</b> las herramientas de las funciones que tienes en el Parque (por ejemplo, Alojamiento o Inventario).',
       '<b>Ver todas las áreas:</b> todas las herramientas que puedes abrir, separadas en Comisiones y Administración.',
       'El <b>?</b> al lado de cada herramienta abre su explicación.'], 'Los números destacados muestran cuántas novedades hay (por ejemplo, registros esperando aprobación).', 'inicio pantalla principal responsabilidades areas herramientas'],
-    ['ferramentas', 'fa-tools', 'Abrir una herramienta y volver a la app', 'Algunas herramientas abren el área restringida completa, ya en el lugar correcto.', [
+    ['ferramentas', 'fa-tools', 'Abrir una herramienta y volver a la app', 'Las herramientas abren dentro de la app, ya en el lugar correcto, con la barra azul de la app arriba.', [
       'Toca el nombre de la herramienta.',
       'Usa la herramienta normalmente. Las explicaciones de cada campo aparecen al tocar el ícono de ayuda de la página.',
-      'Para volver, toca <b>Volver a la app</b>, arriba en la pantalla.',
-      'Lo que guardas queda en el servidor del Parque y aparece para el equipo en cualquier celular o computadora.'], 'Toca <b>Ayuda</b>, al lado de "Volver a la app", para leer la explicación de la herramienta abierta.', 'herramienta abrir volver guardar area restringida'],
+      'Para volver, toca <b>Inicio</b>, en la esquina de arriba a la izquierda.',
+      'Lo que guardas queda en el servidor del Parque y aparece para el equipo en cualquier celular o computadora.'], 'Toca <b>Ayuda</b>, en la esquina de arriba a la derecha, para leer la explicación de la herramienta abierta.', 'herramienta abrir volver guardar area restringida'],
     ['agenda', 'fa-calendar-alt', 'Avisos, agenda y biblioteca', 'Dos pantallas hechas para el celular, para consultar rápido.', [
       '<b>Avisos y agenda:</b> muestra las fechas del Parque, las actividades y las reuniones de los próximos 90 días. El día de hoy aparece destacado.',
       'Para ver el calendario entero, toca <b>Calendario completo</b>.',

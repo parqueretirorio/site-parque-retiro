@@ -16,7 +16,7 @@ const fmtSem = d => d.toLocaleDateString(I.locale(), { weekday: 'short' }).repla
 const fmtDia = iso => new Date(iso + 'T12:00:00').toLocaleDateString(I.locale(), { day: '2-digit', month: '2-digit', year: 'numeric' });
 const primeiro = n => String(n || '').trim().split(/\s+/)[0] || '';
 const tela = $('#tela');
-const ferramenta = id => '../area-restrita.html?app=1#t=' + encodeURIComponent(id);
+const ferramenta = id => 'ferramenta.html?app=1#t=' + encodeURIComponent(id); // mesma área restrita, mas dentro do app (abre na janela do app, sem barra do navegador)
 // Ferramentas com tela própria no app (Bloco 2). As demais abrem a área restrita completa.
 const NATIVAS = { reservas: 'alojamento', inventario: 'inventario', documentos: 'documentos' };
 const destino = id => NATIVAS[id] ? '#' + NATIVAS[id] : ferramenta(id);
@@ -24,7 +24,7 @@ let me = null;
 // Mensagens do login vêm em português do adaptador; aqui viram o idioma do app.
 const traduzErro = m => /incorretos/.test(m) ? t('errCred') : /confirmar seu e-mail/.test(m) ? t('errConf') : /Sem conexão/.test(m) ? t('errRede') : /Muitas tentativas/.test(m) ? t('errMuitas') : m;
 
-const VERSAO = '1.4.0', DATA_VERSAO = '11/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
+const VERSAO = '1.5.0', DATA_VERSAO = '13/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 
 /* ---------- Instalar o app e atualizações ---------- */

@@ -46,7 +46,7 @@ async def main():
         await pg.screenshot(path=OUT + '/app-ajuda-2-inicio.png', full_page=True)
         await pg.click('.linha-f .q[href="#ajuda-f/users"]'); await pg.wait_for_selector('.artigo h1, main.artigo')
         h1 = await pg.inner_text('.topo h1'); ok('responsáveis' in h1.lower() or 'Gestão' in h1, f"'?' de Responsáveis abre o artigo certo ({h1})")
-        ok(await pg.locator('main a.bt-principal[href*="area-restrita.html?app=1#t=users"]').count() == 1, "artigo tem 'Abrir a ferramenta'")
+        ok(await pg.locator('main a.bt-principal[href*="ferramenta.html?app=1#t=users"]').count() == 1, "artigo tem 'Abrir a ferramenta'")
         ok(await pg.locator('main .passos-ajuda li').count() >= 2, "artigo mostra o passo a passo")
         await pg.screenshot(path=OUT + '/app-ajuda-3-artigo.png', full_page=True)
         await pg.click('#bt-ajuda') if await pg.locator('#bt-ajuda').count() else await pg.goto(B + '/app/?servidor=1#ajuda')
@@ -55,7 +55,7 @@ async def main():
         await pg.click('a[href="#artigo/usar-o-app"]') if await pg.locator('a[href="#artigo/usar-o-app"]').count() else await pg.goto(B + '/app/?servidor=1#artigo/usar-o-app')
         await pg.wait_for_selector('main.artigo'); ok('Usar o app CONecta Retiro' in await pg.inner_text('.topo h1'), "artigo novo 'Usar o app CONecta Retiro'")
         # dentro de uma ferramenta: botão Ajuda ao lado de Voltar ao app
-        await pg.goto(B + '/area-restrita.html?app=1#t=reservas'); await pg.wait_for_selector('#ajuda-app', timeout=10000)
+        await pg.goto(B + '/app/ferramenta.html?app=1#t=reservas'); await pg.wait_for_selector('#ajuda-app', timeout=10000)
         ok(await pg.get_attribute('#ajuda-app', 'href') == 'app/#ajuda-f/reservas', "ferramenta aberta pelo app tem o botão Ajuda")
         await pg.click('#ajuda-app'); await pg.wait_for_selector('main.artigo', timeout=10000)
         ok('Alojamento' in await pg.inner_text('.topo h1') or 'reserva' in (await pg.inner_text('.topo h1')).lower(), "botão Ajuda abre a explicação do Alojamento")

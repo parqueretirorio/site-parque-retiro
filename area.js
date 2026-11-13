@@ -1426,9 +1426,13 @@ ELEMENTOS.forEach(([id, nome, ic]) => {
 /* ---------- Páginas ---------- */
 function painel() {
   const SRV = window.PR_DADOS && PR_DADOS.modo === 'supabase', SB = window.PR_SUPABASE;
+  // Aberto pelo app CONecta Retiro: já com a cara do app; sem login, volta para a entrada do próprio app (não para a do site)
+  const emApp = new URLSearchParams(location.search).get('app') === '1' || /\/app\/ferramenta\.html$/.test(location.pathname);
+  if (emApp) document.body.classList.add('modo-app');
+  const entrar = emApp ? 'app/' : 'login.html';
   if (SRV) {
     const s = SB.sessao(), est = PR_DADOS.estadoSync();
-    if (!s || est.estado === 'sem-sessao') { sessionStorage.removeItem('pr_sess'); location.replace('login.html'); return; }
+    if (!s || est.estado === 'sem-sessao') { sessionStorage.removeItem('pr_sess'); location.replace(entrar); return; }
     sessionStorage.setItem('pr_sess', s.user.email);
     if (est.estado === 'offline' && !db.get('users', []).length) { $('#app').innerHTML = `<p class="tip-box" role="alert"><strong>Não foi possível falar com o servidor.</strong> Confira a internet e <a href="area-restrita.html">tente de novo</a>. ${esc(est.erro || '')}</p>`; return; }
   }
@@ -1437,7 +1441,7 @@ function painel() {
   // Acesso temporário (script.js): enquanto estiver ativo, quem clicou na mandala entra sem login.
   const cfgTemp = window.PR_ACESSO_TEMPORARIO, temp = !!(cfgTemp && cfgTemp.ativo && sessionStorage.getItem('pr_temp') === '1');
   if (temp && (!me || statusDe(me) !== 'aprovado')) me = { email: 'acesso-temporario', nome: 'Acesso temporário', nivel: NIV[cfgTemp.nivel] ? cfgTemp.nivel : 'administrador', status: 'aprovado', funcoes: [] };
-  if (!me || statusDe(me) !== 'aprovado') { sessionStorage.removeItem('pr_sess'); location.replace('login.html'); return; }
+  if (!me || statusDe(me) !== 'aprovado') { sessionStorage.removeItem('pr_sess'); location.replace(entrar); return; }
   const n = NIV[me.nivel];
   if (window.PR_IMP2611 && window.PR_IMP2611.autoImportar) window.PR_IMP2611.autoImportar(db, me, hoje); // planilhas de nov/2026 já entram na primeira visita do administrador
   const tabs = abasDe(me);
@@ -1481,6 +1485,7 @@ function painel() {
     if (document.activeElement && nav.contains(document.activeElement)) document.activeElement.blur();
     if (window.PR_EMAILMKT) window.PR_EMAILMKT.barra(me, k, $('#emkt-bar'));
     V[k](me, $('#tab'));
+    document.dispatchEvent(new CustomEvent('pr-aba', { detail: { id: k, nome: t[2] } }));
   };
   irPara = k => { if (tabs.some(t => t[0] === k)) abrir(k); };
   nav.querySelectorAll('.area-col').forEach(c => c.addEventListener('mouseleave', () => c.classList.remove('fechada')));
@@ -1545,14 +1550,20 @@ function painel() {
     if (top && top.firstElementChild) top.firstElementChild.appendChild(ind);
   }
   // Aberto pelo app CONecta Retiro (area-restrita.html?app=1#t=ferramenta): tela limpa, botão de voltar ao app e a ferramenta já aberta.
-  const qApp = new URLSearchParams(location.search).get('app') === '1', alvo = new URLSearchParams(location.hash.slice(1)).get('t');
+  const qApp = new URLSearchParams(location.search).get('app') === '1' || /\/app\/ferramenta\.html$/.test(location.pathname), alvo = new URLSearchParams(location.hash.slice(1)).get('t');
   if (qApp) {
     document.body.classList.add('modo-app');
-    if (!$('#volta-app')) { const v = document.createElement('a'); v.id = 'volta-app'; v.href = 'app/'; v.className = 'btn-visit btn-large'; v.innerHTML = '<i class="fas fa-arrow-left" aria-hidden="true"></i> Voltar ao app'; $('#app').prepend(v);
-      // "Ajuda": explicação da ferramenta aberta, na Ajuda do app (app/#ajuda-f/<ferramenta>)
-      const h = document.createElement('a'); h.id = 'ajuda-app'; h.href = 'app/#ajuda-f/' + encodeURIComponent(alvo || ''); h.className = 'btn-visit btn-large'; h.innerHTML = '<i class="fas fa-question-circle" aria-hidden="true"></i> Ajuda';
+    // Barra do app no topo: voltar ao Início do app, nome da ferramenta e Ajuda (como as telas do próprio app)
+    if (!$('#volta-app')) {
+      const barra = document.createElement('div'); barra.id = 'app-barra'; barra.className = 'app-barra';
+      barra.innerHTML = '<a id="volta-app" href="app/" class="app-barra-bt"><i class="fas fa-arrow-left" aria-hidden="true"></i><span>Início</span></a>'
+        + '<strong id="app-titulo" class="app-barra-titulo">CONecta Retiro</strong>'
+        + '<a id="ajuda-app" href="app/#ajuda-f/' + encodeURIComponent(alvo || '') + '" class="app-barra-bt"><i class="fas fa-question-circle" aria-hidden="true"></i><span>Ajuda</span></a>';
+      document.body.prepend(barra);
+      const h = $('#ajuda-app');
       h.onclick = () => { const at = document.querySelector('.tab-btn[aria-selected="true"], .tab-btn.active'); h.href = 'app/#ajuda-f/' + encodeURIComponent((at && at.dataset.tab) || alvo || ''); };
-      v.after(h); }
+      document.addEventListener('pr-aba', ev => { $('#app-titulo').textContent = ev.detail.nome; h.href = 'app/#ajuda-f/' + encodeURIComponent(ev.detail.id); document.title = ev.detail.nome + ' · CONecta Retiro'; window.scrollTo(0, 0); });
+    }
   }
   if (alvo) irPara(alvo);
 }

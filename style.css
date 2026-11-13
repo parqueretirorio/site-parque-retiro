@@ -1302,11 +1302,37 @@ details[open] .prod-cx-nome::before { content: '\25BE '; }
 .bf-rotulo { display: block; font-weight: 600; margin: 12px 0 4px; }
 .bf-saida { width: 100%; font-family: Consolas, 'Courier New', monospace; font-size: .9rem; line-height: 1.5; border: 1px solid #cfd8e0; border-radius: 8px; padding: 10px; }
 
-/* Área restrita aberta pelo app CONecta Retiro (area-restrita.html?app=1) */
-body.modo-app > header, body.modo-app > footer { display: none; }
-body.modo-app #ajuda-app { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 16px 10px; font-size: 1.1rem; }
-body.modo-app #volta-app { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 16px; font-size: 1.1rem; }
-body.modo-app .page-hero { display: none; }
+/* Área restrita aberta pelo app CONecta Retiro (app/ferramenta.html ou area-restrita.html?app=1):
+   parece uma tela do app: barra azul no topo, só a ferramenta escolhida, letras maiores e nada mais largo que o celular. */
+body.modo-app { background: #f4f7f9; font-size: 17px; -webkit-text-size-adjust: 100%; overflow-x: hidden; }
+body.modo-app > header, body.modo-app > footer, body.modo-app .page-hero, body.modo-app .whatsapp-float { display: none !important; }
+body.modo-app #app .painel-top, body.modo-app #areas, body.modo-app #emkt-bar { display: none !important; }
+.app-barra { display: none; }
+body.modo-app .app-barra { display: flex; align-items: center; gap: 8px; position: sticky; top: 0; z-index: 900; background: #1d4a7a; color: #fff;
+  padding: calc(8px + env(safe-area-inset-top)) 8px 8px; min-height: 60px; box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+.app-barra-titulo { flex: 1; min-width: 0; text-align: center; font-size: 1.12rem; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.app-barra-bt { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 64px; min-height: 48px; padding: 4px 6px;
+  color: #fff !important; text-decoration: none; font-size: .78rem; font-weight: 700; border-radius: 12px; }
+.app-barra-bt i { font-size: 1.25rem; }
+.app-barra-bt:active, .app-barra-bt:focus-visible { background: rgba(255,255,255,.18); outline: 3px solid #f2b705; outline-offset: 0; }
+body.modo-app .container { max-width: 100%; padding: 12px 10px 40px; margin: 0; }
+body.modo-app #tab.panel { padding: 16px 14px; border-radius: 16px; margin: 0; box-shadow: none; border: 1px solid #dfe6ec; }
+body.modo-app #tab h3, body.modo-app #tab .section-title { font-size: 1.25rem; line-height: 1.3; }
+/* abas internas da ferramenta: uma linha que desliza para o lado */
+body.modo-app #tab .tabs, body.modo-app #tab .tabs.sub { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 8px; padding: 2px 2px 10px; margin: 0 -4px 14px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+body.modo-app #tab .tabs .tab-btn { flex: 0 0 auto; scroll-snap-align: start; white-space: nowrap; min-height: 46px; font-size: .95rem; border-radius: 23px; padding: 10px 16px; }
+/* formulários do tamanho do dedo */
+body.modo-app #tab input:not([type=checkbox]):not([type=radio]):not([type=color]):not([type=range]), body.modo-app #tab select, body.modo-app #tab textarea {
+  width: 100%; max-width: 100%; font-size: 1rem; min-height: 48px; border-radius: 12px; box-sizing: border-box; }
+body.modo-app #tab textarea { min-height: 96px; }
+body.modo-app #tab input[type=checkbox], body.modo-app #tab input[type=radio] { width: 24px; height: 24px; }
+body.modo-app #tab .btn-visit, body.modo-app #tab button.btn-visit { min-height: 46px; font-size: 1rem; border-radius: 12px; }
+body.modo-app #tab .form-row, body.modo-app #tab fieldset { max-width: 100%; min-width: 0; }
+/* nada mais largo que o celular: tabelas e conteúdos largos deslizam para o lado */
+body.modo-app #tab table { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+body.modo-app #tab img, body.modo-app #tab iframe, body.modo-app #tab video, body.modo-app #tab canvas { max-width: 100%; height: auto; }
+body.modo-app #tab pre, body.modo-app #tab code { white-space: pre-wrap; word-break: break-word; }
+@media (max-width: 700px) { body.modo-app #tab .emkt-cols { display: block; } }
 
 /* Página Entrar: chamada para o app CONecta Retiro */
 .app-promo { display: grid; grid-template-columns: 80px 1fr; gap: 12px 16px; align-items: center; margin-top: 18px; }

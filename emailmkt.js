@@ -140,7 +140,7 @@ function abrirGerador(me, ctx) {
   ctx = ctx || {};
   const antigo = document.getElementById('emkt-modal'); if (antigo) antigo.remove();
   const pre = ctx.pre || {};
-  const baseSite = location.protocol.startsWith('http') ? location.origin + location.pathname.replace(/[^/]*$/, '') : '';
+  const baseSite = location.protocol.startsWith('http') ? new URL('.', document.baseURI).href : '';
   const atv = (ctx.atividades || []);
   const wrap = document.createElement('div'); wrap.id = 'emkt-modal'; wrap.className = 'emkt-overlay'; wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true'); wrap.setAttribute('aria-label', 'Gerar Comunicado por e-mail');
   wrap.innerHTML = `<div class="emkt-box">

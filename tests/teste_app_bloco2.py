@@ -92,7 +92,7 @@ async def main():
         await pg.fill('#ib', 'S123'); await pg.wait_for_timeout(200); await pg.click('.item-b2')
         await pg.wait_for_selector('.ficha'); t2 = await pg.inner_text('main')
         ok('Furadeira Bosch' in t2 and 'Depósito' in t2 and 'Empréstimo' in t2 and 'Beto Silva' in t2, "ficha do item com local, empréstimo e movimentações")
-        ok(await pg.locator('a.bt-principal[href*="area-restrita.html?app=1#t=inventario"]').count() == 1, "movimentar abre a ferramenta completa")
+        ok(await pg.locator('a.bt-principal[href*="ferramenta.html?app=1#t=inventario"]').count() == 1, "movimentar abre a ferramenta completa")
         await pg.screenshot(path=OUT + '/app-b2-3-ficha.png', full_page=True)
 
         # ---------- Documentos e Calendários ----------
