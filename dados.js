@@ -23,7 +23,8 @@ const CFG = window.PR_CONFIG_DADOS || { modo: 'local' };
 let ls = armazenamentoLocal, modo = CFG.modo || 'local';
 const SB = window.PR_SUPABASE;
 if (SB && SB.ligado() && SB.paginaRestrita()) { ls = SB.criarArmazenamento(); modo = 'supabase'; }   // Fase 1: login e dados no Supabase
-else if (modo === 'supabase') modo = 'local';  // páginas públicas continuam no navegador
+else if (modo === 'supabase' && window.PR_VITRINE && window.PR_VITRINE.ligado()) { ls = window.PR_VITRINE.criar(); modo = 'vitrine'; } // páginas abertas: leem as vitrines e enviam pela caixa de entrada (vitrine-publica.js)
+else if (modo === 'supabase') modo = 'local';  // sem servidor (testes no computador): páginas abertas ficam no navegador
 else if (CFG.modo === 'remoto') {
   if (!window.PR_ADAPTADOR_REMOTO) throw new Error('Modo remoto ligado, mas adaptador-remoto.js não foi carregado. Não vou gravar em silêncio no navegador.');
   ls = window.PR_ADAPTADOR_REMOTO.criar(CFG);

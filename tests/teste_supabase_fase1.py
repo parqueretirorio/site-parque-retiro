@@ -42,9 +42,9 @@ async def main():
         br = await p.chromium.launch()
         ctx, pg, erros = await nova_pagina(br, sb)
 
-        # 1) página pública continua no navegador
+        # 1) página pública: lê só as vitrines do servidor (Fase 2, migração 0011); nada da equipe
         await pg.goto(B + '/index.html?servidor=1')
-        ok(await pg.evaluate("PR_DADOS.modo") == 'local', "páginas públicas continuam no modo do navegador")
+        ok(await pg.evaluate("PR_DADOS.modo") == 'vitrine', "páginas públicas no modo vitrine (só leem o que é público)")
 
         # 2) login: senha errada, cadastro pendente, administrador
         await entrar(pg, 'leonidasfrancaemedi@gmail.com', 'errada')

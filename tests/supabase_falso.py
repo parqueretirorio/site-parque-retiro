@@ -1,5 +1,5 @@
 # Supabase "falso" para os testes da Fase 1: imita as rotas que o site usa (Auth e REST), mas as regras de dados
-# rodam no PostgreSQL DE VERDADE (local), com as mesmas migrações do Supabase (0001–0009 + 0010).
+# rodam no PostgreSQL DE VERDADE (local), com as mesmas migrações do Supabase (0001–0011).
 # Assim o teste confere o banco real: RLS, gatilhos (perfis_protege), versões e conflitos.
 # Requer PostgreSQL 16 local (usuário postgres). Usado por tests/teste_supabase_fase1.py.
 import json, os, re, subprocess, uuid, itertools
@@ -138,6 +138,16 @@ class SupabaseFalso:
         if caminho == '/auth/v1/logout':
             self.tokens.pop(tok, None)
             return 204, None
+        if caminho in ('/rest/v1/rpc/pr_ler_publico', '/rest/v1/rpc/pr_enviar_publico') and not uid:
+            try:  # site aberto, sem login: papel anon (só a chave pública)
+                if caminho.endswith('pr_ler_publico'):
+                    nomes = '{' + ','.join('"' + n.replace('"', '') + '"' for n in (corpo or {}).get('p_nomes', [])) + '}'
+                    r = psql(f"select pr_ler_publico({lit(nomes)}::text[])", self.db, 'anon')
+                else:
+                    r = psql(f"select pr_enviar_publico({lit(corpo['p_caixa'])}, {lit(corpo['p_dados'])}::jsonb)", self.db, 'anon')
+                return 200, json.loads(r[-1])
+            except ErroBanco as e:
+                return 400, {'message': str(e)}
         if caminho.startswith('/rest/v1/'):
             if not uid:
                 return 401, {'message': 'JWT expired'}
@@ -171,6 +181,13 @@ class SupabaseFalso:
                 r = psql("select pr_ler_colecoes()", self.db, 'authenticated', uid)
             elif fn == 'pr_gravar_colecao':
                 r = psql(f"select pr_gravar_colecao({lit(corpo['p_nome'])}, {int(corpo['p_versao_base'])}, {lit(corpo['p_dados'])}::jsonb)", self.db, 'authenticated', uid)
+            elif fn == 'pr_pegar_envios':
+                r = psql("select pr_pegar_envios()", self.db, 'authenticated', uid)
+            elif fn == 'pr_apagar_envios':
+                r = psql(f"select pr_apagar_envios({lit('{' + ','.join(str(int(i)) for i in corpo.get('p_ids', [])) + '}')}::bigint[])", self.db, 'authenticated', uid)
+            elif fn == 'pr_ler_publico':
+                nomes = '{' + ','.join('"' + n.replace('"', '') + '"' for n in (corpo or {}).get('p_nomes', [])) + '}'
+                r = psql(f"select pr_ler_publico({lit(nomes)}::text[])", self.db, 'authenticated', uid)
             elif fn == 'pr_excluir_colecao':
                 r = psql(f"select pr_excluir_colecao({lit(corpo['p_nome'])}, {int(corpo['p_versao_base'])})", self.db, 'authenticated', uid)
             else:

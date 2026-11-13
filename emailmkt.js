@@ -66,6 +66,12 @@ function descadastroPublico(box) {
   const m = box.querySelector('#sai-m');
   box.querySelector('#sai-f').onsubmit = ev => {
     ev.preventDefault(); m.hidden = false; m.className = 'form-erro';
+    if (window.PR_DADOS && PR_DADOS.modo === 'vitrine' && window.PR_VITRINE) { // site ligado ao servidor: o pedido vai para a equipe aplicar
+      const em = String(box.querySelector('#sai-e').value || '').trim().toLowerCase();
+      if (!emailOk(em)) { m.textContent = 'Informe um e-mail válido.'; return; }
+      window.PR_VITRINE.enviar('contatos', { acao: 'sair', email: em });
+      m.className = 'tip-box'; m.textContent = 'Pronto. Você deixou de receber o Comunicado do Parque Retiro.'; return;
+    }
     const r = descadastrar(box.querySelector('#sai-e').value);
     if (r === 'invalido') { m.textContent = 'Informe um e-mail válido.'; return; }
     if (r === 'erro') { m.textContent = 'Não foi possível salvar agora. Tente de novo.'; return; }

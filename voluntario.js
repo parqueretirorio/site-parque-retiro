@@ -11,7 +11,7 @@ const STATUS = { novo: 'Novo', contato: 'Em contato', ativo: 'Voluntário(a) ati
 const CONSENTIMENTO = 'Autorizo o Parque Retiro a usar meus dados apenas para entrar em contato sobre o trabalho voluntário.';
 const UNID = { horas: ['hora', 'horas'], dias: ['dia', 'dias'], semanas: ['semana', 'semanas'], meses: ['mês', 'meses'] };
 const soDig = s => String(s || '').replace(/\D/g, '');
-const modoLocal = () => !(window.PR_DADOS && window.PR_DADOS.modo === 'remoto');
+const modoLocal = () => !(window.PR_DADOS && (window.PR_DADOS.modo === 'remoto' || window.PR_DADOS.modo === 'vitrine'));
 const pad = n => String(n).padStart(2, '0');
 const hojeLocal = () => { const d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
 

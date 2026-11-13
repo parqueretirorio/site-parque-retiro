@@ -194,6 +194,8 @@ function criarArmazenamento(opc) {
     if (r.status !== 200 || !r.corpo || typeof r.corpo !== 'object') { st.estado = r.status === 403 ? 'sem-permissao' : 'offline'; st.erro = 'Não foi possível carregar os dados (' + r.status + ').'; return; }
     Object.keys(r.corpo).forEach(n => { cache.set(PREF + n, JSON.stringify(r.corpo[n].dados)); versoes.set(n, r.corpo[n].versao | 0); });
     st.estado = 'ok'; st.ultimaSync = new Date().toISOString();
+    // depois de abrir: vitrines em dia e envios do site aberto recolhidos (em segundo plano)
+    setTimeout(() => { try { arm.atualizaVitrines(); } catch (e) { /* ignora */ } recolherEnvios().catch(() => { /* fica para a próxima */ }); }, 1200);
   }
 
   function agenda() { if (timer) clearTimeout(timer); timer = setTimeout(() => { timer = null; sincronizar().catch(() => { /* fica pendente */ }); }, atraso); }
@@ -220,6 +222,7 @@ function criarArmazenamento(opc) {
       if (k === PREF + 'users') { cache.set(k, normalizaUsers(v)); usersSujo = true; agenda(); avisa(); return true; }
       cache.set(k, v);
       if (sincronizavel(k)) { sujos.add(nome(k)); apagar.delete(nome(k)); agenda(); avisa(); }
+      atualizaVitrine(nome(k));
       return true;
     },
     del(k) {
@@ -232,6 +235,31 @@ function criarArmazenamento(opc) {
     conflitos: () => [...conflitos.entries()].map(([n, c]) => Object.assign({ colecao: n }, c)),
     resolverConflito
   };
+
+  // Vitrine pública (publico.js): cópia sem dados pessoais do que o site aberto pode mostrar. Só grava se mudou.
+  function atualizaVitrine(n) {
+    const P = window.PR_PUBLICO; if (!P || !P.VITRINES[n] || st.estado !== 'ok') return;
+    let d; try { d = JSON.parse(cache.get(PREF + n) || 'null'); } catch (e) { return; }
+    if (d == null) return;
+    const v = JSON.stringify(P.vitrine(n, d)), k = PREF + 'pub_' + n;
+    if (cache.get(k) === v) return;
+    cache.set(k, v); sujos.add('pub_' + n); apagar.delete('pub_' + n); agenda(); avisa();
+  }
+  // Envios do site aberto (cadastro no Comunicado, voluntários, fotos): entram nas coleções e saem da caixa de entrada.
+  async function recolherEnvios() {
+    const P = window.PR_PUBLICO; if (!P || st.estado !== 'ok') return 0;
+    let envios; try { envios = await rpc('pr_pegar_envios', {}); } catch (e) { return 0; } // migração 0011 ainda não instalada ou sem rede
+    if (!Array.isArray(envios) || !envios.length) return 0;
+    const mudou = P.juntar(envios, n => { try { return JSON.parse(cache.get(PREF + n) || '[]'); } catch (e) { return []; } });
+    Object.keys(mudou).forEach(n => arm.set(PREF + n, JSON.stringify(mudou[n])));
+    try { await sincronizar(); } catch (e) { return 0; }
+    if (sujos.size || conflitos.size) return 0; // só apaga da caixa o que já está guardado no servidor
+    try { await rpc('pr_apagar_envios', { p_ids: envios.map(e => e.id) }); } catch (e) { /* fica para a próxima abertura */ }
+    try { window.dispatchEvent(new CustomEvent('pr-envios', { detail: { total: envios.length, colecoes: Object.keys(mudou) } })); } catch (e) { /* ignora */ }
+    return envios.length;
+  }
+  arm.recolherEnvios = recolherEnvios;
+  arm.atualizaVitrines = () => { const P = window.PR_PUBLICO; if (P) Object.keys(P.VITRINES).forEach(atualizaVitrine); };
 
   async function rpc(nomeFn, corpo) {
     let s = await sessaoValida(); if (!s) { st.estado = 'sem-sessao'; throw new Error('Sua sessão terminou. Entre de novo para continuar salvando.'); }
@@ -256,6 +284,7 @@ function criarArmazenamento(opc) {
         uniao.sort((a, b) => String(a.t || '').localeCompare(String(b.t || '')));
         cache.set(PREF + n, JSON.stringify(uniao)); versoes.set(n, vs); return enviaUma(n);
       }
+      if (n.startsWith('pub_')) { versoes.set(n, vs); return enviaUma(n); } // vitrine: é só uma cópia gerada; a mais nova vale
       conflitos.set(n, { meu: dados, servidor, versaoServidor: vs }); sujos.delete(n);
       return;
     }
