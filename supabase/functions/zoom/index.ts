@@ -49,13 +49,20 @@ async function quemPode(req: Request): Promise<string | null> {
 }
 
 // token do Zoom (vale 1 hora); guardado enquanto a função estiver "quente"
-let tok = { valor: '', ate: 0 };
+let tok = { valor: '', ate: 0 }, motivo = '';
+// limpa espaços, quebras de linha e aspas que às vezes vêm junto ao copiar e colar
+const limpo = (n: string) => (Deno.env.get(n) || '').replace(/[\s"']/g, '');
 async function tokenZoom(): Promise<string | null> {
   if (tok.valor && Date.now() < tok.ate - 60000) return tok.valor;
-  const conta = Deno.env.get('ZOOM_ACCOUNT_ID') || '', id = Deno.env.get('ZOOM_CLIENT_ID') || '', seg = Deno.env.get('ZOOM_CLIENT_SECRET') || '';
+  const conta = limpo('ZOOM_ACCOUNT_ID'), id = limpo('ZOOM_CLIENT_ID'), seg = limpo('ZOOM_CLIENT_SECRET');
   const r = await fetch('https://zoom.us/oauth/token?grant_type=account_credentials&account_id=' + encodeURIComponent(conta),
-    { method: 'POST', headers: { Authorization: 'Basic ' + btoa(id + ':' + seg) } });
-  if (!r.ok) return null;
+    { method: 'POST', headers: { Authorization: 'Basic ' + btoa(id + ':' + seg), 'Content-Type': 'application/x-www-form-urlencoded' } });
+  if (!r.ok) { // guarda só o motivo que o Zoom deu (nunca os códigos)
+    let j: any = {}; try { j = await r.json(); } catch { /* sem corpo */ }
+    motivo = `${r.status} ${j.reason || j.error || ''}`.trim().slice(0, 200);
+    console.error('token do Zoom recusado:', motivo, '| tamanhos (conta/id/segredo):', conta.length, id.length, seg.length);
+    return null;
+  }
   const j = await r.json();
   tok = { valor: j.access_token, ate: Date.now() + (j.expires_in || 3600) * 1000 };
   return tok.valor;
@@ -80,9 +87,9 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors(req) });
   if (req.method !== 'POST') return resp(req, 405, { erro: 'Use POST.' });
   if (!(await quemPode(req))) return resp(req, 403, { erro: 'Só o administrador ou o Responsável pelos Documentos e Calendários pode usar o Zoom pela plataforma.' });
-  if (!Deno.env.get('ZOOM_ACCOUNT_ID') || !Deno.env.get('ZOOM_CLIENT_ID') || !Deno.env.get('ZOOM_CLIENT_SECRET')) return resp(req, 503, { erro: 'nao-configurado' });
+  if (!limpo('ZOOM_ACCOUNT_ID') || !limpo('ZOOM_CLIENT_ID') || !limpo('ZOOM_CLIENT_SECRET')) return resp(req, 503, { erro: 'nao-configurado' });
   const t = await tokenZoom();
-  if (!t) return resp(req, 502, { erro: 'O Zoom recusou os códigos do aplicativo. Confira ZOOM_ACCOUNT_ID, ZOOM_CLIENT_ID e ZOOM_CLIENT_SECRET e se o app CONecta Retiro está ativado.' });
+  if (!t) return resp(req, 502, { erro: 'O Zoom recusou os códigos do aplicativo (resposta do Zoom: ' + (motivo || 'sem detalhe') + '). Confira ZOOM_ACCOUNT_ID, ZOOM_CLIENT_ID e ZOOM_CLIENT_SECRET (sem espaços, cada um no seu nome) e se o app CONecta Retiro está ativado.' });
 
   let c: any; try { c = await req.json(); } catch { return resp(req, 400, { erro: 'Pedido inválido.' }); }
   const hoje = new Date(), okDia = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s || '');
@@ -121,7 +128,7 @@ Deno.serve(async (req) => {
   }
 
   if (c.acao === 'criar_reuniao') {
-    const host = Deno.env.get('ZOOM_USER') || '';
+    const host = limpo('ZOOM_USER');
     if (!host) return resp(req, 503, { erro: 'Falta o segredo ZOOM_USER (e-mail da conta do Zoom que hospeda as reuniões).' });
     const topico = String(c.topico || '').slice(0, 200), inicio = String(c.inicio || ''), dur = Math.min(Math.max(+c.duracao || 60, 15), 720);
     if (!topico || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(inicio)) return resp(req, 400, { erro: 'Informe o título, a data e a hora.' });
