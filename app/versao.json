@@ -1,7 +1,7 @@
 {
-  "versao": "1.6.4",
+  "versao": "1.6.5",
   "data": "2026-11-13",
   "novidades": [
-    "Dar encaminhamento: novo início padrão das mensagens para os Mestres (português e espanhol)"
+    "Dar encaminhamento: uma linha em branco entre um ponto e outro nas mensagens, para ficar mais fácil de ler"
   ]
 }

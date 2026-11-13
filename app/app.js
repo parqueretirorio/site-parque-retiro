@@ -24,7 +24,7 @@ let me = null;
 // Mensagens do login vêm em português do adaptador; aqui viram o idioma do app.
 const traduzErro = m => /incorretos/.test(m) ? t('errCred') : /confirmar seu e-mail/.test(m) ? t('errConf') : /Sem conexão/.test(m) ? t('errRede') : /Muitas tentativas/.test(m) ? t('errMuitas') : m;
 
-const VERSAO = '1.6.4', DATA_VERSAO = '13/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
+const VERSAO = '1.6.5', DATA_VERSAO = '13/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 
 /* ---------- Instalar o app e atualizações ---------- */

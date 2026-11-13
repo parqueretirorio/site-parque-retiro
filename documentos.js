@@ -201,10 +201,10 @@ const nomeLang = (D, lang) => { const m = /^RE-(\d{4})\.(\d+)$/.exec(D.r); retur
 const msgResumo = (D, link, lang = 'pt') => {
   const T = MSG[lang] || MSG.pt, it = D.itens, tx = i => curto(textoLang(i.e, lang)), rs = i => respLang(i.e.resp, lang);
   const L = [T.topo(nomeLang(D, lang)), T.introR(it.length)];
-  const sr = it.filter(i => i.semResp); if (sr.length) { L.push('', T.precisaResp(sr.length)); sr.forEach(i => L.push(`• ${tx(i)} [${i.d.codigo}]`)); }
-  const sd = it.filter(i => i.semData && !i.semResp); if (sd.length) { L.push('', T.precisaData(sd.length)); sd.forEach(i => L.push(`• ${tx(i)} – ${rs(i)}`)); }
-  if (D.atrasados.length) { L.push('', T.atraso); D.atrasados.forEach(i => L.push(`• ${fmtBR(i.data)} · ${tx(i)} – ${semRespM(i.e.resp) ? T.semResp : rs(i)}`)); }
-  const px = D.prox.filter(i => !i.semResp); if (px.length) { L.push('', T.proximos); px.forEach(i => L.push(`• ${fmtBR(i.data)} · ${tx(i)} – ${rs(i)}`)); }
+  const sr = it.filter(i => i.semResp); if (sr.length) { L.push('', T.precisaResp(sr.length)); sr.forEach((i, k) => L.push(...(k ? [''] : []), `• ${tx(i)} [${i.d.codigo}]`)); }
+  const sd = it.filter(i => i.semData && !i.semResp); if (sd.length) { L.push('', T.precisaData(sd.length)); sd.forEach((i, k) => L.push(...(k ? [''] : []), `• ${tx(i)} – ${rs(i)}`)); }
+  if (D.atrasados.length) { L.push('', T.atraso); D.atrasados.forEach((i, k) => L.push(...(k ? [''] : []), `• ${fmtBR(i.data)} · ${tx(i)} – ${semRespM(i.e.resp) ? T.semResp : rs(i)}`)); }
+  const px = D.prox.filter(i => !i.semResp); if (px.length) { L.push('', T.proximos); px.forEach((i, k) => L.push(...(k ? [''] : []), `• ${fmtBR(i.data)} · ${tx(i)} – ${rs(i)}`)); }
   L.push('', T.fimR(link), '', T.abraco);
   return L.join('\n');
 };
@@ -214,6 +214,7 @@ const msgStatus = (D, link, lang = 'pt') => {
     const marcas = [i.semResp ? T.mSemResp : '👤 ' + respLang(i.e.resp, lang), i.semData ? T.mSemData : (i.atraso ? T.mAtraso : '📅 ') + fmtBR(i.data)];
     if (i.prox45) marcas.push(T.mProx);
     const passo = lang === 'es' && i.e.passoEs ? i.e.passoEs : i.e.passo;
+    if (n) L.push('');
     L.push(`${n + 1}. ${curto(textoLang(i.e, lang), 110)} [${i.d.codigo}]`, '   ' + marcas.join(' · ') + (passo ? `\n   ➡️ ${T.passo}: ${passo}` : ''));
   });
   L.push('', T.fimS(link), '', T.abraco);

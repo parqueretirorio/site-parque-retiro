@@ -30,7 +30,7 @@ async def main():
         ok(await pg.locator('#fe').count() == 1, "app abre na tela Entrar")
         ok(await pg.evaluate("!!document.querySelector('link[rel=manifest]')") and await pg.locator('#ajuda').is_visible(), "app instalável e com 'Preciso de ajuda' à vista")
         ok(await pg.locator('.instalar img').count() == 1 and 'Tenha o app no celular' in await pg.inner_text('.instalar'), "ao abrir o app aparece o aviso de instalar, com o ícone")
-        ok('versão 1.6.4' in await pg.inner_text('.versao'), "versão do app à vista")
+        ok('versão 1.6.5' in await pg.inner_text('.versao'), "versão do app à vista")
         await pg.screenshot(path=OUT + '/app-1-entrar.png', full_page=True)
         await pg.click('#fecha-instalar'); ok(await pg.locator('.instalar').count() == 0, "'Agora não' esconde o aviso de instalar")
         # aviso de atualização quando há versão nova publicada
@@ -41,7 +41,7 @@ async def main():
         await ctx.unroute('**/app/versao.json*')
         # página Entrar do site: ícone do app, versão e botão Baixar o app
         await pg.goto(B + '/login.html'); await pg.wait_for_function("document.getElementById('app-ver').textContent.includes('13/11/2026')")
-        ok(await pg.locator('#app-promo img').count() == 1 and 'Versão 1.6.4' in await pg.inner_text('#app-promo') and await pg.locator('#app-promo a[href="app/"]').count() == 1, "página Entrar do site mostra o app, a versão e 'Baixar o app'")
+        ok(await pg.locator('#app-promo img').count() == 1 and 'Versão 1.6.5' in await pg.inner_text('#app-promo') and await pg.locator('#app-promo a[href="app/"]').count() == 1, "página Entrar do site mostra o app, a versão e 'Baixar o app'")
         await pg.screenshot(path=OUT + '/app-0-login-site.png', full_page=True)
         await pg.goto(B + '/app/?servidor=1'); await pg.wait_for_selector('#fe')
         await pg.fill('#e', 'cida@x.com'); await pg.fill('#s', 'senhaCida123'); await pg.click('#be')

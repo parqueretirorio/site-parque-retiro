@@ -1,4 +1,4 @@
-# Teste: app CONecta Retiro (1.6.4) > "Dar encaminhamento" (atalho no início e aba em Documentos e Calendários),
+# Teste: app CONecta Retiro (1.6.5) > "Dar encaminhamento" (atalho no início e aba em Documentos e Calendários),
 # contra o PostgreSQL local com as migrações do Supabase.  Rodar:  python3 tests/teste_app_dar.py [pacote.json]
 import asyncio, subprocess, time, os, sys, json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
