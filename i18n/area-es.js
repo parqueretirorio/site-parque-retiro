@@ -2352,5 +2352,20 @@
 "Nenhuma pendência: todos os encaminhamentos das atas estão resolvidos.": "Sin pendientes: todos los encaminamientos de las actas están resueltos.",
 "Código das atas: RE-ano.nº da reunião no ano (ex.: RE-2026.1 = 1ª Reunião de Escola de 2026); -D1, -D2 quando cada dia da reunião tem ata própria. REX = reunião extraordinária; ATA = outras atas.": "Código de las actas: RE-año.nº de la reunión en el año (ej.: RE-2026.1 = 1ª Reunión de Escuela de 2026); -D1, -D2 cuando cada día de la reunión tiene acta propia. REX = reunión extraordinaria; ATA = otras actas.",
 "Padrão: RE-ano.nº da reunião no ano (1 ou 2); -D1, -D2 quando cada dia tem ata própria. Extraordinária: REX-…; outras: ATA-… Em branco, o código é sugerido ao salvar.": "Patrón: RE-año.nº de la reunión en el año (1 o 2); -D1, -D2 cuando cada día tiene acta propia. Extraordinaria: REX-…; otras: ATA-… En blanco, el código se sugiere al guardar.",
-"Código fora do padrão. Use, por exemplo, RE-2026.1 ou RE-2026.2-D1.": "Código fuera del patrón. Use, por ejemplo, RE-2026.1 o RE-2026.2-D1."
+"Código fora do padrão. Use, por exemplo, RE-2026.1 ou RE-2026.2-D1.": "Código fuera del patrón. Use, por ejemplo, RE-2026.1 o RE-2026.2-D1.",
+"Dar encaminhamento": "Dar seguimiento",
+"Avisar o Grupo de Mestres": "Avisar al Grupo de Maestros",
+"Mensagem para o Grupo de Mestres": "Mensaje para el Grupo de Maestros",
+"Confira, ajuste se quiser e envie. Nada é enviado sozinho.": "Revise, ajuste si quiere y envíe. Nada se envía solo.",
+"Copiar": "Copiar",
+"Copiado": "Copiado",
+"Abrir no WhatsApp": "Abrir en WhatsApp",
+"Fechar": "Cerrar",
+"Quem assume": "Quién asume",
+"Próximo passo": "Próximo paso",
+"O que fazer agora para andar": "Qué hacer ahora para avanzar",
+"Reunião": "Reunión",
+"Nome(s)": "Nombre(s)",
+"Nenhuma ata de Reunião de Escola com código (RE-…) cadastrada ainda.": "Aún no hay actas de Reunión de Escuela con código (RE-…).",
+"Tudo encaminhado: nenhuma pendência desta reunião. 🎉": "Todo encaminado: ningún pendiente de esta reunión. 🎉"
 });})();

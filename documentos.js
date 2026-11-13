@@ -384,6 +384,75 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
     lista();
   };
 
+  /* ---------- Dar encaminhamento: só o que ficou pendente de UMA Reunião de Escola (por padrão a mais recente),
+     para nada ficar parado: completar responsável, prazo e próximo passo, e avisar o Grupo de Mestres. ---------- */
+  const DE = { r: '', msg: false };
+  const chaveReuniao = d => { const m = /^(RE-\d{4}\.\d+)/.exec(d.codigo || ''); return m ? m[1] : ''; };
+  const nomeReuniao = k => { const m = /^RE-(\d{4})\.(\d+)$/.exec(k); return m ? `${m[2]}ª Reunião de Escola ${m[1]}` : k; };
+  const diasDesde = iso => iso ? Math.max(0, Math.round((new Date(hoje() + 'T12:00:00') - new Date(iso + 'T12:00:00')) / 864e5)) : 0;
+  const curto = (t, n = 95) => { t = String(t || '').replace(/\s*\(Documento Oficial CONecta Retiro, (?:item|itens) [^)]*\)/, '').replace(/\s*·\s*a verificar/, ''); return t.length > n ? t.slice(0, n - 1) + '…' : t; };
+  const encArea = el => {
+    const atas = docs().filter(d => d.area === 'atas' && chaveReuniao(d)), al = ativs();
+    const reunioes = [...new Set(atas.slice().sort((a, b) => b.data.localeCompare(a.data)).map(chaveReuniao))];
+    if (!DE.r || !reunioes.includes(DE.r)) DE.r = reunioes[0] || '';
+    const itens = [];
+    atas.filter(d => chaveReuniao(d) === DE.r).forEach(d => (d.enc || []).forEach(e => { if (e.status !== 'Em aberto') return;
+      const at = e.ativ ? al.find(a => a.id === e.ativ) : null, data = at ? at.data : e.data || '';
+      itens.push({ d, e, data, semResp: semResp(e.resp), semData: !data, parado: diasDesde(e.atualizado || d.data) }); }));
+    itens.sort((x, y) => (y.semResp - x.semResp) || (y.semData - x.semData) || (x.data || '').localeCompare(y.data || '') || (x.d.codigo || '').localeCompare(y.d.codigo || ''));
+    const nR = itens.filter(i => i.semResp).length, nD = itens.filter(i => i.semData).length, prox = itens.filter(i => i.data && !i.semResp && i.data <= addDia(hoje(), 45));
+    const link = new URL('.', document.baseURI).href + 'area-restrita.html';
+    const mensagem = () => {
+      const L = [`*Dar encaminhamento · ${nomeReuniao(DE.r)}*`, `Ainda temos *${itens.length}* encaminhamento(s) em aberto da nossa reunião. Para nada ficar parado nem cair no esquecimento:`];
+      const sr = itens.filter(i => i.semResp); if (sr.length) { L.push('', `🙋 *Precisam de alguém que assuma (${sr.length})*`); sr.forEach(i => L.push(`• ${curto(i.e.texto)} [${i.d.codigo}]`)); }
+      const sd = itens.filter(i => i.semData && !i.semResp); if (sd.length) { L.push('', `📅 *Precisam de prazo (${sd.length})*`); sd.forEach(i => L.push(`• ${curto(i.e.texto)} – ${i.e.resp}`)); }
+      if (prox.length) { L.push('', '⏳ *Próximos prazos*'); prox.forEach(i => L.push(`• ${fmtData(i.data)} · ${curto(i.e.texto)} – ${i.e.resp}`)); }
+      L.push('', `Quem puder assumir ou já tiver novidade, responda aqui ou atualize em Área restrita › Documentos e Calendários › Dar encaminhamento: ${link}`, '', 'Um forte abraço!');
+      return L.join('\n');
+    };
+    el.innerHTML = `<h3><i class="fas fa-share-square"></i> Dar encaminhamento</h3>
+    <p>Somente o que ficou <strong>pendente da ${esc(nomeReuniao(DE.r) || 'última Reunião de Escola')}</strong>, para nada ficar parado nem cair no esquecimento. Complete quem assume, o prazo e o próximo passo; depois avise o Grupo de Mestres.${pode ? '' : ' Seu acesso é de consulta.'}</p>
+    ${reunioes.length > 1 ? `<div class="form-row no-print" style="max-width:360px"><label for="de-r">Reunião</label><select id="de-r">${reunioes.map(k => `<option value="${esc(k)}"${k === DE.r ? ' selected' : ''}>${esc(nomeReuniao(k))} (${esc(k)})</option>`).join('')}</select></div>` : ''}
+    ${msg ? `<p class="tip-box" role="status"><i class="fas fa-check-circle"></i> ${esc(msg)}</p>` : ''}
+    ${DE.r ? `<p class="tip-box" role="note"><i class="fas fa-tasks"></i> <strong>${itens.length}</strong> em aberto · <strong style="color:#a31d21">${nR}</strong> sem responsável · <strong style="color:#b8620f">${nD}</strong> sem data · <strong>${prox.length}</strong> com prazo nos próximos 45 dias</p>
+    <p class="no-print"><button type="button" class="btn-visit btn-large" id="de-msg"><i class="fab fa-whatsapp"></i> Avisar o Grupo de Mestres</button></p>
+    ${DE.msg ? `<section class="tip-box" style="display:block"><h4 style="margin-top:0"><i class="fab fa-whatsapp"></i> Mensagem para o Grupo de Mestres</h4><p><small>Confira, ajuste se quiser e envie. Nada é enviado sozinho.</small></p>
+      <textarea id="de-txt" rows="14" style="width:100%;font-family:inherit">${esc(mensagem())}</textarea>
+      <p><button type="button" class="btn-visit" id="de-cp"><i class="fas fa-copy"></i> Copiar</button> <a class="btn-visit" id="de-wa" href="#" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> Abrir no WhatsApp</a> <button type="button" class="btn-visit" id="de-fx" style="background:#6c7a7b">Fechar</button></p></section>` : ''}
+    <div id="de-lista">${itens.length ? itens.map((i, n) => `<div class="doc-item" data-de="${esc(i.d.id)}|${esc(i.e.id)}" style="display:block">
+      <p style="margin:0 0 6px"><span class="badge-status" style="background:#1d4a7a;color:#fff">${esc(i.d.codigo)}</span>
+        ${i.semResp ? '<span class="badge-status" style="background:#a31d21;color:#fff">Sem responsável</span>' : ''} ${i.semData ? '<span class="badge-status" style="background:#b8620f;color:#fff">Sem data</span>' : ''}
+        ${i.data && i.data < hoje() ? '<span class="badge-status" style="background:#a31d21;color:#fff">Em atraso</span>' : ''} <small>${i.e.atualizado ? 'atualizado há ' : 'parado há '}${i.parado} dia(s)</small></p>
+      <strong>${esc(i.e.texto)}</strong>${i.e.passo ? `<p style="margin:4px 0"><i class="fas fa-shoe-prints" aria-hidden="true"></i> Próximo passo: ${esc(i.e.passo)}</p>` : ''}
+      ${!i.semResp ? `<p style="margin:4px 0"><small>${respHtml(i.e.resp)}</small></p>` : ''}
+      ${pode ? `<div style="display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-top:8px">
+        <div><label for="de-rs${n}" style="display:block;font-weight:600;font-size:.85em">Quem assume</label><input id="de-rs${n}" data-k="resp" maxlength="80" value="${esc(semResp(i.e.resp) ? '' : i.e.resp)}" placeholder="Nome(s)"></div>
+        <div><label for="de-dt${n}" style="display:block;font-weight:600;font-size:.85em">Prazo</label><input id="de-dt${n}" data-k="data" type="date" value="${esc(i.data)}"></div>
+        <div style="grid-column:span 2;min-width:170px"><label for="de-ps${n}" style="display:block;font-weight:600;font-size:.85em">Próximo passo</label><input id="de-ps${n}" data-k="passo" maxlength="160" value="${esc(i.e.passo || '')}" placeholder="O que fazer agora para andar"></div>
+        <div><label for="de-st${n}" style="display:block;font-weight:600;font-size:.85em">Situação</label><select id="de-st${n}" data-k="status">${opt(ENC_ST, i.e.status)}</select></div>
+        <div style="align-self:end"><button type="button" class="btn-visit" data-de-ok><i class="fas fa-save"></i> Salvar</button></div></div>` : ''}</div>`).join('')
+      : '<p class="vazio">Tudo encaminhado: nenhuma pendência desta reunião. 🎉</p>'}</div>` : '<p class="vazio">Nenhuma ata de Reunião de Escola com código (RE-…) cadastrada ainda.</p>'}`;
+    const sel = $('#de-r', el); if (sel) sel.onchange = () => { DE.r = sel.value; DE.msg = false; msg = ''; draw(); };
+    const bm = $('#de-msg', el); if (bm) bm.onclick = () => { DE.msg = true; msg = ''; draw(); const t = $('#de-txt', el); if (t) t.scrollIntoView({ block: 'center' }); };
+    const tx = $('#de-txt', el);
+    if (tx) {
+      const wa = $('#de-wa', el), atual = () => { wa.href = 'https://wa.me/?text=' + encodeURIComponent(tx.value); }; atual(); tx.oninput = atual;
+      $('#de-cp', el).onclick = async () => { try { await navigator.clipboard.writeText(tx.value); } catch (x) { tx.select(); try { document.execCommand('copy'); } catch (y) {} } $('#de-cp', el).innerHTML = '<i class="fas fa-check"></i> Copiado'; };
+      $('#de-fx', el).onclick = () => { DE.msg = false; draw(); };
+    }
+    el.querySelectorAll('[data-de-ok]').forEach(b => b.onclick = () => {
+      if (!pode) return; const box = b.closest('[data-de]'), [di, ei] = box.dataset.de.split('|'), v = k => box.querySelector(`[data-k="${k}"]`).value.trim();
+      const l = docs(), d = l.find(y => y.id === di), e = d && (d.enc || []).find(y => y.id === ei); if (!e) return;
+      const al2 = ativs(), at = e.ativ ? al2.find(a => a.id === e.ativ) : null;
+      e.resp = v('resp') || (semResp(e.resp) ? e.resp : ''); e.passo = v('passo'); e.status = v('status'); e.atualizado = hoje(); e.atualizadoPor = me.nome;
+      const nd = v('data'); e.data = nd;
+      if (at) { if (nd) at.data = nd; at.resp = e.resp; }
+      else if (nd && e.status === 'Em aberto') { const id = 'enc-' + e.id; al2.push({ id, titulo: e.texto.slice(0, 120), data: nd, fim: '', hora: '', categoria: e.tipo || 'Outras atividades', local: '', descricao: `Encaminhamento da ata ${d.codigo || d.titulo}.`, resp: e.resp, criado: hoje(), por: me.nome, origem: 'ata' }); e.ativ = id; }
+      if (!db.set('ativ', al2) || !db.set('docs', l)) { msg = 'Não foi possível salvar.'; draw(); return; }
+      msg = e.status === 'Em aberto' ? `Encaminhamento atualizado${nd && !at ? ' e colocado no calendário' : ''}: "${curto(e.texto, 60)}".` : `"${curto(e.texto, 60)}" marcado como ${e.status}.`; draw();
+    });
+  };
+
   /* ---------- Calendários (uma única lista de atividades alimenta todas as visões: semanal, mensal, trimestral, semestral e anual) ---------- */
   const calendario = (el, cal) => {
     const sem = !!cal.semanal; // visão semanal: 7 dias, de domingo a sábado
@@ -480,12 +549,12 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
   };
 
   /* ---------- Estrutura da aba ---------- */
-  const SUB = areas.map(a => [a.id, a.nome]).concat(areas.some(a => a.id === 'atas') ? [['pend', 'Pendências']] : [], cals.map(c => [c.id, c.nome]));
+  const SUB = areas.map(a => [a.id, a.nome]).concat(areas.some(a => a.id === 'atas') ? [['pend', 'Pendências'], ['dar', 'Dar encaminhamento']] : [], cals.map(c => [c.id, c.nome]));
   const draw = () => {
     root.innerHTML = `${SUB.length > 1 ? `<div class="tabs sub no-print" role="tablist">${SUB.map(t => `<button class="tab-btn${t[0] === sub ? ' active' : ''}" data-s="${t[0]}">${esc(t[1])}</button>`).join('')}</div>` : ''}<div id="doc-sub"></div>`;
     root.querySelectorAll('[data-s]').forEach(b => b.onclick = () => { sub = b.dataset.s; form = null; msg = ''; F.ano = F.cat = F.q = ''; F.aberto = false; draw(); });
     const area = areas.find(a => a.id === sub), cal = cals.find(c => c.id === sub);
-    if (area) docArea($('#doc-sub', root), area); else if (sub === 'pend') pendArea($('#doc-sub', root)); else calendario($('#doc-sub', root), cal);
+    if (area) docArea($('#doc-sub', root), area); else if (sub === 'pend') pendArea($('#doc-sub', root)); else if (sub === 'dar') encArea($('#doc-sub', root)); else calendario($('#doc-sub', root), cal);
   };
   draw();
 } };
