@@ -79,7 +79,14 @@ const eventos = (db, de, ate) => {
   // Toda atividade cadastrada em Comissões > Atividades (inclusive rascunho) também entra no calendário, para planejar a divulgação nas redes sociais.
   const MAPA = { evento: 'Celebração / Evento', encontro: 'Encontro Estacional', retiro: 'Retiro / Seminário', reuniao: 'Reunião de Escola' };
   const doModulo = db.get('atividades', []).filter(a => a && a.dataAtiv && a.titulo).map(a => ({ id: 'at:' + a.id, key: 't:' + a.id, travada: true, modulo: 'Atividades', titulo: a.titulo + (a.status === 'publicada' ? '' : ' (rascunho)'), descricao: a.lide || '', data: a.dataAtiv, fim: '', hora: '', local: a.local || '', categoria: MAPA[a.categoria] || 'Outras atividades' }));
-  return db.get('ativ', []).map(a => ({ ...a, key: 'a:' + a.id })).concat(doModulo, fx).filter(e => e.data <= ate && (e.fim || e.data) >= de)
+  // Atividade semanal (a.semanal): repete no mesmo dia da semana, da data inicial até a data final (sem data final = sem fim).
+  const sem = [];
+  db.get('ativ', []).forEach(a => {
+    if (!a.semanal || !a.data) { sem.push({ ...a, key: 'a:' + a.id }); return; }
+    const fim = a.fim && a.fim < ate ? a.fim : ate;
+    for (let d = a.data, n = 0; d <= fim && n < 600; d = addDia(d, 7), n++) if (d >= de) sem.push({ ...a, data: d, fim: '', key: 'a:' + a.id + ':' + d, ocorrencia: true });
+  });
+  return sem.concat(doModulo, fx).filter(e => e.data <= ate && (e.fim || e.data) >= de)
     .sort((x, y) => x.data.localeCompare(y.data) || (x.hora || '').localeCompare(y.hora || '') || x.titulo.localeCompare(y.titulo, 'pt-BR'));
 };
 // Quadro de gestão das datas fixas (usado no Calendário Anual e na aba de Comunicação). aoMudar(msg) é chamado após cada alteração.
@@ -142,6 +149,16 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, abri
   const ativs = () => db.get('ativ', []);
   const catsDe = a => a.cats.concat(db.get('doc_cats', {})[a.id] || []);
   const catsAtiv = () => ATIV_CATS.concat(db.get('ativ_cats', []));
+  // Responsável escrito à mão ("Ana e Pablo", "Comissão de Construção (Marcos, Antônio)"): cada nome que bate com um cadastro
+  // aprovado aparece marcado (✓ e o nome completo); os demais ficam como texto, "sem cadastro", até a pessoa se cadastrar.
+  const cadastroDe = nome => { const n = norm(nome); if (n.length < 3) return null; const us = (db.get('users', []) || []).filter(u => (u.status || 'aprovado') === 'aprovado' && u.nome);
+    return us.find(u => norm(u.nome) === n) || us.find(u => norm(u.nome).startsWith(n + ' ')) || null; };
+  const respHtml = txt => {
+    const partes = String(txt).split(/(\s*,\s*|\s+e\s+|\s*[()]\s*|\s*:\s*)/);
+    let algum = false;
+    const html = partes.map(p => { if (/^(\s*,\s*|\s+e\s+|\s*[()]\s*|\s*:\s*)$/.test(p) || !p.trim()) return esc(p); const u = cadastroDe(p.trim()); if (!u) return esc(p); algum = true; return `<strong title="Tem cadastro: ${esc(u.nome)}"><i class="fas fa-user-check" aria-hidden="true" style="color:#2e7d32"></i> ${esc(p)}</strong>`; }).join('');
+    return `<i class="fas fa-user" aria-hidden="true"></i> Responsável: ${html}${algum ? '' : ' <em>(sem cadastro)</em>'}`;
+  };
   const cor = c => c === CAT_FIXA ? '#6a3d9a' : CORES[Math.max(0, catsAtiv().indexOf(c)) % CORES.length];
   const novaCat = (chave, nome, base) => { // registra categoria nova sem duplicar
     nome = String(nome || '').trim().replace(/\s+/g, ' ').slice(0, 60); if (!nome) return '';
@@ -193,16 +210,16 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, abri
         ${a.descricao ? `<p style="margin:4px 0">${esc(a.descricao)}</p>` : ''}
         <p style="margin:4px 0"><small>${a.arquivo ? '<i class="fas fa-file-pdf"></i> ' + esc(a.arqNome || 'ata') + ' · ' : ''}${(a.anexos || []).length ? (a.anexos || []).length + ' anexo(s) · ' : ''}${(a.videos || []).length} vídeo(s)</small></p>
         ${(a.enc || []).length ? `<ul style="margin:4px 0 0 18px">${a.enc.map(e => `<li>${esc(e.texto)}${e.resp ? ` <em>(${esc(e.resp)})</em>` : ''}${e.data ? ' · ' + fmtData(e.data) : ''} · <span style="color:${encCor(e.status || ENC_ST[0])}">${esc(e.status || ENC_ST[0])}</span>${e.cal && e.data ? ' · <i class="fas fa-calendar-plus" title="vai para o calendário"></i>' : ''}</li>`).join('')}</ul>` : ''}</div>`).join('')}
-      ${(p.atividades || []).length ? `<div style="border-top:1px solid #dfe6ec;padding:10px 0"><strong>Datas para o calendário</strong><ul style="margin:4px 0 0 18px">${p.atividades.map(t => `<li>${fmtData(t.data)}${t.fim ? ' a ' + fmtData(t.fim) : ''}${t.hora ? ' · ' + esc(t.hora) : ''} · ${esc(t.titulo)} <small>(${esc(t.categoria || 'Outras atividades')})${novaAt(t.id) ? '' : ' · já existe: será atualizada'}</small></li>`).join('')}</ul></div>` : ''}
+      ${(p.atividades || []).length ? `<div style="border-top:1px solid #dfe6ec;padding:10px 0"><strong>Datas para o calendário</strong><ul style="margin:4px 0 0 18px">${p.atividades.map(t => `<li>${t.semanal ? 'toda semana desde ' : ''}${fmtData(t.data)}${t.fim ? ' a ' + fmtData(t.fim) : ''}${t.hora ? ' · ' + esc(t.hora) : ''} · ${esc(t.titulo)}${t.resp ? ` <em>(${esc(t.resp)})</em>` : ''} <small>(${esc(t.categoria || 'Outras atividades')})${novaAt(t.id) ? '' : ' · já existe: será atualizada'}</small></li>`).join('')}</ul></div>` : ''}
       <p><button type="button" class="btn-visit btn-large" id="imp-ok"><i class="fas fa-check"></i> Está certo, importar</button> <button type="button" class="btn-visit" id="imp-x">Cancelar</button></p></section>`;
   };
   const importa = p => {
     const l = docs(), al = ativs(); let nAt = 0, nCal = 0;
-    const poeAtiv = (id, x) => { const i = al.findIndex(a => a.id === id); const o = Object.assign({ fim: '', hora: '', local: '', descricao: '' }, x, { id, origem: 'ata', criado: hoje(), por: me.nome }); if (i >= 0) al[i] = Object.assign(al[i], o, { criado: al[i].criado || o.criado }); else al.push(o); nCal++; };
+    const poeAtiv = (id, x) => { const i = al.findIndex(a => a.id === id); const o = Object.assign({ fim: '', hora: '', local: '', descricao: '', resp: '', semanal: false }, x, { id, origem: 'ata', criado: hoje(), por: me.nome }); if (i >= 0) al[i] = Object.assign(al[i], o, { criado: al[i].criado || o.criado }); else al.push(o); nCal++; };
     p.atas.forEach(a => {
       const enc = (a.enc || []).map(e => {
         const e1 = { id: e.id || uid(), texto: String(e.texto || '').slice(0, 300), resp: String(e.resp || '').slice(0, 80), data: okData(e.data) ? e.data : '', status: ENC_ST.includes(e.status) ? e.status : ENC_ST[0], tipo: e.tipo || 'Outras atividades', ativ: '' };
-        if (e.cal && e1.data) { e1.ativ = 'imp-' + e1.id; poeAtiv(e1.ativ, { titulo: e1.texto.slice(0, 120), data: e1.data, categoria: e1.tipo, descricao: e1.resp ? 'Responsável: ' + e1.resp : '' }); }
+        if (e.cal && e1.data) { e1.ativ = 'imp-' + e1.id; poeAtiv(e1.ativ, { titulo: e1.texto.slice(0, 120), data: e1.data, categoria: e1.tipo, resp: e1.resp, descricao: e.descricao || '' }); }
         return e1;
       });
       const dados = { area: 'atas', titulo: a.titulo, data: a.data, ano: +a.data.slice(0, 4), categoria: a.categoria || 'Reunião de Escola', descricao: a.descricao || '', arquivo: a.arquivo || '', arqNome: a.arqNome || '', link: a.link || '', videos: (a.videos || []).filter(v => /^https:\/\//i.test(v.url || '')), anexos: (a.anexos || []).filter(x => H.safeUrl(x.arquivo || '')), enc, origem: 'importacao' };
@@ -210,7 +227,7 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, abri
       if (i >= 0) l[i] = Object.assign(l[i], dados, { editado: hoje(), editadoPor: me.nome }); else l.push(Object.assign({ id: a.id }, dados, { criado: hoje(), por: me.nome }));
       nAt++;
     });
-    (p.atividades || []).forEach(t => poeAtiv(t.id, { titulo: t.titulo, data: t.data, fim: okData(t.fim) ? t.fim : '', hora: t.hora || '', categoria: t.categoria || 'Outras atividades', local: t.local || '', descricao: t.descricao || '' }));
+    (p.atividades || []).forEach(t => poeAtiv(t.id, { titulo: t.titulo, data: t.data, fim: okData(t.fim) ? t.fim : '', hora: t.hora || '', categoria: t.categoria || 'Outras atividades', local: t.local || '', descricao: t.descricao || '', resp: String(t.resp || '').slice(0, 160), semanal: !!t.semanal }));
     if (!db.set('ativ', al) || !db.set('docs', l)) return 'Não foi possível salvar a importação.';
     return `Importação concluída: ${nAt} ata(s) e ${nCal} data(s) no calendário.`;
   };
@@ -329,7 +346,7 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, abri
       const multi = a.fim && a.fim !== a.data;
       const rot = porDia ? (multi ? `${fmtData(a.data).slice(0, 5)} a ${fmtData(a.fim).slice(0, 5)}` : '') + (a.hora ? ' ' + esc(a.hora) : '')
         : `${a.data.slice(8)}/${a.data.slice(5, 7)}${multi ? ' a ' + fmtData(a.fim).slice(0, 5) : ''}${a.hora ? ' ' + esc(a.hora) : ''}`;
-      return `<li><span class="cal-ponto" style="background:${cor(a.categoria)}"></span><span>${rot.trim() ? `<strong>${rot.trim()}</strong> ` : ''}${esc(a.titulo)}${a.local ? ` <small>(${esc(a.local)})</small>` : ''}${a.descricao ? `<br><small>${esc(a.descricao)}</small>` : ''}${botoes(a)}</span></li>`;
+      return `<li><span class="cal-ponto" style="background:${cor(a.categoria)}"></span><span>${rot.trim() ? `<strong>${rot.trim()}</strong> ` : ''}${esc(a.titulo)}${a.semanal ? ' <small title="Repete toda semana"><i class="fas fa-redo"></i> semanal</small>' : ''}${a.local ? ` <small>(${esc(a.local)})</small>` : ''}${a.resp ? `<br><small>${respHtml(a.resp)}</small>` : ''}${a.descricao ? `<br><small>${esc(a.descricao)}</small>` : ''}${botoes(a)}</span></li>`;
     };
     const mesCard = m => {
       const prim = new Date(C.ano, m, 1).getDay(), dias = new Date(C.ano, m + 1, 0).getDate(); let c = '';
@@ -364,7 +381,9 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, abri
       <div class="form-row"><label for="a-h">Horário (opcional)</label><input id="a-h" type="time" value="${esc(ed ? ed.hora || '' : '')}"></div>
       <div class="form-row"><label for="a-c">Tipo de atividade *</label><select id="a-c">${opt(cats, ed ? ed.categoria : cats[0])}<option value="__novo">＋ Novo tipo...</option></select></div>
       <div class="form-row" id="a-cw" hidden><label for="a-cn">Nome do novo tipo *</label><input id="a-cn" maxlength="60"></div>
+      <div class="form-row"><label><input type="checkbox" id="a-sem" ${ed && ed.semanal ? 'checked' : ''}> Repete toda semana, no mesmo dia (até a data final; sem data final, segue sempre)</label></div>
       <div class="form-row"><label for="a-l">Local</label><input id="a-l" maxlength="80" value="${esc(ed ? ed.local || '' : '')}"></div>
+      <div class="form-row"><label for="a-r">Responsável</label><input id="a-r" maxlength="160" value="${esc(ed ? ed.resp || '' : '')}" placeholder="Nome(s), mesmo de quem ainda não tem cadastro"><small>Quem tiver cadastro na área restrita aparece marcado no calendário.</small></div>
       <div class="form-row"><label for="a-s">Descrição</label><textarea id="a-s" rows="2" maxlength="300">${esc(ed ? ed.descricao || '' : '')}</textarea></div>
       <p class="form-erro" id="a-e" role="alert" hidden></p>
       <button class="btn-visit btn-large"><i class="fas fa-save"></i> ${ed ? 'Salvar alterações' : 'Cadastrar'}</button> <button type="button" class="btn-visit btn-large" id="a-x" style="background:#6c7a7b;margin-left:8px">Cancelar</button></form>` : ''}
@@ -395,7 +414,7 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, abri
       if (!t || !d) return falha('Informe o título e a data.');
       if (f && f < d) return falha('A data final não pode ser antes da data inicial.');
       let cat = g('a-c'); if (cat === '__novo') { cat = novaCat('ativ_cats', g('a-cn'), ATIV_CATS); if (!cat) return falha('Digite o nome do novo tipo.'); }
-      const l = ativs(), dados = { titulo: t, data: d, fim: f && f !== d ? f : '', hora: g('a-h'), categoria: cat, local: g('a-l'), descricao: g('a-s') };
+      const l = ativs(), dados = { titulo: t, data: d, fim: f && f !== d ? f : '', hora: g('a-h'), categoria: cat, local: g('a-l'), descricao: g('a-s'), resp: g('a-r'), semanal: $('#a-sem', el).checked };
       if (ed) Object.assign(l.find(a => a.id === ed.id), dados); else l.push({ id: uid(), ...dados, criado: hoje(), por: me.nome });
       if (!db.set('ativ', l)) return falha('Sem espaço no navegador para salvar.');
       C.ano = +d.slice(0, 4); const mm = +d.slice(5, 7) - 1; C.per = { mes: mm + 1, tri: Math.floor(mm / 3) + 1, sem: mm < 6 ? 1 : 2, ano: 1 }; W.ini = domingoDe(d); // mostra o período da atividade salva

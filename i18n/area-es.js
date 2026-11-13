@@ -2328,5 +2328,12 @@
 "Importação concluída: # ata(s) e # data(s) no calendário.": "Importación concluida: # acta(s) y # fecha(s) en el calendario.",
 "Este arquivo não é um pacote de ata válido (.json).": "Este archivo no es un paquete de acta válido (.json).",
 "Este arquivo não é um pacote de ata do CONecta Retiro.": "Este archivo no es un paquete de acta de CONecta Retiro.",
-"Ata em espanhol": "Acta en español"
+"Ata em espanhol": "Acta en español",
+"Repete toda semana, no mesmo dia (até a data final; sem data final, segue sempre)": "Se repite cada semana, el mismo día (hasta la fecha final; sin fecha final, sigue siempre)",
+"Repete toda semana": "Se repite cada semana",
+"semanal": "semanal",
+"(sem cadastro)": "(sin registro)",
+"Responsável:": "Responsable:",
+"Nome(s), mesmo de quem ainda não tem cadastro": "Nombre(s), incluso de quien aún no tiene registro",
+"toda semana desde": "cada semana desde"
 });})();
