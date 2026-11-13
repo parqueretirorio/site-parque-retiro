@@ -72,6 +72,9 @@ class SupabaseFalso:
         self.arquivos = {}      # Storage: 'bucket/caminho' -> {bytes, tipo}
         self.r2 = False         # função album-r2: False = não configurada (503); True = ligada
         self.r2_arquivos = {}   # Cloudflare R2 simulada: caminho -> bytes
+        self.zoom = False       # função zoom: False = não configurada (503)
+        self.zoom_gravacoes = []  # [{uuid, topico, inicio, duracao, tamanho, transcricao(texto|None)}]
+        self.zoom_reunioes = []
         self.ultimo_binario = None
 
     # ---------- dados de teste ----------
@@ -122,6 +125,8 @@ class SupabaseFalso:
     def rotear(self, m, caminho, q, corpo, uid, tok):
         if m == 'OPTIONS':
             return 200, None
+        if caminho == '/functions/v1/zoom':
+            return self.funcao_zoom(corpo or {}, uid)
         if caminho == '/functions/v1/album-r2':
             return self.album_r2(corpo or {}, uid)
         if caminho.startswith('/storage/v1/'):
@@ -272,3 +277,25 @@ class SupabaseFalso:
             await route.fulfill(status=200 if b else 404, headers=cors, content_type='image/jpeg', body=b or b'')
             return
         await route.fulfill(status=404, body='')
+
+    # ---------- função zoom (Edge Function) simulada ----------
+    def funcao_zoom(self, corpo, uid):
+        if not uid: return 403, {'erro': 'sem login'}
+        p = psql(f"select nivel || '|' || status || '|' || array_to_string(funcoes, ',') from perfis where id='{uid}'", self.db)
+        nivel, status, fn = (p[0].split('|') + ['', '', ''])[:3] if p else ('', '', '')
+        if status != 'aprovado' or not (nivel == 'administrador' or 'documentos' in fn.split(',')): return 403, {'erro': 'sem permissão'}
+        if not self.zoom: return 503, {'erro': 'nao-configurado'}
+        ac = corpo.get('acao')
+        if ac == 'gravacoes':
+            return 200, {'reunioes': [{'uuid': g['uuid'], 'id': 1, 'topico': g['topico'], 'inicio': g['inicio'], 'duracao': g['duracao'], 'tamanho': g['tamanho'], 'link': 'https://zoom.us/rec/share/x', 'transcricao': bool(g.get('transcricao')), 'video': True, 'arquivos': 3} for g in self.zoom_gravacoes]}
+        if ac == 'transcricao':
+            g = next((g for g in self.zoom_gravacoes if g['uuid'] == corpo.get('uuid')), None)
+            if not g or not g.get('transcricao'): return 404, {'erro': 'Esta gravação não tem transcrição.'}
+            return 200, {'texto': g['transcricao'], 'topico': g['topico'], 'inicio': g['inicio'], 'duracao': g['duracao']}
+        if ac == 'apagar':
+            antes = len(self.zoom_gravacoes); self.zoom_gravacoes = [g for g in self.zoom_gravacoes if g['uuid'] != corpo.get('uuid')]
+            return (200, {'apagado': True}) if len(self.zoom_gravacoes) < antes else (502, {'erro': 'não achei'})
+        if ac == 'criar_reuniao':
+            self.zoom_reunioes.append(corpo); n = len(self.zoom_reunioes)
+            return 200, {'id': 900 + n, 'link': f'https://us02web.zoom.us/j/900{n}', 'senha': 'abc'}
+        return 400, {'erro': 'ação'}

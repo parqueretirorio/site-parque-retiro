@@ -23,3 +23,10 @@ Próximos passos (ver docs/PLANO.md): (1) criar projeto homologação; (2) aplic
 - Enquanto a função não estiver configurada (responde 503), o Enviar em lote continua usando o Supabase Storage (0012).
 - No bucket da R2, a política de CORS precisa liberar PUT e GET para https://parqueretirorio.github.io e https://parqueretiro.org.br.
 - **Situação em 13/11:** conta Cloudflare criada (Gmail do Parque); ativação da R2 adiada até haver o cartão virtual do Parque. Até lá o Enviar em lote usa o Supabase Storage (0012).
+
+## Função zoom — ligação Zoom ↔ plataforma (13/11/2026)
+- Arquivo: `supabase/functions/zoom/index.ts`. Nome: **zoom**, com **Verify JWT desligado** (confere sozinha: administrador ou função "documentos").
+- App no Zoom Marketplace: **CONecta Retiro** (Server-to-Server OAuth, conta Parque Retiro, Workplace Pro), com 5 permissões:
+  `cloud_recording:read:list_account_recordings:admin`, `cloud_recording:read:list_user_recordings:admin`, `cloud_recording:delete:meeting_recording:admin`, `meeting:write:meeting:admin`, `meeting:read:meeting:admin`.
+- Segredos: `ZOOM_ACCOUNT_ID`, `ZOOM_CLIENT_ID`, `ZOOM_CLIENT_SECRET` (aba App Credentials) e `ZOOM_USER` (e-mail da conta do Zoom que hospeda as reuniões).
+- Na plataforma: Atas › **Gravações do Zoom** (lista 30 dias por vez, cria ata pela transcrição, apaga da nuvem) e, no calendário, "Criar a reunião no Zoom" na atividade (link de entrada; semanal vira reunião recorrente).

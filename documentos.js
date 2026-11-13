@@ -163,6 +163,8 @@ const darEncaminhamento = (db, h, r) => {
   return { r, nome: nomeReuniao(r), reunioes, itens, nR: itens.filter(i => i.semResp).length, nD: itens.filter(i => i.semData).length,
     atrasados: itens.filter(i => i.atraso), prox: itens.filter(i => i.prox45) };
 };
+// Ligação com o Zoom (função zoom no Supabase): só no modo servidor
+const zoomLigado = () => !!(window.PR_SUPABASE && PR_SUPABASE.ligado && PR_SUPABASE.ligado() && PR_SUPABASE.funcao);
 // ---------- Transcrição de reunião (Zoom .vtt, YouTube .vtt/.srt ou texto) -> rascunho de ata ----------
 // Zoom: "Nome: fala" em cada trecho; YouTube (legenda automática): sem nomes, com marcações <00:00:01.234><c>…</c>
 // e linhas repetidas que "rolam" – tudo isso é limpo aqui.
@@ -325,6 +327,28 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
     for (const t of p.atividades || []) if (!t.id || !t.titulo || !okData(t.data)) return 'Uma das datas do pacote está incompleta.';
     return p;
   };
+  // Gravações na nuvem do Zoom (função zoom no Supabase): criar ata pela transcrição e apagar da nuvem
+  const ZM = { aberto: false, ate: '', lista: null, erro: '', carregando: false };
+  const zoomBloco = () => {
+    const ate = ZM.ate || hoje(), de = addDia(ate, -30), mb = b => (b / 1048576).toLocaleString('pt-BR', { maximumFractionDigits: b < 10485760 ? 1 : 0 });
+    const tot = (ZM.lista || []).reduce((n, m) => n + (m.tamanho || 0), 0);
+    return `<section class="tip-box" style="display:block" id="zm-box"><h4 style="margin-top:0"><i class="fas fa-video"></i> Gravações na nuvem do Zoom</h4>
+      <p><small>De ${fmtData(de)} a ${fmtData(ate)}. ${ZM.lista ? `${ZM.lista.length} gravação(ões), ocupando ${mb(tot)} MB dos 10 GB da nuvem.` : ''}</small></p>
+      ${ZM.carregando ? '<p>Buscando no Zoom…</p>' : ZM.erro ? `<p class="form-erro" role="alert">${esc(ZM.erro)}</p>` : ZM.lista && !ZM.lista.length ? '<p class="vazio">Nenhuma gravação neste período.</p>' : ZM.lista ? `<div style="overflow-x:auto"><table class="doc-table"><thead><tr><th>Data</th><th>Reunião</th><th>Duração</th><th>Tamanho</th><th></th></tr></thead><tbody>${ZM.lista.map((m, i) => `<tr>
+        <td>${esc(fmtData(isoBR(m.inicio)))}<br><small>${esc(horaBR(m.inicio))}</small></td><td>${esc(m.topico || 'Reunião')}${m.transcricao ? ' <span class="badge-status" style="background:#2e7d32;color:#fff">com transcrição</span>' : ' <span class="badge-status badge-uso">sem transcrição</span>'}</td>
+        <td>${m.duracao || 0} min</td><td>${mb(m.tamanho || 0)} MB</td>
+        <td style="white-space:nowrap">${m.transcricao ? `<button type="button" class="btn-visit" data-zma="${i}"><i class="fas fa-file-alt"></i> Criar ata</button> ` : ''}${m.link ? `<a class="btn-visit" href="${esc(m.link)}" target="_blank" rel="noopener" style="background:#6c7a7b">Ver/baixar no Zoom</a> ` : ''}<button type="button" class="icon-btn" data-zmx="${i}" title="Apagar de vez da nuvem do Zoom" aria-label="Apagar do Zoom: ${esc(m.topico || '')}"><i class="fas fa-trash"></i></button></td></tr>`).join('')}</tbody></table></div>` : ''}
+      <p><button type="button" class="btn-visit" id="zm-ant"><i class="fas fa-chevron-left"></i> 30 dias antes</button>${ZM.ate ? ' <button type="button" class="btn-visit" id="zm-dep">30 dias depois <i class="fas fa-chevron-right"></i></button>' : ''} <button type="button" class="btn-visit" id="zm-x" style="background:#6c7a7b">Fechar</button></p>
+      <p><small>Antes de apagar: se o vídeo for importante, baixe ou publique no YouTube (não listado). Apagar libera o espaço na hora e não tem volta.</small></p></section>`;
+  };
+  const isoBR = z => { const d = new Date(z); return isNaN(d) ? '' : new Date(d.getTime() - 3 * 3600e3).toISOString().slice(0, 10); };
+  const horaBR = z => { const d = new Date(z); return isNaN(d) ? '' : new Date(d.getTime() - 3 * 3600e3).toISOString().slice(11, 16); };
+  const carregaZoom = () => { ZM.carregando = true; ZM.erro = ''; draw();
+    const ate = ZM.ate || hoje();
+    PR_SUPABASE.funcao('zoom', { acao: 'gravacoes', de: addDia(ate, -30), ate }).then(r => { ZM.carregando = false;
+      if (r.status === 200 && r.corpo) ZM.lista = (r.corpo.reunioes || []).sort((a, b) => String(b.inicio).localeCompare(String(a.inicio)));
+      else { ZM.lista = null; ZM.erro = r.status === 503 ? 'A ligação com o Zoom ainda não foi configurada no Supabase (função zoom e os códigos ZOOM_*).' : (r.corpo && r.corpo.erro) || 'Não foi possível falar com o Zoom (' + r.status + ').'; }
+      draw(); }); };
   const trsBloco = (r, area) => {
     const cats = catsDe(area), cat = cats.find(c => c !== 'Reunião de Escola') || cats[0]; // Reunião de Escola só quando escolhida (ganha o código RE)
     return `<section class="tip-box" style="display:block" id="trs-box"><h4 style="margin-top:0"><i class="fas fa-closed-captioning"></i> Ata a partir da transcrição: conferir</h4>
@@ -383,9 +407,10 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
     <p>Documentos organizados por ano e, dentro de cada ano, pela data (do mais recente ao mais antigo).${pode ? '' : ' Seu acesso é de consulta.'}</p>
     ${area.id === 'atas' ? (() => { const ab = todos.reduce((n, d) => n + (d.enc || []).filter(e => e.status === 'Em aberto').length, 0); return `<p class="tip-box" role="note"><i class="fas fa-tasks"></i> <strong>${ab}</strong> encaminhamento(s) em aberto nas atas. Decisões que precisam de data podem ser levadas ao calendário direto da ata.</p>`; })() : ''}
     ${msg ? `<p class="tip-box" role="status"><i class="fas fa-check-circle"></i> ${esc(msg)}</p>` : ''}
-    ${pode && !form && !imp && !trs ? `<p><button class="btn-visit btn-large" id="d-novo"><i class="fas fa-plus-circle"></i> Novo documento</button>${area.id === 'atas' ? ` <label class="btn-visit btn-large" for="d-imp" style="cursor:pointer"><i class="fas fa-file-import"></i> Importar ata preparada</label><input id="d-imp" type="file" accept=".json,application/json" hidden> <label class="btn-visit btn-large" for="d-trs" style="cursor:pointer"><i class="fas fa-closed-captioning"></i> Ata a partir da transcrição</label><input id="d-trs" type="file" accept=".vtt,.srt,.txt,text/vtt,text/plain" hidden>` : ''}</p>${area.id === 'atas' ? '<p class="vazio"><small>"Importar ata preparada": arquivo .json montado pelo Claude a partir da ata, com datas, encaminhamentos e vídeos. "Ata a partir da transcrição": o arquivo de transcrição do Zoom (.vtt) ou a legenda baixada do YouTube Studio (.vtt ou .srt) vira o rascunho da ata, com participantes e o link do vídeo. Você confere tudo antes de gravar.</small></p>' : ''}` : ''}
+    ${pode && !form && !imp && !trs ? `<p><button class="btn-visit btn-large" id="d-novo"><i class="fas fa-plus-circle"></i> Novo documento</button>${area.id === 'atas' ? ` <label class="btn-visit btn-large" for="d-imp" style="cursor:pointer"><i class="fas fa-file-import"></i> Importar ata preparada</label><input id="d-imp" type="file" accept=".json,application/json" hidden> <label class="btn-visit btn-large" for="d-trs" style="cursor:pointer"><i class="fas fa-closed-captioning"></i> Ata a partir da transcrição</label><input id="d-trs" type="file" accept=".vtt,.srt,.txt,text/vtt,text/plain" hidden>${zoomLigado() ? ' <button type="button" class="btn-visit btn-large" id="d-zoom"><i class="fas fa-video"></i> Gravações do Zoom</button>' : ''}` : ''}</p>${area.id === 'atas' ? '<p class="vazio"><small>"Importar ata preparada": arquivo .json montado pelo Claude a partir da ata, com datas, encaminhamentos e vídeos. "Ata a partir da transcrição": o arquivo de transcrição do Zoom (.vtt) ou a legenda baixada do YouTube Studio (.vtt ou .srt) vira o rascunho da ata, com participantes e o link do vídeo. Você confere tudo antes de gravar.</small></p>' : ''}` : ''}
     ${pode && imp ? impBloco(imp) : ''}
     ${pode && trs ? trsBloco(trs, area) : ''}
+    ${pode && ZM.aberto && !trs ? zoomBloco() : ''}
     ${pode && form ? `<form id="fd" class="form-reserva" novalidate><h4 style="margin-top:0">${ed ? 'Editar documento' : 'Cadastrar documento'}</h4>
       <div class="form-row"><label for="d-t">Título *</label><input id="d-t" maxlength="140" value="${esc(ed ? ed.titulo : '')}"></div>
       <div class="form-row"><label for="d-d">Data *</label><input id="d-d" type="date" value="${esc(ed ? ed.data : hoje())}"></div>
@@ -427,6 +452,23 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
     const ft = $('#d-trs', el); if (ft) ft.onchange = () => { const f = ft.files[0]; if (!f) return; if (f.size > 3e6) { msg = 'Arquivo grande demais para uma transcrição (máximo 3 MB).'; draw(); return; } const rd = new FileReader();
       rd.onload = () => { const r = lerTranscricao(rd.result, f.name); if (!r.falas.length) { msg = 'Não encontrei texto de transcrição neste arquivo. Use o .vtt do Zoom ou a legenda (.vtt/.srt) baixada do YouTube Studio.'; draw(); return; }
         const dt = r.data || hoje(); trs = Object.assign(r, { arquivo: f.name.slice(0, 120), titulo: 'Reunião de ' + fmtData(dt), video: '' }); msg = ''; draw(); const bx = $('#trs-box', el); if (bx) bx.scrollIntoView({ block: 'start' }); }; rd.readAsText(f); };
+    const bz = $('#d-zoom', el); if (bz) bz.onclick = () => { ZM.aberto = true; ZM.ate = ''; carregaZoom(); };
+    if (ZM.aberto && $('#zm-box', el)) {
+      $('#zm-x', el).onclick = () => { ZM.aberto = false; draw(); };
+      $('#zm-ant', el).onclick = () => { ZM.ate = addDia(ZM.ate || hoje(), -30); carregaZoom(); };
+      const dp = $('#zm-dep', el); if (dp) dp.onclick = () => { const n = addDia(ZM.ate, 30); ZM.ate = n >= hoje() ? '' : n; carregaZoom(); };
+      el.querySelectorAll('[data-zma]').forEach(b => b.onclick = () => { const m = ZM.lista[+b.dataset.zma], ate = ZM.ate || hoje(); b.disabled = true; b.textContent = 'Buscando…';
+        PR_SUPABASE.funcao('zoom', { acao: 'transcricao', uuid: m.uuid, de: addDia(ate, -30), ate }).then(r => {
+          if (r.status !== 200 || !r.corpo) { ZM.erro = (r.corpo && r.corpo.erro) || 'Não foi possível buscar a transcrição (' + r.status + ').'; draw(); return; }
+          const x = lerTranscricao(r.corpo.texto, ''), dt = isoBR(m.inicio) || hoje();
+          if (!x.falas.length) { ZM.erro = 'A transcrição desta reunião veio vazia.'; draw(); return; }
+          trs = Object.assign(x, { origem: 'Zoom', data: dt, arquivo: (m.topico || 'Reunião') + ' (Zoom)', titulo: (m.topico || 'Reunião') + ' – ' + fmtData(dt), video: '', zoomUuid: m.uuid });
+          msg = ''; draw(); const bx = $('#trs-box', el); if (bx) bx.scrollIntoView({ block: 'start' }); }); });
+      el.querySelectorAll('[data-zmx]').forEach(b => b.onclick = () => { const m = ZM.lista[+b.dataset.zmx];
+        if (!confirm(`Apagar de vez a gravação "${m.topico || 'Reunião'}" de ${fmtData(isoBR(m.inicio))} da nuvem do Zoom?\n\nLibera o espaço na hora e NÃO tem volta. Se o vídeo for importante, baixe antes.`)) return;
+        b.disabled = true;
+        PR_SUPABASE.funcao('zoom', { acao: 'apagar', uuid: m.uuid, definitivo: true }).then(r => { if (r.status === 200) { msg = 'Gravação apagada da nuvem do Zoom.'; carregaZoom(); } else { ZM.erro = (r.corpo && r.corpo.erro) || 'O Zoom não apagou (' + r.status + ').'; draw(); } }); });
+    }
     if (trs) {
       $('#tr-x', el).onclick = () => { trs = null; draw(); };
       $('#tr-ok', el).onclick = () => {
@@ -436,10 +478,10 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
         const d = { id, area: 'atas', titulo: t, data: dt, ano: +dt.slice(0, 4), categoria: cat, codigo: '', arquivo: '', arqNome: '', link: '',
           descricao: `Rascunho a partir da transcrição automática (${r.origem}${dur}${r.participantes.length ? ' · ' + r.participantes.length + ' participante(s) com fala' : ''}). Falta revisar, resumir e registrar os encaminhamentos.`.slice(0, 400),
           videos: v ? [{ titulo: 'Vídeo da reunião', url: v }] : [], anexos: [], enc: [], participantes: r.participantes.slice(0, 200),
-          transcricao: r.texto.slice(0, 400000), transcricaoOrigem: r.origem + ' · ' + r.arquivo, origem: 'transcricao', criado: hoje(), por: me.nome };
+          transcricao: r.texto.slice(0, 400000), transcricaoOrigem: r.origem + ' · ' + r.arquivo, ...(r.zoomUuid ? { zoomUuid: r.zoomUuid } : {}), origem: 'transcricao', criado: hoje(), por: me.nome };
         if (cat === 'Reunião de Escola') d.codigo = sugereCodigo(l, d);
         l.push(d); if (!db.set('docs', l)) return falha('Não foi possível salvar (espaço cheio?).');
-        trs = null; form = id; msg = 'Ata criada a partir da transcrição. Agora escreva o resumo e os encaminhamentos e salve.'; draw(); window.scrollTo(0, 0);
+        trs = null; form = id; msg = 'Ata criada a partir da transcrição. Agora escreva o resumo e os encaminhamentos e salve.' + (r.zoomUuid ? ' Depois, se o vídeo já estiver guardado, apague a gravação em "Gravações do Zoom" para liberar espaço.' : ''); draw(); window.scrollTo(0, 0);
       };
     }
     if (imp) { $('#imp-x', el).onclick = () => { imp = null; draw(); }; $('#imp-ok', el).onclick = () => { msg = importa(imp); imp = null; draw(); }; }
@@ -608,7 +650,7 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
       const multi = a.fim && a.fim !== a.data;
       const rot = porDia ? (multi ? `${fmtData(a.data).slice(0, 5)} a ${fmtData(a.fim).slice(0, 5)}` : '') + (a.hora ? ' ' + esc(a.hora) : '')
         : `${a.data.slice(8)}/${a.data.slice(5, 7)}${multi ? ' a ' + fmtData(a.fim).slice(0, 5) : ''}${a.hora ? ' ' + esc(a.hora) : ''}`;
-      return `<li><span class="cal-ponto" style="background:${cor(a.categoria)}"></span><span>${rot.trim() ? `<strong>${rot.trim()}</strong> ` : ''}${esc(a.titulo)}${a.semanal ? ' <small title="Repete toda semana"><i class="fas fa-redo"></i> semanal</small>' : ''}${a.local ? ` <small>(${esc(a.local)})</small>` : ''}${a.resp ? `<br><small>${respHtml(a.resp)}</small>` : ''}${a.descricao ? `<br><small>${esc(a.descricao)}</small>` : ''}${botoes(a)}</span></li>`;
+      return `<li><span class="cal-ponto" style="background:${cor(a.categoria)}"></span><span>${rot.trim() ? `<strong>${rot.trim()}</strong> ` : ''}${esc(a.titulo)}${a.semanal ? ' <small title="Repete toda semana"><i class="fas fa-redo"></i> semanal</small>' : ''}${a.local ? ` <small>(${esc(a.local)})</small>` : ''}${a.zoom && /^https:\/\//.test(a.zoom) ? ` <a href="${esc(a.zoom)}" target="_blank" rel="noopener" title="Entrar na reunião pelo Zoom"><i class="fas fa-video" aria-hidden="true"></i> Zoom</a>` : ''}${a.resp ? `<br><small>${respHtml(a.resp)}</small>` : ''}${a.descricao ? `<br><small>${esc(a.descricao)}</small>` : ''}${botoes(a)}</span></li>`;
     };
     const mesCard = m => {
       const prim = new Date(C.ano, m, 1).getDay(), dias = new Date(C.ano, m + 1, 0).getDate(); let c = '';
@@ -645,6 +687,7 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
       <div class="form-row" id="a-cw" hidden><label for="a-cn">Nome do novo tipo *</label><input id="a-cn" maxlength="60"></div>
       <div class="form-row"><label><input type="checkbox" id="a-sem" ${ed && ed.semanal ? 'checked' : ''}> Repete toda semana, no mesmo dia (até a data final; sem data final, segue sempre)</label></div>
       <div class="form-row"><label for="a-l">Local</label><input id="a-l" maxlength="80" value="${esc(ed ? ed.local || '' : '')}"></div>
+      ${zoomLigado() ? `<div class="form-row"><label><input type="checkbox" id="a-zoom" ${ed && ed.zoom ? 'checked disabled' : ''}> ${ed && ed.zoom ? 'Já tem reunião no Zoom' : 'Criar a reunião no Zoom do Parque para esta atividade (o link de entrada aparece no calendário)'}</label>${ed && ed.zoom ? ` <small><a href="${esc(ed.zoom)}" target="_blank" rel="noopener">${esc(ed.zoom)}</a></small>` : '<small>Precisa da hora. Atividade semanal vira reunião semanal no Zoom (mesmo link toda semana).</small>'}</div>` : ''}
       <div class="form-row"><label for="a-r">Responsável</label><input id="a-r" maxlength="160" value="${esc(ed ? ed.resp || '' : '')}" placeholder="Nome(s), mesmo de quem ainda não tem cadastro"><small>Quem tiver cadastro na área restrita aparece marcado no calendário.</small></div>
       <div class="form-row"><label for="a-s">Descrição</label><textarea id="a-s" rows="2" maxlength="300">${esc(ed ? ed.descricao || '' : '')}</textarea></div>
       <p class="form-erro" id="a-e" role="alert" hidden></p>
@@ -677,8 +720,20 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
       if (f && f < d) return falha('A data final não pode ser antes da data inicial.');
       let cat = g('a-c'); if (cat === '__novo') { cat = novaCat('ativ_cats', g('a-cn'), ATIV_CATS); if (!cat) return falha('Digite o nome do novo tipo.'); }
       const l = ativs(), dados = { titulo: t, data: d, fim: f && f !== d ? f : '', hora: g('a-h'), categoria: cat, local: g('a-l'), descricao: g('a-s'), resp: g('a-r'), semanal: $('#a-sem', el).checked };
-      if (ed) Object.assign(l.find(a => a.id === ed.id), dados); else l.push({ id: uid(), ...dados, criado: hoje(), por: me.nome });
+      const querZoom = $('#a-zoom', el) && $('#a-zoom', el).checked && !(ed && ed.zoom);
+      if (querZoom && !/^\d{1,2}:\d{2}/.test(dados.hora)) return falha('Para criar a reunião no Zoom, informe a hora.');
+      const novoId = ed ? ed.id : uid();
+      if (ed) Object.assign(l.find(a => a.id === ed.id), dados); else l.push({ id: novoId, ...dados, criado: hoje(), por: me.nome });
       if (!db.set('ativ', l)) return falha('Sem espaço no navegador para salvar.');
+      if (querZoom) {
+        const [hh, mi] = dados.hora.split(':'), dur = 60;
+        PR_SUPABASE.funcao('zoom', { acao: 'criar_reuniao', topico: dados.titulo, inicio: `${dados.data}T${hh.padStart(2, '0')}:${mi.slice(0, 2)}`, duracao: dur, descricao: dados.descricao, semanal: dados.semanal }).then(r => {
+          const l2 = ativs(), a = l2.find(x => x.id === novoId);
+          if (r.status === 200 && r.corpo && r.corpo.link && a) { a.zoom = r.corpo.link; a.zoomId = r.corpo.id; if (r.corpo.senha) a.zoomSenha = r.corpo.senha; db.set('ativ', l2); msg = 'Reunião criada no Zoom. O link de entrada já está na atividade.'; }
+          else msg = 'A atividade foi salva, mas o Zoom não criou a reunião: ' + ((r.corpo && r.corpo.erro) || 'erro ' + r.status) + (r.status === 503 ? ' (falta configurar a ligação com o Zoom no Supabase).' : '');
+          draw();
+        });
+      }
       C.ano = +d.slice(0, 4); const mm = +d.slice(5, 7) - 1; C.per = { mes: mm + 1, tri: Math.floor(mm / 3) + 1, sem: mm < 6 ? 1 : 2, ano: 1 }; W.ini = domingoDe(d); // mostra o período da atividade salva
       msg = (ed ? 'Atividade atualizada' : 'Atividade cadastrada') + '. Ela já aparece nos calendários semanal, mensal, trimestral, semestral e anual.'; form = null; draw();
     };
