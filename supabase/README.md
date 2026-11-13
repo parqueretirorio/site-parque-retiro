@@ -13,4 +13,4 @@ Próximos passos (ver docs/PLANO.md): (1) criar projeto homologação; (2) aplic
 - Cria o bucket público **album** (fotos JPEG/PNG/WEBP até 5 MB cada) e as regras: ler é público; enviar, trocar e apagar só o administrador ou quem tem a função "album".
 - Função `pr_album_uso()` mostra quantos arquivos e quanto espaço o Álbum ocupa.
 - A área restrita (Álbum Parque Retiro › **Enviar em lote**) reduz cada foto no navegador (1600 px + miniatura de 480 px) e envia até 1000 por lote, 3 por vez.
-- Rodar uma vez no SQL Editor. Resultado esperado: `ok`.
+- Rodar uma vez no SQL Editor. Resultado esperado: `ok`. **Aplicada em 13/11/2026 (resultado "ok").**
