@@ -2372,5 +2372,8 @@
 "Versão curta (resumo)": "Versión corta (resumen)",
 "Mensagem para os Mestres": "Mensaje para los Maestros",
 "Atualizar o status de cada ponto": "Actualizar el estado de cada punto",
-"A mensagem se atualiza sozinha quando você salva um ponto. Confira, ajuste se quiser e envie: nada é enviado sozinho.": "El mensaje se actualiza solo cuando guarda un punto. Revise, ajuste si quiere y envíe: nada se envía solo."
+"A mensagem se atualiza sozinha quando você salva um ponto. Confira, ajuste se quiser e envie: nada é enviado sozinho.": "El mensaje se actualiza solo cuando guarda un punto. Revise, ajuste si quiere y envíe: nada se envía solo.",
+"Idioma:": "Idioma:",
+"Em espanhol (para a mensagem em espanhol)": "En español (para el mensaje en español)",
+"Traducción del punto": "Traducción del punto"
 });})();

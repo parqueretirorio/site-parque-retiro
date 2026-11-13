@@ -5,6 +5,9 @@
 const C = ['pt', 'es', 'it', 'fr', 'en', 'de'];
 // chave: [pt, es, it, fr, en, de]
 const L = {
+  b2_darEs: ["Em espanhol (para a mensagem em espanhol)", "En español (para el mensaje en español)", "In spagnolo (per il messaggio in spagnolo)", "En espagnol (pour le message en espagnol)", "In Spanish (for the Spanish message)", "Auf Spanisch (für die spanische Nachricht)"],
+  b2_darSemEs: ["{n} ponto(s) ainda sem texto em espanhol: aparecem em português. Preencha \"Em espanhol\" no ponto.", "{n} punto(s) aún sin texto en español: aparecen en portugués. Complete \"En español\" en el punto.", "{n} punto/i ancora senza testo in spagnolo: compaiono in portoghese. Compila \"In spagnolo\" nel punto.", "{n} point(s) sans texte en espagnol : ils apparaissent en portugais. Remplissez « En espagnol » dans le point.", "{n} item(s) still without Spanish text: they appear in Portuguese. Fill in \"In Spanish\" on the item.", "{n} Punkt(e) noch ohne spanischen Text: erscheinen auf Portugiesisch. Füllen Sie „Auf Spanisch\" beim Punkt aus."],
+  b2_darIdioma: ["Idioma da mensagem", "Idioma del mensaje", "Lingua del messaggio", "Langue du message", "Message language", "Sprache der Nachricht"],
   b2_darAtualizar: ["Atualizar o status de cada ponto", "Actualizar el estado de cada punto", "Aggiorna lo stato di ogni punto", "Mettre à jour l’état de chaque point", "Update each item’s status", "Stand jedes Punkts aktualisieren"],
   b2_darCurta: ["Versão curta", "Versión corta", "Versione breve", "Version courte", "Short version", "Kurzfassung"],
   b2_darCada: ["Cada ponto com o status", "Cada punto con su estado", "Ogni punto con lo stato", "Chaque point avec son état", "Each item with its status", "Jeder Punkt mit Stand"],

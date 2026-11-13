@@ -1,8 +1,8 @@
 {
-  "versao": "1.6.2",
+  "versao": "1.6.3",
   "data": "2026-11-13",
   "novidades": [
-    "Atualizar o app ficou mais confiável: o botão agora busca sempre os arquivos novos",
-    "Dar encaminhamento: mensagem para os Mestres com cada ponto e o seu status, pronta no topo"
+    "Dar encaminhamento: mensagem para os Mestres também em espanhol (Português | Español)",
+    "Campo \"Em espanhol\" em cada ponto"
   ]
 }

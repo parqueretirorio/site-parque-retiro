@@ -1,4 +1,4 @@
-# Teste: app CONecta Retiro (1.6.2) > "Dar encaminhamento" (atalho no início e aba em Documentos e Calendários),
+# Teste: app CONecta Retiro (1.6.3) > "Dar encaminhamento" (atalho no início e aba em Documentos e Calendários),
 # contra o PostgreSQL local com as migrações do Supabase.  Rodar:  python3 tests/teste_app_dar.py [pacote.json]
 import asyncio, subprocess, time, os, sys, json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -39,6 +39,9 @@ async def main():
         ok(t.startswith('*Status dos encaminhamentos') and f'{n0}. ' in t and 'sem responsável' in t, "cada ponto com o status")
         ok((await pg.get_attribute('#dwa', 'href')).startswith('https://wa.me/?text='), "abre no WhatsApp")
         ok(f'{B}/area-restrita.html' in t, "link da mensagem leva à área restrita do site")
+        await pg.click('[data-dl=es]'); await pg.wait_for_selector('#dtxt')
+        ok((await pg.input_value('#dtxt')).startswith('*Estado de los encaminamientos'), "mensagem em espanhol no app")
+        await pg.click('[data-dl=pt]'); await pg.wait_for_selector('#dtxt')
         await pg.click('[data-dm=resumo]'); await pg.wait_for_selector('#dtxt')
         ok('Dar encaminhamento' in await pg.input_value('#dtxt'), "versão curta disponível")
         await pg.click('[data-dm=status]'); await pg.wait_for_selector('#dtxt')

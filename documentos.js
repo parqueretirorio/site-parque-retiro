@@ -169,6 +169,7 @@ const salvarEnc = (db, di, ei, v, por, h) => {
   const al = db.get('ativ', []) || [], at = e.ativ ? al.find(a => a.id === e.ativ) : null; let novoCal = false;
   e.resp = String(v.resp || '').trim().slice(0, 80) || (semRespM(e.resp) ? e.resp : '');
   if (v.passo !== undefined) e.passo = String(v.passo || '').trim().slice(0, 160);
+  if (v.es !== undefined) e.es = String(v.es || '').trim().slice(0, 300);
   if (v.status) e.status = v.status;
   if (v.data !== undefined) e.data = v.data || '';
   e.atualizado = h; e.atualizadoPor = por;
@@ -177,23 +178,45 @@ const salvarEnc = (db, di, ei, v, por, h) => {
   if (!db.set('ativ', al) || !db.set('docs', l)) return null;
   return { d, e, novoCal };
 };
-const msgResumo = (D, link) => {
-  const it = D.itens, L = [`*Dar encaminhamento · ${D.nome}*`, `Ainda temos *${it.length}* encaminhamento(s) em aberto da nossa reunião. Para nada ficar parado nem cair no esquecimento:`];
-  const sr = it.filter(i => i.semResp); if (sr.length) { L.push('', `🙋 *Precisam de alguém que assuma (${sr.length})*`); sr.forEach(i => L.push(`• ${curto(i.e.texto)} [${i.d.codigo}]`)); }
-  const sd = it.filter(i => i.semData && !i.semResp); if (sd.length) { L.push('', `📅 *Precisam de prazo (${sd.length})*`); sd.forEach(i => L.push(`• ${curto(i.e.texto)} – ${i.e.resp}`)); }
-  if (D.atrasados.length) { L.push('', '⚠️ *Em atraso*'); D.atrasados.forEach(i => L.push(`• ${fmtBR(i.data)} · ${curto(i.e.texto)} – ${semRespM(i.e.resp) ? 'sem responsável' : i.e.resp}`)); }
-  const px = D.prox.filter(i => !i.semResp); if (px.length) { L.push('', '⏳ *Próximos prazos*'); px.forEach(i => L.push(`• ${fmtBR(i.data)} · ${curto(i.e.texto)} – ${i.e.resp}`)); }
-  L.push('', `Quem puder assumir ou já tiver novidade, responda aqui ou atualize em Área restrita › Documentos e Calendários › Dar encaminhamento: ${link}`, '', 'Um forte abraço!');
+// Mensagens para os Mestres em português ('pt') ou espanhol ('es'). Em espanhol usa o texto traduzido do ponto (e.es) quando houver.
+const MSG = {
+  pt: { reuniao: (n, a) => `${n}ª Reunião de Escola ${a}`, titR: 'Dar encaminhamento', introR: n => `Ainda temos *${n}* encaminhamento(s) em aberto da nossa reunião. Para nada ficar parado nem cair no esquecimento:`,
+    precisaResp: n => `🙋 *Precisam de alguém que assuma (${n})*`, precisaData: n => `📅 *Precisam de prazo (${n})*`, atraso: '⚠️ *Em atraso*', proximos: '⏳ *Próximos prazos*', semResp: 'sem responsável',
+    fimR: l => `Quem puder assumir ou já tiver novidade, responda aqui ou atualize em Área restrita › Documentos e Calendários › Dar encaminhamento: ${l}`, abraco: 'Um forte abraço!',
+    titS: 'Status dos encaminhamentos', introS: (t, r, d, p, a) => `Hoje são *${t}* em aberto: ${r} sem responsável · ${d} sem data · ${p} com prazo nos próximos 45 dias${a ? ` · ${a} em atraso` : ''}.`,
+    mSemResp: '🙋 *sem responsável*', mSemData: '📅 *sem data*', mAtraso: '⚠️ *em atraso* desde ', mProx: '⏳ próximos 45 dias', passo: 'Próximo passo',
+    fimS: l => `Peço a ajuda de todos que participaram da reunião: quem puder assumir um ponto, dar um prazo ou trazer novidade, responda aqui ou atualize em Área restrita › Documentos e Calendários › Dar encaminhamento: ${l}` },
+  es: { reuniao: (n, a) => `${n}ª Reunión de Escuela ${a}`, titR: 'Dar seguimiento', introR: n => `Todavía tenemos *${n}* encaminamiento(s) abiertos de nuestra reunión. Para que nada quede parado ni caiga en el olvido:`,
+    precisaResp: n => `🙋 *Necesitan a alguien que los asuma (${n})*`, precisaData: n => `📅 *Necesitan plazo (${n})*`, atraso: '⚠️ *Atrasados*', proximos: '⏳ *Próximos plazos*', semResp: 'sin responsable',
+    fimR: l => `Quien pueda asumir o ya tenga novedades, responda aquí o actualice en Área restringida › Documentos y Calendarios › Dar seguimiento: ${l}`, abraco: '¡Un fuerte abrazo!',
+    titS: 'Estado de los encaminamientos', introS: (t, r, d, p, a) => `Hoy hay *${t}* abiertos: ${r} sin responsable · ${d} sin fecha · ${p} con plazo en los próximos 45 días${a ? ` · ${a} atrasados` : ''}.`,
+    mSemResp: '🙋 *sin responsable*', mSemData: '📅 *sin fecha*', mAtraso: '⚠️ *atrasado* desde ', mProx: '⏳ próximos 45 días', passo: 'Próximo paso',
+    fimS: l => `Pido la ayuda de todos los que participaron de la reunión: quien pueda asumir un punto, dar un plazo o traer novedades, responda aquí o actualice en Área restringida › Documentos y Calendarios › Dar seguimiento: ${l}` }
+};
+const RESP_ES = [[/Comissão de Construção/g, 'Comisión de Construcción'], [/Comissão de Biblioteca e Acervo/g, 'Comisión de Biblioteca y Acervo'], [/Frente de Ação/g, 'Frente de Acción'], [/Diretoria da Pangea/g, 'Directiva de Pangea'],
+  [/representante legal/g, 'representante legal'], [/\bMestres\b/g, 'Maestros'], [/\bvoluntários\b/g, 'voluntarios'], [/\bTodos\b/g, 'Todos'], [/ e /g, ' y ']];
+const respLang = (r, lang) => lang === 'es' ? RESP_ES.reduce((x, [a, b]) => x.replace(a, b), String(r || '')) : String(r || '');
+const textoLang = (e, lang) => lang === 'es' && e.es ? e.es : e.texto;
+const nomeLang = (D, lang) => { const m = /^RE-(\d{4})\.(\d+)$/.exec(D.r); return m ? MSG[lang].reuniao(m[2], m[1]) : D.nome; };
+const msgResumo = (D, link, lang = 'pt') => {
+  const T = MSG[lang] || MSG.pt, it = D.itens, tx = i => curto(textoLang(i.e, lang)), rs = i => respLang(i.e.resp, lang);
+  const L = [`*${T.titR} · ${nomeLang(D, lang)}*`, T.introR(it.length)];
+  const sr = it.filter(i => i.semResp); if (sr.length) { L.push('', T.precisaResp(sr.length)); sr.forEach(i => L.push(`• ${tx(i)} [${i.d.codigo}]`)); }
+  const sd = it.filter(i => i.semData && !i.semResp); if (sd.length) { L.push('', T.precisaData(sd.length)); sd.forEach(i => L.push(`• ${tx(i)} – ${rs(i)}`)); }
+  if (D.atrasados.length) { L.push('', T.atraso); D.atrasados.forEach(i => L.push(`• ${fmtBR(i.data)} · ${tx(i)} – ${semRespM(i.e.resp) ? T.semResp : rs(i)}`)); }
+  const px = D.prox.filter(i => !i.semResp); if (px.length) { L.push('', T.proximos); px.forEach(i => L.push(`• ${fmtBR(i.data)} · ${tx(i)} – ${rs(i)}`)); }
+  L.push('', T.fimR(link), '', T.abraco);
   return L.join('\n');
 };
-const msgStatus = (D, link) => {
-  const L = [`*Status dos encaminhamentos · ${D.nome}*`, `Hoje são *${D.itens.length}* em aberto: ${D.nR} sem responsável · ${D.nD} sem data · ${D.prox.length} com prazo nos próximos 45 dias${D.atrasados.length ? ` · ${D.atrasados.length} em atraso` : ''}.`, ''];
+const msgStatus = (D, link, lang = 'pt') => {
+  const T = MSG[lang] || MSG.pt, L = [`*${T.titS} · ${nomeLang(D, lang)}*`, T.introS(D.itens.length, D.nR, D.nD, D.prox.length, D.atrasados.length), ''];
   D.itens.forEach((i, n) => {
-    const marcas = [i.semResp ? '🙋 *sem responsável*' : '👤 ' + i.e.resp, i.semData ? '📅 *sem data*' : (i.atraso ? '⚠️ *em atraso* desde ' : '📅 ') + fmtBR(i.data)];
-    if (i.prox45) marcas.push('⏳ próximos 45 dias');
-    L.push(`${n + 1}. ${curto(i.e.texto, 110)} [${i.d.codigo}]`, '   ' + marcas.join(' · ') + (i.e.passo ? `\n   ➡️ Próximo passo: ${i.e.passo}` : ''));
+    const marcas = [i.semResp ? T.mSemResp : '👤 ' + respLang(i.e.resp, lang), i.semData ? T.mSemData : (i.atraso ? T.mAtraso : '📅 ') + fmtBR(i.data)];
+    if (i.prox45) marcas.push(T.mProx);
+    const passo = lang === 'es' && i.e.passoEs ? i.e.passoEs : i.e.passo;
+    L.push(`${n + 1}. ${curto(textoLang(i.e, lang), 110)} [${i.d.codigo}]`, '   ' + marcas.join(' · ') + (passo ? `\n   ➡️ ${T.passo}: ${passo}` : ''));
   });
-  L.push('', `Peço a ajuda de todos que participaram da reunião: quem puder assumir um ponto, dar um prazo ou trazer novidade, responda aqui ou atualize em Área restrita › Documentos e Calendários › Dar encaminhamento: ${link}`, '', 'Um forte abraço!');
+  L.push('', T.fimS(link), '', T.abraco);
   return L.join('\n');
 };
 window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codigoOk, sugereCodigo, darEncaminhamento, msgResumo, msgStatus, salvarEnc, curto, abrir(me, root, H, lugar = 'docs') { // lugar: 'docs' (Documentos e Calendários) ou 'mapa' (Documentação IP)
@@ -268,30 +291,37 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
   const impBloco = p => {
     const ativs0 = ativs(), novaAt = id => !ativs0.some(a => a.id === id), ja = id => docs().some(d => d.id === id);
     return `<section class="tip-box" style="display:block"><h4 style="margin-top:0"><i class="fas fa-file-import"></i> Conferir antes de importar</h4>
-      ${p.atas.map(a => `<div style="border-top:1px solid #dfe6ec;padding:10px 0">${a.codigo ? `<span class="badge-status" style="background:#1d4a7a;color:#fff">${esc(a.codigo)}</span> ` : ''}<strong>${esc(a.titulo)}</strong> · ${fmtData(a.data)} ${ja(a.id) ? '<span class="badge-status badge-uso">já existe: será atualizada</span>' : '<span class="badge-status badge-aprovado">nova</span>'}
+      ${p.atas.map(a => `<div style="border-top:1px solid #dfe6ec;padding:10px 0">${a.codigo ? `<span class="badge-status" style="background:#1d4a7a;color:#fff">${esc(a.codigo)}</span> ` : ''}<strong>${esc(a.titulo)}</strong> · ${fmtData(a.data)} ${ja(a.id) ? '<span class="badge-status badge-uso">já existe: será atualizada</span> <small>(o que você já mudou na plataforma fica como está; só entra o que falta)</small>' : '<span class="badge-status badge-aprovado">nova</span>'}
         ${a.descricao ? `<p style="margin:4px 0">${esc(a.descricao)}</p>` : ''}
         <p style="margin:4px 0"><small>${a.arquivo ? '<i class="fas fa-file-pdf"></i> ' + esc(a.arqNome || 'ata') + ' · ' : ''}${(a.anexos || []).length ? (a.anexos || []).length + ' anexo(s) · ' : ''}${(a.videos || []).length} vídeo(s)</small></p>
         ${(a.enc || []).length ? `<ul style="margin:4px 0 0 18px">${a.enc.map(e => `<li>${esc(e.texto)}${e.resp ? ` <em>(${esc(e.resp)})</em>` : ''}${e.data ? ' · ' + fmtData(e.data) : ''} · <span style="color:${encCor(e.status || ENC_ST[0])}">${esc(e.status || ENC_ST[0])}</span>${e.cal && e.data ? ' · <i class="fas fa-calendar-plus" title="vai para o calendário"></i>' : ''}</li>`).join('')}</ul>` : ''}</div>`).join('')}
       ${(p.atividades || []).length ? `<div style="border-top:1px solid #dfe6ec;padding:10px 0"><strong>Datas para o calendário</strong><ul style="margin:4px 0 0 18px">${p.atividades.map(t => `<li>${t.semanal ? 'toda semana desde ' : ''}${fmtData(t.data)}${t.fim ? ' a ' + fmtData(t.fim) : ''}${t.hora ? ' · ' + esc(t.hora) : ''} · ${esc(t.titulo)}${t.resp ? ` <em>(${esc(t.resp)})</em>` : ''} <small>(${esc(t.categoria || 'Outras atividades')})${novaAt(t.id) ? '' : ' · já existe: será atualizada'}</small></li>`).join('')}</ul></div>` : ''}
       <p><button type="button" class="btn-visit btn-large" id="imp-ok"><i class="fas fa-check"></i> Está certo, importar</button> <button type="button" class="btn-visit" id="imp-x">Cancelar</button></p></section>`;
   };
+  // Importar de novo NUNCA desfaz o que foi mudado na plataforma: no que já existe, só completa o que está vazio
+  // (ex.: o texto em espanhol); atas, pontos e datas novas entram normalmente.
+  const vazio = x => x === undefined || x === null || x === '' || (Array.isArray(x) && !x.length);
+  const completa = (dst, src) => { Object.keys(src).forEach(k => { if (vazio(dst[k]) && !vazio(src[k])) dst[k] = src[k]; }); return dst; };
   const importa = p => {
     const l = docs(), al = ativs(); let nAt = 0, nCal = 0;
-    const poeAtiv = (id, x) => { const i = al.findIndex(a => a.id === id); const o = Object.assign({ fim: '', hora: '', local: '', descricao: '', resp: '', semanal: false }, x, { id, origem: 'ata', criado: hoje(), por: me.nome }); if (i >= 0) al[i] = Object.assign(al[i], o, { criado: al[i].criado || o.criado }); else al.push(o); nCal++; };
+    const poeAtiv = (id, x) => { const i = al.findIndex(a => a.id === id); const o = Object.assign({ fim: '', hora: '', local: '', descricao: '', resp: '', semanal: false }, x, { id, origem: 'ata', criado: hoje(), por: me.nome }); if (i >= 0) completa(al[i], o); else al.push(o); nCal++; };
     p.atas.forEach(a => {
+      const i = l.findIndex(d => d.id === a.id), antes = i >= 0 ? (l[i].enc || []) : [];
       const enc = (a.enc || []).map(e => {
-        const e1 = { id: e.id || uid(), texto: String(e.texto || '').slice(0, 300), resp: String(e.resp || '').slice(0, 80), data: okData(e.data) ? e.data : '', status: ENC_ST.includes(e.status) ? e.status : ENC_ST[0], tipo: e.tipo || 'Outras atividades', ativ: '' };
+        const e1 = { id: e.id || uid(), texto: String(e.texto || '').slice(0, 300), es: String(e.es || '').slice(0, 300), resp: String(e.resp || '').slice(0, 80), data: okData(e.data) ? e.data : '', status: ENC_ST.includes(e.status) ? e.status : ENC_ST[0], tipo: e.tipo || 'Outras atividades', ativ: '' };
+        const prev = antes.find(x => x.id === e1.id);
+        if (prev) return completa(Object.assign({}, prev), { es: e1.es, tipo: e1.tipo });
         if (e.cal && e1.data) { e1.ativ = 'imp-' + e1.id; poeAtiv(e1.ativ, { titulo: e1.texto.slice(0, 120), data: e1.data, categoria: e1.tipo, resp: e1.resp, descricao: e.descricao || '' }); }
         return e1;
-      });
-      const dados = { area: 'atas', codigo: codigoOk(a.codigo) ? a.codigo : (l.find(d => d.id === a.id) || {}).codigo || '', titulo: a.titulo, data: a.data, ano: +a.data.slice(0, 4), categoria: a.categoria || 'Reunião de Escola', descricao: a.descricao || '', arquivo: a.arquivo || '', arqNome: a.arqNome || '', link: a.link || '', videos: (a.videos || []).filter(v => /^https:\/\//i.test(v.url || '')), anexos: (a.anexos || []).filter(x => H.safeUrl(x.arquivo || '')), enc, origem: 'importacao' };
-      const i = l.findIndex(d => d.id === a.id);
-      if (i >= 0) l[i] = Object.assign(l[i], dados, { editado: hoje(), editadoPor: me.nome }); else l.push(Object.assign({ id: a.id }, dados, { criado: hoje(), por: me.nome }));
+      }).concat(antes.filter(x => !(a.enc || []).some(e => e.id === x.id))); // pontos acrescentados na plataforma ficam
+      const dados = { area: 'atas', codigo: codigoOk(a.codigo) ? a.codigo : '', titulo: a.titulo, data: a.data, ano: +a.data.slice(0, 4), categoria: a.categoria || 'Reunião de Escola', descricao: a.descricao || '', arquivo: a.arquivo || '', arqNome: a.arqNome || '', link: a.link || '', videos: (a.videos || []).filter(v => /^https:\/\//i.test(v.url || '')), anexos: (a.anexos || []).filter(x => H.safeUrl(x.arquivo || '')), origem: 'importacao' };
+      if (i >= 0) { completa(l[i], dados); l[i].enc = enc; }
+      else l.push(Object.assign({ id: a.id }, dados, { enc, criado: hoje(), por: me.nome }));
       nAt++;
     });
     (p.atividades || []).forEach(t => poeAtiv(t.id, { titulo: t.titulo, data: t.data, fim: okData(t.fim) ? t.fim : '', hora: t.hora || '', categoria: t.categoria || 'Outras atividades', local: t.local || '', descricao: t.descricao || '', resp: String(t.resp || '').slice(0, 160), semanal: !!t.semanal }));
     if (!db.set('ativ', al) || !db.set('docs', l)) return 'Não foi possível salvar a importação.';
-    return `Importação concluída: ${nAt} ata(s) e ${nCal} data(s) no calendário.`;
+    return `Importação concluída: ${nAt} ata(s) e ${nCal} data(s) no calendário. O que já tinha sido atualizado na plataforma foi mantido.`;
   };
 
   /* ---------- Atas e documentos ---------- */
@@ -438,13 +468,15 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
 
   /* ---------- Dar encaminhamento: só o que ficou pendente de UMA Reunião de Escola (por padrão a mais recente),
      para nada ficar parado: completar responsável, prazo e próximo passo, e avisar o Grupo de Mestres. ---------- */
-  const DE = { r: '', msg: 'status' }; // msg: 'status' (cada ponto, padrão) ou 'resumo' (versão curta)
+  const DE = { r: '', msg: 'status', lang: 'pt' }; // msg: 'status' (cada ponto, padrão) ou 'resumo' (versão curta)
   const encArea = el => {
     const D = darEncaminhamento(db, hoje(), DE.r); DE.r = D.r;
     const { reunioes, itens, nR, nD, prox } = D;
     const link = new URL('.', document.baseURI).href + 'area-restrita.html';
-    const mensagem = () => msgResumo(D, link), mensagemStatus = () => msgStatus(D, link);
-    const caixaMsg = (titulo, texto) => `<section class="tip-box" style="display:block"><h4 style="margin-top:0"><i class="fab fa-whatsapp"></i> ${esc(titulo)}</h4><p class="no-print" role="group" aria-label="Tipo de mensagem"><button type="button" class="btn-visit" data-dm="status" aria-pressed="${DE.msg === 'status'}" style="${DE.msg === 'status' ? '' : 'background:#e8eef3;color:#1d4a7a'}">Cada ponto com o status</button> <button type="button" class="btn-visit" data-dm="resumo" aria-pressed="${DE.msg === 'resumo'}" style="${DE.msg === 'resumo' ? '' : 'background:#e8eef3;color:#1d4a7a'}">Versão curta (resumo)</button></p>
+    const mensagem = () => msgResumo(D, link, DE.lang), mensagemStatus = () => msgStatus(D, link, DE.lang), semEs = itens.filter(i => !i.e.es).length;
+    const caixaMsg = (titulo, texto) => `<section class="tip-box" style="display:block"><h4 style="margin-top:0"><i class="fab fa-whatsapp"></i> ${esc(titulo)}</h4><p class="no-print" role="group" aria-label="Tipo de mensagem"><button type="button" class="btn-visit" data-dm="status" aria-pressed="${DE.msg === 'status'}" style="${DE.msg === 'status' ? '' : 'background:#e8eef3;color:#1d4a7a'}">Cada ponto com o status</button> <button type="button" class="btn-visit" data-dm="resumo" aria-pressed="${DE.msg === 'resumo'}" style="${DE.msg === 'resumo' ? '' : 'background:#e8eef3;color:#1d4a7a'}">Versão curta (resumo)</button>
+        <span style="display:inline-block;margin-left:12px">Idioma: <button type="button" class="btn-visit" data-dl="pt" aria-pressed="${DE.lang === 'pt'}" style="${DE.lang === 'pt' ? '' : 'background:#e8eef3;color:#1d4a7a'}">Português</button> <button type="button" class="btn-visit" data-dl="es" aria-pressed="${DE.lang === 'es'}" style="${DE.lang === 'es' ? '' : 'background:#e8eef3;color:#1d4a7a'}">Español</button></span></p>
+      ${DE.lang === 'es' && semEs ? `<p class="tip-box" role="note" style="display:block"><i class="fas fa-language" aria-hidden="true"></i> ${semEs} ponto(s) ainda sem texto em espanhol: aparecem em português. Preencha "Em espanhol" no ponto, abaixo.</p>` : ''}
       <p><small>A mensagem se atualiza sozinha quando você salva um ponto. Confira, ajuste se quiser e envie: nada é enviado sozinho.</small></p>
       <textarea id="de-txt" rows="16" style="width:100%;font-family:inherit">${esc(texto)}</textarea>
       <p><button type="button" class="btn-visit" id="de-cp"><i class="fas fa-copy"></i> Copiar</button> <a class="btn-visit" id="de-wa" href="#" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> Abrir no WhatsApp</a> </p></section>`;
@@ -465,11 +497,13 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
         <div><label for="de-rs${n}" style="display:block;font-weight:600;font-size:.85em">Quem assume</label><input id="de-rs${n}" data-k="resp" maxlength="80" value="${esc(semResp(i.e.resp) ? '' : i.e.resp)}" placeholder="Nome(s)"></div>
         <div><label for="de-dt${n}" style="display:block;font-weight:600;font-size:.85em">Prazo</label><input id="de-dt${n}" data-k="data" type="date" value="${esc(i.data)}"></div>
         <div style="grid-column:span 2;min-width:170px"><label for="de-ps${n}" style="display:block;font-weight:600;font-size:.85em">Próximo passo</label><input id="de-ps${n}" data-k="passo" maxlength="160" value="${esc(i.e.passo || '')}" placeholder="O que fazer agora para andar"></div>
+        <div style="grid-column:1/-1"><label for="de-es${n}" style="display:block;font-weight:600;font-size:.85em">Em espanhol (para a mensagem em espanhol)</label><input id="de-es${n}" data-k="es" maxlength="300" value="${esc(i.e.es || '')}" placeholder="Traducción del punto"></div>
         <div><label for="de-st${n}" style="display:block;font-weight:600;font-size:.85em">Situação</label><select id="de-st${n}" data-k="status">${opt(ENC_ST, i.e.status)}</select></div>
         <div style="align-self:end"><button type="button" class="btn-visit" data-de-ok><i class="fas fa-save"></i> Salvar</button></div></div>` : ''}</div>`).join('')
       : '<p class="vazio">Tudo encaminhado: nenhuma pendência desta reunião. 🎉</p>'}</div>` : '<p class="vazio">Nenhuma ata de Reunião de Escola com código (RE-…) cadastrada ainda.</p>'}`;
     const sel = $('#de-r', el); if (sel) sel.onchange = () => { DE.r = sel.value; msg = ''; draw(); };
     el.querySelectorAll('[data-dm]').forEach(b => b.onclick = () => { DE.msg = b.dataset.dm; msg = ''; draw(); });
+    el.querySelectorAll('[data-dl]').forEach(b => b.onclick = () => { DE.lang = b.dataset.dl; msg = ''; draw(); });
     const tx = $('#de-txt', el);
     if (tx) {
       const wa = $('#de-wa', el), atual = () => { wa.href = 'https://wa.me/?text=' + encodeURIComponent(tx.value); }; atual(); tx.oninput = atual;
@@ -477,7 +511,7 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
     }
     el.querySelectorAll('[data-de-ok]').forEach(b => b.onclick = () => {
       if (!pode) return; const box = b.closest('[data-de]'), [di, ei] = box.dataset.de.split('|'), v = k => box.querySelector(`[data-k="${k}"]`).value.trim();
-      const r = salvarEnc(db, di, ei, { resp: v('resp'), data: v('data'), passo: v('passo'), status: v('status') }, me.nome, hoje());
+      const r = salvarEnc(db, di, ei, { resp: v('resp'), data: v('data'), passo: v('passo'), es: v('es'), status: v('status') }, me.nome, hoje());
       const y = window.scrollY;
       if (!r) { msg = 'Não foi possível salvar.'; draw(); return; }
       msg = r.e.status === 'Em aberto' ? `Encaminhamento atualizado${r.novoCal ? ' e colocado no calendário' : ''}: "${curto(r.e.texto, 60)}".` : `"${curto(r.e.texto, 60)}" marcado como ${r.e.status}.`; draw(); window.scrollTo(0, y);
