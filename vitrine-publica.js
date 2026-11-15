@@ -30,6 +30,17 @@ async function enviar(caixa, dados) {
   } catch (e) { /* sem internet */ }
   const f = lerFila(); f.push({ caixa, dados }); gravaFila(f); return false;
 }
+// Chamada direta a uma função pública do servidor (15/11/2026: sorteio dos números da Rifa e consultas por e-mail e celular).
+// Devolve a resposta do servidor ou lança um erro com a mensagem que o servidor deu.
+async function rpc(nomeFn, corpo) {
+  let r;
+  try { r = await fetch(base() + '/rest/v1/rpc/' + nomeFn, { method: 'POST', headers: cab(), body: JSON.stringify(corpo || {}) }); }
+  catch (e) { throw new Error('Sem conexão com o servidor do Parque. Verifique a internet e tente de novo.'); }
+  let j = null; try { j = await r.json(); } catch (e) { /* sem corpo */ }
+  if (r.ok) return j;
+  const m = j && (j.message || j.msg || j.error_description);
+  throw new Error(m ? String(m) : (r.status === 404 ? 'Esta função ainda não foi instalada no servidor do Parque.' : 'O servidor do Parque não respondeu (' + r.status + ').'));
+}
 async function reenviarFila() {
   const f = lerFila(); if (!f.length) return; gravaFila([]);
   for (const x of f) await enviar(x.caixa, x.dados);
@@ -69,5 +80,5 @@ function criar() {
     estado: () => Object.assign({ pendentes: lerFila().length, conflitos: 0 }, st)
   };
 }
-window.PR_VITRINE = { ligado, criar, enviar, reenviarFila };
+window.PR_VITRINE = { ligado, criar, enviar, reenviarFila, rpc };
 })();

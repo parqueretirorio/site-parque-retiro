@@ -12,6 +12,7 @@ const PUBLICAS = ['PIX', 'MUMBUCA'];   // formas aceitas na página pública (di
 const CONSENTIMENTO = 'Autorizo o uso dos meus dados pelo Parque Retiro apenas para esta vaquinha (contato, conferência do pagamento e prestação de contas).';
 const soDig = s => String(s || '').replace(/\D/g, '');
 const pct = (arrec, meta) => (meta > 0 ? Math.round((arrec / meta) * 1000) / 10 : 0);   // 1 casa decimal; pode passar de 100
+const remoto = () => !!(window.PR_DADOS && window.PR_DADOS.modo === 'vitrine' && window.PR_VITRINE && window.PR_VITRINE.rpc);
 const fmtPct = p => p.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '%';
 
 /* ---------- Operações compartilhadas (painel e página pública) ---------- */
@@ -83,12 +84,14 @@ const statusVaq = v => v.cancelada ? ['Cancelada', 'badge-emprestado'] : v.encer
 const modoLocal = () => !(window.PR_DADOS && window.PR_DADOS.modo === 'remoto');
 const AVISO_LOCAL = 'Enquanto o site estiver em modo local (dados no navegador), as contribuições feitas por visitantes ficam gravadas só no navegador de quem contribuiu e NÃO chegam a esta tela. Para valer de verdade, é preciso ligar o servidor (veja docs/VAQUINHA_COLETIVA.md).';
 
-// Gráfico da campanha: anel com a % da meta + Meta / Arrecadado / Falta. Só valores confirmados.
+// Gráfico da campanha (15/11/2026): barra que vai enchendo com a % da meta, como nas vaquinhas da internet,
+// + Meta / Arrecadado / Falta. Só valores confirmados.
 function grafico(v, t, brl, esc) {
-  const p = pct(t.conf, v.meta), falta = r2(Math.max(v.meta - t.conf, 0)), C = 2 * Math.PI * 52, preench = Math.min(p, 100) / 100 * C;
+  const p = pct(t.conf, v.meta), falta = r2(Math.max(v.meta - t.conf, 0)), larg = Math.min(p, 100);
   const rot = `Vaquinha ${v.titulo}: ${fmtPct(p)} da meta. Arrecadado ${brl(t.conf)} de ${brl(v.meta)}; ${falta > 0 ? 'faltam ' + brl(falta) : 'meta alcançada'}.`;
   return `<div class="vq-grafico" role="img" aria-label="${esc(rot)}">
-    <svg viewBox="0 0 120 120" width="140" height="140" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="none" stroke="#e3ece8" stroke-width="12"/><circle class="vq-arco" cx="60" cy="60" r="52" fill="none" stroke="${p >= 100 ? '#2e7d32' : 'var(--accent-color)'}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${preench.toFixed(2)} ${C.toFixed(2)}" transform="rotate(-90 60 60)"/><text x="60" y="66" text-anchor="middle" font-size="22" font-weight="700" fill="var(--primary-color)">${esc(fmtPct(p))}</text></svg>
+    <div class="vq-barra-topo" aria-hidden="true"><strong class="vq-pct">${esc(fmtPct(p))}</strong><span>da meta</span></div>
+    <div class="vq-barra${p >= 100 ? ' vq-cheia' : ''}" aria-hidden="true"><div class="vq-barra-enche" style="width:${larg.toFixed(1)}%"></div></div>
     <div class="vq-valores"><div><span>Meta</span><strong>${brl(v.meta)}</strong></div><div><span>Arrecadado</span><strong class="vq-arrec">${brl(t.conf)}</strong></div><div><span>${falta > 0 ? 'Falta' : 'Meta'}</span><strong class="vq-falta">${falta > 0 ? brl(falta) : 'alcançada'}</strong></div></div>
   </div>${t.nConf ? `<p class="vazio">${t.nConf} contribuição(ões) confirmada(s).</p>` : ''}`;
 }
@@ -294,10 +297,13 @@ window.PR_VAQUINHA = {
         ${S.consulta ? (S.consulta.length ? `<table class="doc-table"><thead><tr><th>Código</th><th>Vaquinha</th><th>Valor</th><th>Situação</th></tr></thead><tbody>${S.consulta.map(p => { const v = A.vaqs().find(x => x.id === p.vaquinha), st = ROT_PART[p.status]; return `<tr><td>${esc(p.codigo)}</td><td>${esc(v ? v.titulo : '')}</td><td>${brl(p.valor)}</td><td>${st[0]}${p.motivo ? `<br><small>${esc(p.motivo)}</small>` : ''}</td></tr>`; }).join('')}</tbody></table>` : '<p class="vazio">Nenhuma contribuição encontrada com esses dados.</p>') : ''}</section>` : ''}`;
       el.querySelectorAll('[data-sel]').forEach(b => b.onclick = () => { S.sel = b.dataset.sel; S.ok = null; draw(); const f = document.getElementById('vq-form-box'); if (f && f.scrollIntoView) f.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
       const cons = document.getElementById('vq-cons');
-      if (cons) cons.onsubmit = e => {
+      if (cons) cons.onsubmit = async e => {
         e.preventDefault();
         const em = document.getElementById('k-e').value.trim().toLowerCase(), cel = soDig(document.getElementById('k-c').value);
-        S.consulta = em && cel.length >= 10 ? A.parts().filter(p => String(p.email || '').toLowerCase() === em && (soDig(p.celular) === cel || soDig(p.whatsapp) === cel)).sort((a, b) => b.criadoEm.localeCompare(a.criadoEm)) : [];
+        if (!(em && cel.length >= 10)) { S.consulta = []; return draw(); }
+        // Site ligado ao servidor: as contribuições dos outros não ficam no aparelho; o servidor consulta pelo e-mail + celular.
+        if (remoto()) { try { S.consulta = await window.PR_VITRINE.rpc('pr_consultar_publico', { p_tipo: 'vaq_part', p_email: em, p_contato: cel }) || []; } catch (x) { S.consulta = []; } return draw(); }
+        S.consulta = A.parts().filter(p => String(p.email || '').toLowerCase() === em && (soDig(p.celular) === cel || soDig(p.whatsapp) === cel)).sort((a, b) => b.criadoEm.localeCompare(a.criadoEm));
         draw();
       };
       const f = document.getElementById('vq-form'); if (!f) return;

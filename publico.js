@@ -12,6 +12,9 @@ const lista = v => Array.isArray(v) ? v : [];
 const txt = (v, n) => String(v == null ? '' : v).slice(0, n || 200);
 const emailOk = e => /^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]{2,}$/.test(e);
 const hoje = () => new Date().toISOString().slice(0, 10);
+// Nome que pode aparecer no site: primeiro nome + inicial do último ("Maria S.").
+const nomeCurto = n => { const p = String(n || '').trim().split(/\s+/).filter(Boolean); return p.length > 1 ? p[0] + ' ' + p[p.length - 1][0].toUpperCase() + '.' : (p[0] || ''); };
+const dataOk = s => /^data:(image\/(jpeg|png|webp)|application\/pdf);base64,/.test(s || '');
 
 const VITRINES = {
   atividades: l => lista(l).filter(a => a && a.status === 'publicada').map(limpa),
@@ -20,12 +23,21 @@ const VITRINES = {
   estela: l => lista(l).filter(n => n && (n.pub === undefined || n.pub === true)).map(n => ({ id: n.id, nome: n.nome })),
   livros: l => lista(l).map(limpa),
   loja_itens: l => lista(l).filter(i => i && i.publicado).map(limpa),
-  vol_acoes: l => lista(l).map(limpa)
+  vol_acoes: l => lista(l).map(limpa),
+  // Rifa, Vaquinha e Encomendas (15/11/2026): o site mostra o que está cadastrado e quanto já foi reservado/arrecadado,
+  // sem nome completo, contato nem comprovante de ninguém.
+  rifas: l => lista(l).map(r => { const x = limpa(r); delete x.historico; delete x.tentativaMsg; if (x.apuracao) x.apuracao = limpa(x.apuracao); if (x.uso) x.uso = limpa(x.uso); return x; }),
+  rifa_part: l => lista(l).filter(p => p && p.status !== 'recusado').map(p => ({ id: p.id, rifa: p.rifa, numeros: lista(p.numeros), status: p.status, nome: nomeCurto(p.nome) })),
+  vaquinhas: l => lista(l).map(limpa),
+  vaq_part: l => lista(l).filter(p => p && p.status === 'confirmado').map(p => ({ id: p.id, vaquinha: p.vaquinha, valor: p.valor, status: p.status })),
+  livraria_itens: l => lista(l).filter(i => i && i.pre).map(i => { const x = limpa(i); delete x.preResp; delete x.preRespAte; delete x.preRespNome; return x; }),
+  livraria_enc: l => lista(l).map(e => ({ id: e.id, livro: e.livro, seq: e.seq, qtd: e.qtd, cancelado: e.cancelado ? true : null }))
 };
 // Quais vitrines cada página aberta lê (pelo data-page do <body>; sem data-page = Início).
 const PAGINAS = {
   atividades: ['atividades'], atividade: ['atividades'], '': ['atividades', 'livros'],
-  biblioteca: ['livros'], fotos: ['album', 'eventos'], estela: ['estela'], lojinha: ['loja_itens'], voluntario: ['vol_acoes']
+  biblioteca: ['livros'], fotos: ['album', 'eventos'], estela: ['estela'], lojinha: ['loja_itens'], voluntario: ['vol_acoes'],
+  rifa: ['rifas', 'rifa_part'], vaquinha: ['vaquinhas', 'vaq_part'], livraria: ['livraria_itens', 'livraria_enc'], encomenda: ['livraria_itens', 'livraria_enc']
 };
 
 // Regras de cada caixa: limpam o envio e dizem como ele entra na coleção (sem nunca apagar o que já existe).
@@ -44,6 +56,25 @@ const CAIXAS = {
   voluntarios: {
     limpa: d => { if (!d || !d.id || !d.nome) return null; const r = {}; Object.keys(d).slice(0, 40).forEach(k => { const v = d[k]; r[k] = Array.isArray(v) ? v.slice(0, 30).map(x => txt(x, 200)) : typeof v === 'boolean' || typeof v === 'number' ? v : txt(v, 2000); }); r.origem = 'publica'; return r; },
     junta: (l, d) => { if (l.some(x => x.id === d.id)) return false; l.push(d); return true; }
+  },
+  // Vaquinha (15/11/2026): a contribuição chega "pendente" para o Responsável conferir o comprovante.
+  vaq_part: {
+    limpa: d => d && d.id && d.vaquinha && txt(d.nome).trim().split(/\s+/).length >= 2 && Number(d.valor) > 0 && Number(d.valor) <= 1000000 && emailOk(String(d.email || '').toLowerCase()) && dataOk(d.comprovante) && d.consentimento
+      ? { id: txt(d.id, 40), codigo: txt(d.codigo, 12), vaquinha: txt(d.vaquinha, 40), nome: txt(d.nome, 120), celular: txt(d.celular, 30), whatsapp: txt(d.whatsapp, 30), email: String(d.email).toLowerCase().slice(0, 160), valor: Math.round(Number(d.valor) * 100) / 100, moeda: txt(d.moeda, 20), comprovante: d.comprovante, status: 'pendente', origem: 'publica', criadoEm: txt(d.criadoEm, 30) || new Date().toISOString(), consentimento: true, por: '', conta: '' }
+      : null,
+    junta: (l, d) => { if (l.some(x => x.id === d.id)) return false; l.push(d); return true; }
+  },
+  // Encomenda de livro (15/11/2026): a posição na fila é conferida na chegada, para nunca repetir.
+  livraria_enc: {
+    limpa: d => d && d.id && d.livro && txt(d.nome).trim().length >= 2 && parseInt(d.qtd, 10) >= 1 && parseInt(d.qtd, 10) <= 50 && (emailOk(String(d.email || '').toLowerCase()) || String(d.whatsapp || '').replace(/\D/g, '').length >= 10) && d.consent !== false
+      ? Object.assign({}, ...Object.keys(d).slice(0, 40).map(k => ({ [k]: typeof d[k] === 'string' ? txt(d[k], 400) : (typeof d[k] === 'number' || typeof d[k] === 'boolean' ? d[k] : null) })), { origem: 'publica', por: '', pago: null, entregue: null, cancelado: null })
+      : null,
+    junta: (l, d) => {
+      if (l.some(x => x.id === d.id)) return false;
+      const doLivro = l.filter(x => x.livro === d.livro).map(x => x.seq || 0);
+      if (doLivro.includes(d.seq) || !(d.seq >= 1)) d.seq = Math.max(0, ...doLivro) + 1;
+      l.push(d); return true;
+    }
   },
   album: {
     limpa: d => d && d.id && /^data:image\/(jpeg|png|webp);base64,/.test(d.foto || '') ? { id: txt(d.id, 40), foto: d.foto, evento: txt(d.evento, 40), dataFoto: txt(d.dataFoto, 10), autor: txt(d.autor, 120), mostrarAutor: !!d.mostrarAutor, legenda: '', email: '', data: txt(d.data, 10) || hoje(), status: 'pendente', origem: 'publica' } : null,

@@ -1059,6 +1059,13 @@ fieldset.funcoes input, label.fn input { width: auto; margin-right: 6px; }
 .vq-grafico { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin: 10px 0; }
 .vq-grafico svg { flex: 0 0 auto; }
 .vq-arco { transition: stroke-dasharray .6s ease; }
+.vq-grafico { flex-direction: column; align-items: stretch; }
+.vq-barra-topo { display: flex; align-items: baseline; gap: 6px; }
+.vq-barra-topo .vq-pct { font-size: 1.6rem; color: var(--primary-color); }
+.vq-barra-topo span { color: #555; }
+.vq-barra { height: 18px; background: #e3ece8; border-radius: 999px; overflow: hidden; }
+.vq-barra-enche { height: 100%; background: var(--accent-color); border-radius: 999px; transition: width .6s ease; }
+.vq-cheia .vq-barra-enche { background: #2e7d32; }
 .vq-valores { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; flex: 1 1 220px; }
 .vq-valores div { background: var(--bg-light); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; }
 .vq-valores span { display: block; font-size: .78rem; color: #777; }
@@ -1066,7 +1073,7 @@ fieldset.funcoes input, label.fn input { width: auto; margin-right: 6px; }
 .vq-valores .vq-arrec { color: #2e7d32; }
 .vq-pay { white-space: pre-wrap; }
 .vq-obj { white-space: pre-wrap; }
-@media (prefers-reduced-motion: reduce) { .vq-arco { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .vq-arco, .vq-barra-enche { transition: none; } }
 
 
 /* ---------- Atividades (lista e artigo) ---------- */

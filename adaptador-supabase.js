@@ -16,6 +16,9 @@
 const SESSAO = 'pr-sb-sessao', MODO = 'pr-modo', PREF = 'pr_';
 const LOCAIS = new Set(['meta']);
 const MESCLA_LISTA = new Set(['audit', 'lixeira']);
+// Listas em que o próprio servidor também acrescenta itens (15/11/2026: a inscrição pública na Rifa é gravada pelo servidor,
+// que sorteia os números). No conflito, junta pelo id: o que o servidor tem e esta tela não tem entra; o resto vale o desta tela.
+const MESCLA_POR_ID = new Set(['rifa_part']);
 const CAMPOS_PERFIL = ['nome', 'whatsapp', 'lgpd', 'nivel', 'status', 'funcoes'];
 
 // ---------- chave de teste ?servidor=1 / ?servidor=0 ----------
@@ -302,6 +305,10 @@ function criarArmazenamento(opc) {
         servidor.concat(dados).forEach(x => { const s = JSON.stringify(x); if (!vistos.has(s)) { vistos.add(s); uniao.push(x); } });
         uniao.sort((a, b) => String(a.t || '').localeCompare(String(b.t || '')));
         cache.set(PREF + n, JSON.stringify(uniao)); versoes.set(n, vs); return enviaUma(n);
+      }
+      if (MESCLA_POR_ID.has(n) && Array.isArray(servidor) && Array.isArray(dados)) {
+        const meus = new Set(dados.map(x => x && x.id).filter(Boolean)), novos = servidor.filter(x => x && x.id && !meus.has(x.id));
+        cache.set(PREF + n, JSON.stringify(dados.concat(novos))); versoes.set(n, vs); return enviaUma(n);
       }
       if (n.startsWith('pub_')) { versoes.set(n, vs); return enviaUma(n); } // vitrine: é só uma cópia gerada; a mais nova vale
       conflitos.set(n, { meu: dados, servidor, versaoServidor: vs }); sujos.delete(n);

@@ -1,5 +1,5 @@
 # Supabase "falso" para os testes da Fase 1: imita as rotas que o site usa (Auth e REST), mas as regras de dados
-# rodam no PostgreSQL DE VERDADE (local), com as mesmas migrações do Supabase (0001–0011).
+# rodam no PostgreSQL DE VERDADE (local), com as mesmas migrações do Supabase (0001–0013).
 # Assim o teste confere o banco real: RLS, gatilhos (perfis_protege), versões e conflitos.
 # Requer PostgreSQL 16 local (usuário postgres). Usado por tests/teste_supabase_fase1.py.
 import json, os, re, subprocess, uuid, itertools
@@ -164,9 +164,13 @@ class SupabaseFalso:
         if caminho == '/auth/v1/logout':
             self.tokens.pop(tok, None)
             return 204, None
-        if caminho in ('/rest/v1/rpc/pr_ler_publico', '/rest/v1/rpc/pr_enviar_publico') and not uid:
+        if caminho in ('/rest/v1/rpc/pr_ler_publico', '/rest/v1/rpc/pr_enviar_publico', '/rest/v1/rpc/pr_rifa_inscrever', '/rest/v1/rpc/pr_consultar_publico') and not uid:
             try:  # site aberto, sem login: papel anon (só a chave pública)
-                if caminho.endswith('pr_ler_publico'):
+                if caminho.endswith('pr_rifa_inscrever'):
+                    r = psql(f"select pr_rifa_inscrever({lit(corpo['p_dados'])}::jsonb)", self.db, 'anon')
+                elif caminho.endswith('pr_consultar_publico'):
+                    r = psql(f"select pr_consultar_publico({lit(corpo.get('p_tipo'))}, {lit(corpo.get('p_email'))}, {lit(corpo.get('p_contato'))})", self.db, 'anon')
+                elif caminho.endswith('pr_ler_publico'):
                     nomes = '{' + ','.join('"' + n.replace('"', '') + '"' for n in (corpo or {}).get('p_nomes', [])) + '}'
                     r = psql(f"select pr_ler_publico({lit(nomes)}::text[])", self.db, 'anon')
                 else:

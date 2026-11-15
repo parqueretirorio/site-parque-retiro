@@ -38,6 +38,7 @@ function lerResultado(j) {
 const ehFederal = iso => { const [y, m, d] = iso.split('-').map(Number), w = new Date(y, m - 1, d).getDay(); return w === 3 || w === 6; };
 const nomePublico = n => { const p = String(n || '').trim().split(/\s+/); return p.length > 1 ? p[0] + ' ' + p[p.length - 1][0].toUpperCase() + '.' : (p[0] || ''); };
 const soDig = s => String(s || '').replace(/\D/g, '');
+const remoto = () => !!(window.PR_DADOS && window.PR_DADOS.modo === 'vitrine' && window.PR_VITRINE && window.PR_VITRINE.rpc);
 
 /* ---------- Operações compartilhadas (painel e página pública) ---------- */
 function api(H) {
@@ -441,7 +442,10 @@ window.PR_RIFA = {
       if (kc) kc.onsubmit = e => {
         e.preventDefault();
         const em = document.getElementById('k-e').value.trim().toLowerCase(), ce = soDig(document.getElementById('k-c').value);
-        S.consulta = em && ce.length >= 8 ? A.parts().filter(p => String(p.email).toLowerCase() === em && [p.celular, p.whatsapp].some(t => soDig(t) === ce)) : []; draw();
+        if (!(em && ce.length >= 8)) { S.consulta = []; return draw(); }
+        // Site ligado ao servidor: as inscrições dos outros não ficam no aparelho; o servidor consulta pelo e-mail + celular.
+        if (remoto()) { window.PR_VITRINE.rpc('pr_consultar_publico', { p_tipo: 'rifa_part', p_email: em, p_contato: ce }).then(l => { S.consulta = l || []; draw(); }, () => { S.consulta = []; draw(); }); return; }
+        S.consulta = A.parts().filter(p => String(p.email).toLowerCase() === em && [p.celular, p.whatsapp].some(t => soDig(t) === ce)); draw();
       };
       const f = document.getElementById('rifa-form'); if (!f || !sel) return;
       const tot = () => { const q = parseInt(document.getElementById('p-q').value, 10); document.querySelector('#p-tot strong').textContent = q >= 1 ? 'Total a pagar: ' + brl(r2(q * sel.preco)) : ''; };
@@ -460,7 +464,18 @@ window.PR_RIFA = {
         if (!arq) return falha('Anexe o comprovante de pagamento.');
         if (!document.getElementById('p-ok').checked) return falha('É preciso concordar com o uso dos dados para participar.');
         let comp; try { comp = await lerArq(arq); } catch (x) { return falha(String(x)); }
-        const res = A.inscrever({ rifa: sel.id, nome, celular: cel, whatsapp: wpp, email: em, qtd: q, moeda: v('p-m'), comprovante: comp, consentimento: true });
+        const dados = { rifa: sel.id, nome, celular: cel, whatsapp: wpp, email: em, qtd: q, moeda: v('p-m'), comprovante: comp, consentimento: true };
+        let res;
+        if (remoto()) {
+          // Site ligado ao servidor (15/11/2026): o SERVIDOR sorteia os números, na hora e sem repetir, e guarda a inscrição.
+          const bt = f.querySelector('button[type=submit], button.btn-large'); if (bt) bt.disabled = true;
+          try {
+            const p = await window.PR_VITRINE.rpc('pr_rifa_inscrever', { p_dados: dados });
+            A.db.set('rifa_part', A.parts().concat([{ id: p.id, rifa: p.rifa, numeros: p.numeros, status: p.status, nome: '' }])); // só para a grade desta página mostrar os números como reservados
+            res = { part: p };
+          } catch (x) { res = { erro: x.message }; }
+          if (bt) bt.disabled = false;
+        } else res = A.inscrever(dados);
         if (res.erro) return falha(res.erro);
         S.ok = { part: res.part, rifa: sel }; S.sel = ''; draw(); el.querySelector('.rifa-ok').scrollIntoView({ behavior: 'smooth' });
       };
