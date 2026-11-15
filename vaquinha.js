@@ -81,7 +81,7 @@ function api(H) {
 
 const ROT_PART = { pendente: ['Aguardando conferência', ''], confirmado: ['Confirmado', 'badge-disponivel'], recusado: ['Recusado', 'badge-emprestado'] };
 const statusVaq = v => v.cancelada ? ['Cancelada', 'badge-emprestado'] : v.encerrada ? ['Encerrada', 'badge-emprestado'] : v.prazo && hojeLocal() > v.prazo ? ['Prazo encerrado', 'badge-emprestado'] : !v.ativa ? ['Oculta no site', ''] : ['Aberta', 'badge-disponivel'];
-const modoLocal = () => !(window.PR_DADOS && window.PR_DADOS.modo === 'remoto');
+const modoLocal = () => !(window.PR_DADOS && (window.PR_DADOS.modo === 'remoto' || window.PR_DADOS.modo === 'vitrine'));
 const AVISO_LOCAL = 'Enquanto o site estiver em modo local (dados no navegador), as contribuições feitas por visitantes ficam gravadas só no navegador de quem contribuiu e NÃO chegam a esta tela. Para valer de verdade, é preciso ligar o servidor (veja docs/VAQUINHA_COLETIVA.md).';
 
 // Gráfico da campanha (15/11/2026): barra que vai enchendo com a % da meta, como nas vaquinhas da internet,

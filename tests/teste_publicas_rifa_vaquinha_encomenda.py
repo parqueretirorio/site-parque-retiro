@@ -63,6 +63,7 @@ async def main():
         t = await inscrever_rifa(q, 'Maria da Silva Souza', '(21) 99999-1111', 'maria@x.com', 3)
         ok(await q.evaluate("PR_DADOS.modo") == 'vitrine', "página da Rifa em modo vitrine (ligada ao servidor)")
         ok('Seu código' in t, "inscrição confirmada ao visitante com código e números")
+        ok('demonstração' not in await q.inner_text('#rifas'), "Rifa sem o aviso de 'modo de demonstração'")
         partes = json.loads(banco("select dados::text from registros where colecao='rifa_part'"))
         ok(len(partes) == 1 and partes[0]['email'] == 'maria@x.com' and len(partes[0]['numeros']) == 3 and partes[0]['status'] == 'pendente' and partes[0]['comprovante'].startswith('data:image'),
            "inscrição gravada NO SERVIDOR, pendente, com comprovante e 3 números")
@@ -96,6 +97,7 @@ async def main():
         await q.goto(B + '/vaquinha-coletiva.html'); await q.wait_for_selector('.vq-card')
         larg = await q.evaluate("document.querySelector('.vq-barra-enche').style.width")
         ok(larg in ('25%', '25.0%') and '25%' in await q.inner_text('.vq-pct'), f"barra de progresso da Vaquinha em 25% ({larg})")
+        ok('demonstração' not in await q.evaluate('document.body.innerText'), "Vaquinha sem o aviso de 'modo de demonstração'")
         await q.click('[data-sel]'); await q.wait_for_selector('#vq-form')
         await q.fill('#q-n', 'Carla Mendes Rocha'); await q.fill('#q-c', '21977776666'); await q.check('#q-mesmo'); await q.fill('#q-e', 'carla@x.com'); await q.fill('#q-v', '100')
         await q.set_input_files('#q-f', IMG); await q.check('#q-ok'); await q.click('#vq-form button.btn-large'); await q.wait_for_selector('.rifa-ok'); await q.wait_for_timeout(800)

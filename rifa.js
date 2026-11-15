@@ -132,7 +132,7 @@ function api(H) {
 
 const statusRifa = r => r.cancelada ? ['Cancelada', 'badge-emprestado'] : r.apuracao ? ['Apurada', 'badge-disponivel'] : !r.ativa ? ['Oculta no site', ''] : hojeLocal() < r.dataSorteio ? ['Aberta', 'badge-disponivel'] : ['Vendas encerradas', 'badge-emprestado'];
 const ROT_PART = { pendente: ['Aguardando conferência', ''], confirmado: ['Confirmado', 'badge-disponivel'], recusado: ['Recusado', 'badge-emprestado'] };
-const modoLocal = () => !(window.PR_DADOS && window.PR_DADOS.modo === 'remoto');
+const modoLocal = () => !(window.PR_DADOS && (window.PR_DADOS.modo === 'remoto' || window.PR_DADOS.modo === 'vitrine'));
 const AVISO_LOCAL = 'Enquanto o site estiver em modo local (dados no navegador), as inscrições feitas por visitantes ficam gravadas só no navegador de quem se inscreveu e NÃO chegam a esta tela. Para valer de verdade, é preciso ligar o servidor (veja docs/RIFA_SOLIDARIA.md).';
 const textoResultado = (r, p, d, esc, fmtData) => {
   const a = r.apuracao; if (!a) return '';
