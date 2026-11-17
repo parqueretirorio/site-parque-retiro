@@ -89,29 +89,30 @@ returns jsonb
 language plpgsql security definer
 as $$
 declare
-  v_lista  jsonb;
-  v_item   jsonb;
-  v_total  int := 0;
+  v_lista    jsonb;
+  v_row      record;
+  v_item     jsonb;
+  v_total    int := 0;
   v_voltaria jsonb := '{"sim":0,"talvez":0,"nao":0}'::jsonb;
-  v_avisos int := 0;
+  v_avisos   int := 0;
+  v_vot      text;
 begin
   select dados into v_lista from registros where colecao = 'com_feedback' limit 1;
   if v_lista is null then
     return jsonb_build_object('total', 0, 'voltaria', v_voltaria, 'quer_avisos', 0);
   end if;
 
-  for v_item in select * from jsonb_array_elements(v_lista)
+  for v_row in select value from jsonb_array_elements(v_lista)
   loop
+    v_item := v_row.value;
     if p_atividade_id is not null and (v_item->>'atividade') <> p_atividade_id then
       continue;
     end if;
     v_total := v_total + 1;
-    declare v_vot text := coalesce(v_item->>'voltaria','');
-    begin
-      if v_vot = 'sim'    then v_voltaria := jsonb_set(v_voltaria,'{sim}',   to_jsonb((v_voltaria->>'sim')::int    + 1)); end if;
-      if v_vot = 'talvez' then v_voltaria := jsonb_set(v_voltaria,'{talvez}',to_jsonb((v_voltaria->>'talvez')::int + 1)); end if;
-      if v_vot = 'nao'    then v_voltaria := jsonb_set(v_voltaria,'{nao}',   to_jsonb((v_voltaria->>'nao')::int    + 1)); end if;
-    end;
+    v_vot := coalesce(v_item->>'voltaria', '');
+    if v_vot = 'sim'    then v_voltaria := jsonb_set(v_voltaria, '{sim}',    to_jsonb((v_voltaria->>'sim')::int    + 1)); end if;
+    if v_vot = 'talvez' then v_voltaria := jsonb_set(v_voltaria, '{talvez}', to_jsonb((v_voltaria->>'talvez')::int + 1)); end if;
+    if v_vot = 'nao'    then v_voltaria := jsonb_set(v_voltaria, '{nao}',    to_jsonb((v_voltaria->>'nao')::int    + 1)); end if;
     if (v_item->>'quer_avisos')::boolean then v_avisos := v_avisos + 1; end if;
   end loop;
 
