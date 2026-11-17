@@ -24,6 +24,10 @@ const VITRINES = {
   livros: l => lista(l).map(limpa),
   loja_itens: l => lista(l).filter(i => i && i.publicado).map(limpa),
   vol_acoes: l => lista(l).map(limpa),
+  // Encontros públicos (17/11/2026): o site mostra nome, datas, local e descrição. Sem dados de inscritos.
+  atividades_pub: l => lista(l).filter(a => a && a.ativo).map(a => {
+    const x = limpa(a); delete x.criadoEm; return x;
+  }),
   // Rifa, Vaquinha e Encomendas (15/11/2026): o site mostra o que está cadastrado e quanto já foi reservado/arrecadado,
   // sem nome completo, contato nem comprovante de ninguém.
   rifas: l => lista(l).map(r => { const x = limpa(r); delete x.historico; delete x.tentativaMsg; if (x.apuracao) x.apuracao = limpa(x.apuracao); if (x.uso) x.uso = limpa(x.uso); return x; }),
@@ -37,7 +41,8 @@ const VITRINES = {
 const PAGINAS = {
   atividades: ['atividades'], atividade: ['atividades'], '': ['atividades', 'livros'],
   biblioteca: ['livros'], fotos: ['album', 'eventos'], estela: ['estela'], lojinha: ['loja_itens'], voluntario: ['vol_acoes'],
-  rifa: ['rifas', 'rifa_part'], vaquinha: ['vaquinhas', 'vaq_part'], livraria: ['livraria_itens', 'livraria_enc'], encomenda: ['livraria_itens', 'livraria_enc']
+  rifa: ['rifas', 'rifa_part'], vaquinha: ['vaquinhas', 'vaq_part'], livraria: ['livraria_itens', 'livraria_enc'], encomenda: ['livraria_itens', 'livraria_enc'],
+  encontro: ['atividades_pub']
 };
 
 // Regras de cada caixa: limpam o envio e dizem como ele entra na coleção (sem nunca apagar o que já existe).
@@ -78,6 +83,36 @@ const CAIXAS = {
   },
   album: {
     limpa: d => d && d.id && /^data:image\/(jpeg|png|webp);base64,/.test(d.foto || '') ? { id: txt(d.id, 40), foto: d.foto, evento: txt(d.evento, 40), dataFoto: txt(d.dataFoto, 10), autor: txt(d.autor, 120), mostrarAutor: !!d.mostrarAutor, legenda: '', email: '', data: txt(d.data, 10) || hoje(), status: 'pendente', origem: 'publica' } : null,
+    junta: (l, d) => { if (l.some(x => x.id === d.id)) return false; l.push(d); return true; }
+  },
+  // Inscrições em encontros/atividades públicos (17/11/2026).
+  // Exige nome completo e e-mail. Telefone e cidade são opcionais.
+  // Entra como 'interesse'; a equipe não precisa confirmar (diferente de doação com comprovante).
+  inscricoes: {
+    limpa: d => {
+      if (!d || !d.id || !d.atividade) return null;
+      const partes = txt(d.nome).trim().split(/\s+/).filter(Boolean);
+      if (partes.length < 2) return null;
+      if (!emailOk(String(d.email || '').toLowerCase())) return null;
+      if (!d.consentimento) return null;
+      return {
+        id: txt(d.id, 40),
+        atividade: txt(d.atividade, 40),
+        atividade_nome: txt(d.atividade_nome, 120),
+        nome: txt(d.nome, 120),
+        email: String(d.email).toLowerCase().slice(0, 160),
+        telefone: txt(d.telefone, 30),
+        cidade: txt(d.cidade, 80),
+        extra: txt(d.extra, 200),
+        data_atividade: txt(d.data_atividade, 10),
+        status: 'interesse',
+        origem: 'publica',
+        criadoEm: txt(d.criadoEm, 30) || new Date().toISOString(),
+        consentimento: true,
+        chegou: false,
+        cancelado: false
+      };
+    },
     junta: (l, d) => { if (l.some(x => x.id === d.id)) return false; l.push(d); return true; }
   }
 };
