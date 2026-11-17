@@ -1,5 +1,5 @@
 # Teste: Dia do Testemunho (4 de maio, todos os anos) no calendário de uso e página Blogger com matérias selecionadas da Pressenza.
-# Rodar a partir da pasta do site:  python3 tests/teste_blog_calendario.py
+# Rodar a partir da pasta do site: python3 tests/teste_blog_calendario.py
 import subprocess, time, os
 from playwright.sync_api import sync_playwright
 SITE = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); PORT = 8798
