@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encontro | Parque de Estudo e Reflexão Retiro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ── Cabeçalho do encontro ── */
+        .encontro-hero {
+            background: linear-gradient(135deg, var(--cor-primaria, #2c6e4f) 0%, var(--cor-secundaria, #1a4a35) 100%);
+            color: #fff;
+            padding: 48px 24px 40px;
+            text-align: center;
+        }
+        .encontro-hero h1 { font-size: clamp(1.6rem, 5vw, 2.4rem); margin: 0 0 12px; font-weight: 700; }
+        .encontro-hero p  { font-size: 1.1rem; margin: 0; opacity: .9; }
+        .encontro-detalhes { display: flex; flex-wrap: wrap; gap: 10px 24px; justify-content: center; margin-top: 20px; font-size: 1rem; }
+        .encontro-detalhes p { margin: 0; opacity: .95; }
+        .encontro-imagem { width: 100%; max-height: 320px; object-fit: cover; display: none; }
+
+        /* ── Formulário ── */
+        .encontro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; margin-top: 32px; }
+        @media (max-width: 720px) { .encontro-grid { grid-template-columns: 1fr; } }
+        .encontro-texto { font-size: 1.05rem; line-height: 1.7; color: #333; }
+        .encontro-texto h2 { color: var(--cor-primaria, #2c6e4f); margin-top: 0; }
+
+        .cartao-form { background: #fff; border-radius: 12px; padding: 28px 24px; box-shadow: 0 2px 16px rgba(0,0,0,.1); }
+        .cartao-form h2 { margin-top: 0; font-size: 1.3rem; color: var(--cor-primaria, #2c6e4f); }
+
+        .campo-grupo { margin-bottom: 18px; }
+        .campo-grupo label { display: block; font-size: 1rem; font-weight: 600; margin-bottom: 6px; color: #222; }
+        .campo-grupo input, .campo-grupo textarea {
+            width: 100%; padding: 12px 14px; font-size: 1rem; border: 2px solid #ddd;
+            border-radius: 8px; box-sizing: border-box; transition: border-color .2s;
+            font-family: inherit;
+        }
+        .campo-grupo input:focus, .campo-grupo textarea:focus { border-color: var(--cor-primaria, #2c6e4f); outline: none; }
+        .campo-consentimento label { font-weight: 400; font-size: .95rem; display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+        .campo-consentimento input[type=checkbox] { width: 20px; height: 20px; min-width: 20px; margin-top: 2px; cursor: pointer; }
+
+        .obrigatorio { color: #c0392b; }
+        .opcional { font-weight: 400; color: #666; font-size: .88rem; }
+
+        .btn-primario {
+            display: block; width: 100%; padding: 15px; font-size: 1.1rem; font-weight: 700;
+            background: var(--cor-primaria, #2c6e4f); color: #fff; border: none; border-radius: 10px;
+            cursor: pointer; transition: background .2s, transform .1s;
+        }
+        .btn-primario:hover { background: var(--cor-secundaria, #1a4a35); transform: translateY(-1px); }
+        .btn-primario:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+        /* ── Mensagens ── */
+        .aviso-sucesso, .aviso-erro, .aviso-info {
+            padding: 16px 18px; border-radius: 10px; font-size: 1rem; margin-bottom: 16px;
+        }
+        .aviso-sucesso { background: #d4f4e3; color: #1a5c38; border: 1px solid #a8dfc0; }
+        .aviso-sucesso strong { display: block; font-size: 1.1rem; margin-bottom: 6px; }
+        .aviso-sucesso a { color: #1a5c38; }
+        .aviso-erro    { background: #fde8e8; color: #721c24; border: 1px solid #f5c6cb; }
+        .aviso-info    { background: #e8f4fd; color: #0c5460; border: 1px solid #b8daff; }
+
+        .pi-vagas { background: #fff8e1; color: #856404; border: 1px solid #ffc107; padding: 10px 14px; border-radius: 8px; margin-bottom: 20px; font-size: .95rem; display: none; }
+    </style>
+</head>
+<body data-page="encontro">
+
+<a href="https://wa.me/552128881830" class="whatsapp-float" target="_blank" rel="noopener" title="Fale com o Parque Retiro pelo WhatsApp"><i class="fab fa-whatsapp"></i></a>
+
+<header>
+    <a href="index.html" class="brand">
+        <img src="placaparqueretiro.png" alt="Mandala da Escola" class="brand-logo">
+        <span class="brand-name">Parque de Estudo e Reflexão Retiro</span>
+    </a>
+    <nav>
+        <a href="comece-aqui.html">Quem somos</a>
+        <a href="index.html">Início</a>
+        <div class="nav-dropdown">
+            <a href="o-parque.html">O Parque</a>
+            <div class="nav-sub">
+                <a href="o-parque.html">Sobre o Parque</a>
+                <a href="elementos.html">Elementos</a>
+                <a href="como-chegar.html">Como Chegar</a>
+                <div class="nav-item-sub">
+                    <a href="atividades.html">Atividades</a>
+                    <div class="nav-sub2">
+                        <a href="atividades.html?cat=evento">Eventos</a>
+                        <a href="atividades.html?cat=encontro">Encontros</a>
+                        <a href="atividades.html?cat=retiro">Retiros</a>
+                        <a href="atividades.html?cat=reuniao">Reuniões</a>
+                        <a href="fotos.html">Álbum de fotos</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="nav-dropdown">
+            <a href="reservas.html">Reservas</a>
+            <div class="nav-sub">
+                <a href="como-fazer.html">Como Fazer</a>
+                <a href="calendario.html">Calendário de uso</a>
+            </div>
+        </div>
+        <div class="nav-dropdown">
+            <a href="silo.html">Silo</a>
+            <div class="nav-sub">
+                <div class="nav-item-sub">
+                    <a href="mensagem-de-silo.html">Mensagem de Silo</a>
+                    <div class="nav-sub2"><a href="comunidades-da-mensagem.html">Comunidades da Mensagem</a></div>
+                </div>
+                <a href="organismos.html">Organismos do Movimento</a>
+                <a href="biblioteca-silo.html">Biblioteca de Silo</a>
+            </div>
+        </div>
+        <div class="nav-dropdown">
+            <a href="centro-estudo.html">Centro de Estudo</a>
+            <div class="nav-sub">
+                <div class="nav-item-sub">
+                    <a href="escola.html">Escola</a>
+                    <div class="nav-sub2"><a href="nivelamento.html">Nivelação</a></div>
+                </div>
+                <a href="biblioteca.html">Biblioteca do Parque</a>
+                <a href="producoes-de-escola.html">Produções de Escola</a>
+                <a href="livros-audios-app.html">Livros, Áudios e App</a>
+                <a href="oficios.html">Ofícios</a>
+            </div>
+        </div>
+        <div class="nav-dropdown">
+            <a href="ajude-o-parque.html">Ajude o Parque</a>
+            <div class="nav-sub">
+                <a href="doacao.html">Doação</a>
+                <a href="pagar.html">Pagar online</a>
+                <a href="livraria.html">Livraria</a>
+                <a href="lojinha.html">Lojinha</a>
+                <a href="rifa-solidaria.html">Rifa Solidária</a>
+                <a href="vaquinha-coletiva.html">Vaquinha Coletiva</a>
+                <a href="voluntario.html">Voluntário</a>
+                <div class="nav-item-sub">
+                    <a href="comissoes.html">Comissões</a>
+                    <div class="nav-sub2">
+                        <a href="comissao-jardinagem.html">Jardinagem / Área Externa</a>
+                        <a href="comissao-comunicacao.html">Comunicação, Redes Sociais e Site</a>
+                        <a href="comissao-multiuso.html">Multiuso</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a href="parques-mundo.html">Parques no Mundo</a>
+        <div class="nav-dropdown">
+            <a href="noticias.html">Notícias</a>
+            <div class="nav-sub">
+                <a href="blogger.html">Blog</a>
+                <a href="noticias-conecta.html">CONecta Retiro</a>
+            </div>
+        </div>
+    </nav>
+    <a href="login.html" class="btn-entrar"><i class="fas fa-user-lock"></i> Entrar</a>
+</header>
+
+<!-- Cabeçalho dinâmico do encontro -->
+<div class="encontro-hero">
+    <h1 id="pi-titulo">Carregando…</h1>
+    <p id="pi-subtitulo"></p>
+    <div class="encontro-detalhes" id="pi-detalhes"></div>
+</div>
+
+<img id="pi-imagem" class="encontro-imagem" alt="" src="" style="display:none">
+
+<div class="container" id="pi-conteudo">
+    <div class="encontro-grid">
+
+        <!-- Coluna esquerda: texto do encontro -->
+        <div class="encontro-texto" id="pi-texto">
+            <!-- preenchido pelo JS quando o encontro tiver texto -->
+        </div>
+
+        <!-- Coluna direita: formulário de interesse -->
+        <div>
+            <div class="pi-vagas" id="pi-vagas"></div>
+            <div class="cartao-form">
+                <h2><i class="fas fa-hand-holding-heart"></i> Quero participar</h2>
+                <div id="pi-form">
+                    <!-- preenchido pelo atividade-inscricao.js -->
+                    <p style="color:#666"><i class="fas fa-spinner fa-spin"></i> Carregando formulário…</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    <div class="social-links">
+        <a href="https://www.facebook.com/parqueretiro/" target="_blank" rel="noopener" title="Facebook"><i class="fab fa-facebook"></i></a>
+        <a href="https://www.instagram.com/parqueretirorio/" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="https://www.youtube.com/@parquedeestudoereflexaoret6772" target="_blank" rel="noopener" title="YouTube"><i class="fab fa-youtube"></i></a>
+        <a href="blogger.html" title="Blog"><i class="fab fa-blogger-b"></i></a>
+        <a href="https://whatsapp.com/channel/0029VbDmMh9ElagzPYbsg22t" target="_blank" rel="noopener" title="Canal do Parque Retiro no WhatsApp"><i class="fab fa-whatsapp"></i></a>
+    </div>
+    <p class="rodape-news"><a href="newsletter.html"><i class="fas fa-envelope"></i> Receba o Comunicado do Parque por e-mail</a></p>
+    <p>&copy; 2026 Parque de Estudo e Reflexão Retiro - Maricá, Rio de Janeiro, Brasil | Instituto Pangeia</p>
+</footer>
+
+<script src="script.js"></script>
+<script src="config-dados.js"></script>
+<script src="adaptador-remoto.js"></script>
+<script src="publico.js"></script>
+<script src="vitrine-publica.js"></script>
+<script src="dados.js"></script>
+<script src="area.js"></script>
+<script src="banners.js"></script>
+<script src="idioma.js"></script>
+<script src="ajuda-conteudo.js"></script>
+<script src="ajuda.js"></script>
+<script src="atividade-inscricao.js"></script>
+</body>
+</html>
