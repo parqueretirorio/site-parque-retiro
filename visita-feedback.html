@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Como foi a sua visita? | Parque de Estudo e Reflexão Retiro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+      /* ── Página de feedback ─────────────────────────────────────────────── */
+      .feedback-hero {
+        background: linear-gradient(135deg, #1a3c2a 0%, #2d6a4f 100%);
+        color: #fff;
+        padding: 48px 24px 40px;
+        text-align: center;
+      }
+      .feedback-hero h1 {
+        font-size: clamp(1.5rem, 4vw, 2.2rem);
+        margin: 0 0 10px;
+        font-weight: 700;
+      }
+      .feedback-hero p {
+        font-size: clamp(1rem, 2.5vw, 1.15rem);
+        opacity: .88;
+        max-width: 540px;
+        margin: 0 auto;
+      }
+      .feedback-container {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 40px 20px 60px;
+      }
+      .fb-pergunta {
+        margin-bottom: 32px;
+      }
+      .fb-pergunta label {
+        display: block;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1a3c2a;
+        margin-bottom: 10px;
+      }
+      .fb-pergunta .fb-dica {
+        font-size: .9rem;
+        color: #666;
+        margin-bottom: 8px;
+        font-weight: normal;
+      }
+      .fb-input {
+        width: 100%;
+        padding: 12px 14px;
+        font-size: 1rem;
+        border: 2px solid #c8ddd2;
+        border-radius: 8px;
+        font-family: inherit;
+        transition: border-color .2s;
+        box-sizing: border-box;
+      }
+      .fb-input:focus {
+        outline: none;
+        border-color: #2d6a4f;
+      }
+      .fb-opcoes {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .fb-opcao {
+        flex: 1;
+        min-width: 100px;
+      }
+      .fb-opcao input[type="radio"] {
+        display: none;
+      }
+      .fb-opcao label {
+        display: block;
+        text-align: center;
+        padding: 14px 10px;
+        border: 2px solid #c8ddd2;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+        color: #444 !important;
+        transition: all .2s;
+        margin-bottom: 0;
+      }
+      .fb-opcao input:checked + label {
+        border-color: #2d6a4f;
+        background: #2d6a4f;
+        color: #fff !important;
+      }
+      .fb-opcao label:hover {
+        border-color: #2d6a4f;
+      }
+      .fb-aviso-email {
+        margin-top: 12px;
+        display: none;
+      }
+      .fb-aviso-email.visivel {
+        display: block;
+      }
+      .fb-submit {
+        width: 100%;
+        padding: 16px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        background: #2d6a4f;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background .2s;
+        margin-top: 8px;
+      }
+      .fb-submit:hover { background: #1a3c2a; }
+      .fb-submit:disabled { background: #9db8ac; cursor: not-allowed; }
+      .fb-erro {
+        color: #c00;
+        font-size: .9rem;
+        margin-top: 6px;
+        min-height: 20px;
+      }
+      /* ── Tela de sucesso ─────────────────────────────────────────────────── */
+      #fb-sucesso {
+        display: none;
+        text-align: center;
+        padding: 48px 24px;
+      }
+      #fb-sucesso .fb-icone-ok {
+        font-size: 4rem;
+        color: #2d6a4f;
+        margin-bottom: 16px;
+      }
+      #fb-sucesso h2 {
+        font-size: 1.6rem;
+        color: #1a3c2a;
+        margin: 0 0 12px;
+      }
+      #fb-sucesso p {
+        color: #555;
+        font-size: 1rem;
+        line-height: 1.6;
+        max-width: 460px;
+        margin: 0 auto 24px;
+      }
+      #fb-sucesso a {
+        color: #2d6a4f;
+        font-weight: 600;
+      }
+    </style>
+</head>
+<body data-page="feedback">
+
+<a href="https://wa.me/552128881830" class="whatsapp-float" target="_blank" rel="noopener" title="Fale com o Parque Retiro pelo WhatsApp"><i class="fab fa-whatsapp"></i></a>
+
+<header>
+    <a href="index.html" class="brand">
+        <img src="placaparqueretiro.png" alt="Mandala da Escola" class="brand-logo">
+        <span class="brand-name">Parque de Estudo e Reflexão Retiro</span>
+    </a>
+    <nav>
+        <a href="comece-aqui.html">Quem somos</a>
+        <a href="index.html">Início</a>
+        <div class="nav-dropdown">
+            <a href="o-parque.html">O Parque</a>
+            <div class="nav-sub">
+                <a href="o-parque.html">Sobre o Parque</a>
+                <a href="elementos.html">Elementos</a>
+                <a href="como-chegar.html">Como Chegar</a>
+                <div class="nav-item-sub">
+                    <a href="atividades.html">Atividades</a>
+                    <div class="nav-sub2">
+                        <a href="atividades.html?cat=evento">Eventos</a>
+                        <a href="atividades.html?cat=encontro">Encontros</a>
+                        <a href="atividades.html?cat=retiro">Retiros</a>
+                        <a href="atividades.html?cat=reuniao">Reuniões</a>
+                        <a href="fotos.html">Álbum de fotos</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="nav-dropdown">
+            <a href="reservas.html">Reservas</a>
+            <div class="nav-sub">
+                <a href="como-fazer.html">Como Fazer</a>
+                <a href="calendario.html">Calendário de uso</a>
+            </div>
+        </div>
+        <div class="nav-dropdown">
+            <a href="silo.html">Silo</a>
+            <div class="nav-sub">
+                <div class="nav-item-sub">
+                    <a href="mensagem-de-silo.html">Mensagem de Silo</a>
+                    <div class="nav-sub2"><a href="comunidades-da-mensagem.html">Comunidades da Mensagem</a></div>
+                </div>
+                <a href="organismos.html">Organismos do Movimento</a>
+                <a href="biblioteca-silo.html">Biblioteca de Silo</a>
+            </div>
+        </div>
+        <div class="nav-dropdown">
+            <a href="centro-estudo.html">Centro de Estudo</a>
+            <div class="nav-sub">
+                <div class="nav-item-sub">
+                    <a href="escola.html">Escola</a>
+                    <div class="nav-sub2"><a href="nivelamento.html">Nivelação</a></div>
+                </div>
+                <a href="biblioteca.html">Biblioteca do Parque</a>
+                <a href="producoes-de-escola.html">Produções de Escola</a>
+                <a href="livros-audios-app.html">Livros, Áudios e App</a>
+                <a href="oficios.html">Ofícios</a>
+            </div>
+        </div>
+        <div class="nav-dropdown">
+            <a href="ajude-o-parque.html">Ajude o Parque</a>
+            <div class="nav-sub">
+                <a href="doacao.html">Doação</a>
+                <a href="pagar.html">Pagar online</a>
+                <a href="livraria.html">Livraria</a>
+                <a href="lojinha.html">Lojinha</a>
+                <a href="rifa-solidaria.html">Rifa Solidária</a>
+                <a href="vaquinha-coletiva.html">Vaquinha Coletiva</a>
+                <a href="voluntario.html">Voluntário</a>
+                <div class="nav-item-sub">
+                    <a href="comissoes.html">Comissões</a>
+                    <div class="nav-sub2">
+                        <a href="comissao-jardinagem.html">Jardinagem / Área Externa</a>
+                        <a href="comissao-comunicacao.html">Comunicação, Redes Sociais e Site</a>
+                        <a href="comissao-multiuso.html">Multiuso</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a href="parques-mundo.html">Parques no Mundo</a>
+        <div class="nav-dropdown">
+            <a href="noticias.html">Notícias</a>
+            <div class="nav-sub">
+                <a href="blogger.html">Blog</a>
+                <a href="noticias-conecta.html">CONecta Retiro</a>
+            </div>
+        </div>
+    </nav>
+    <a href="login.html" class="btn-entrar"><i class="fas fa-user-lock"></i> Entrar</a>
+</header>
+
+<!-- Hero -->
+<div class="feedback-hero">
+    <h1>Como foi a sua visita?</h1>
+    <p>Sua resposta ajuda a melhorar o Parque. Pode responder só o que quiser — tudo é opcional.</p>
+</div>
+
+<!-- Formulário -->
+<div class="feedback-container">
+
+    <div id="fb-formulario">
+
+        <!-- P1: Como soube -->
+        <div class="fb-pergunta">
+            <label for="fb-como-soube">
+                1. Como você soube do Parque Retiro?
+                <span class="fb-dica">(opcional)</span>
+            </label>
+            <input id="fb-como-soube" class="fb-input" type="text"
+                placeholder="Ex.: Instagram, amigo, buscando na internet…" maxlength="200">
+        </div>
+
+        <!-- P2: Destaque -->
+        <div class="fb-pergunta">
+            <label for="fb-destaque">
+                2. O que mais chamou sua atenção?
+                <span class="fb-dica">(opcional)</span>
+            </label>
+            <textarea id="fb-destaque" class="fb-input" rows="3"
+                placeholder="O que você levou dessa visita?" maxlength="1000"></textarea>
+        </div>
+
+        <!-- P3: Melhorar -->
+        <div class="fb-pergunta">
+            <label for="fb-melhorar">
+                3. Tem algo que poderíamos melhorar?
+                <span class="fb-dica">(opcional)</span>
+            </label>
+            <textarea id="fb-melhorar" class="fb-input" rows="3"
+                placeholder="Sua visão é bem-vinda." maxlength="1000"></textarea>
+        </div>
+
+        <!-- P4: Voltaria -->
+        <div class="fb-pergunta">
+            <label>4. Você voltaria ao Parque?</label>
+            <div class="fb-opcoes">
+                <div class="fb-opcao">
+                    <input type="radio" name="fb-voltaria" id="fb-vol-sim" value="sim">
+                    <label for="fb-vol-sim">😊 Sim</label>
+                </div>
+                <div class="fb-opcao">
+                    <input type="radio" name="fb-voltaria" id="fb-vol-talvez" value="talvez">
+                    <label for="fb-vol-talvez">🤔 Talvez</label>
+                </div>
+                <div class="fb-opcao">
+                    <input type="radio" name="fb-voltaria" id="fb-vol-nao" value="nao">
+                    <label for="fb-vol-nao">😕 Não sei</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- P5: Avisos -->
+        <div class="fb-pergunta">
+            <label>5. Gostaria de receber avisos sobre atividades do Parque?</label>
+            <div class="fb-opcoes">
+                <div class="fb-opcao">
+                    <input type="radio" name="fb-avisos" id="fb-av-sim" value="sim">
+                    <label for="fb-av-sim">✉️ Sim</label>
+                </div>
+                <div class="fb-opcao">
+                    <input type="radio" name="fb-avisos" id="fb-av-nao" value="nao">
+                    <label for="fb-av-nao">Não, obrigado</label>
+                </div>
+            </div>
+            <!-- Campo de e-mail, aparece só se "Sim" -->
+            <div id="fb-aviso-email" class="fb-aviso-email">
+                <label for="fb-email" style="font-weight:normal;color:#444;font-size:.95rem;margin-top:8px;display:block">
+                    Seu e-mail para receber os avisos:
+                </label>
+                <input id="fb-email" class="fb-input" type="email"
+                    placeholder="seu@email.com" maxlength="160">
+            </div>
+        </div>
+
+        <div id="fb-erro" class="fb-erro"></div>
+
+        <button id="fb-enviar" class="fb-submit">
+            <i class="fas fa-paper-plane"></i> Enviar resposta
+        </button>
+
+        <p style="font-size:.82rem;color:#888;margin-top:14px;text-align:center">
+            Nenhuma resposta é obrigatória. Os dados são usados apenas pelo Parque Retiro
+            para melhorar as atividades.
+        </p>
+    </div>
+
+    <!-- Tela de sucesso -->
+    <div id="fb-sucesso">
+        <div class="fb-icone-ok"><i class="fas fa-check-circle"></i></div>
+        <h2>Obrigado pela resposta!</h2>
+        <p>
+            Sua mensagem chegou ao Parque Retiro. Ela vai ajudar a cuidar melhor
+            deste espaço para todos.
+        </p>
+        <a href="index.html"><i class="fas fa-home"></i> Voltar ao início</a>
+    </div>
+
+</div><!-- /feedback-container -->
+
+<footer>
+    <div class="social-links">
+        <a href="https://www.facebook.com/parqueretiro/" target="_blank" rel="noopener" title="Facebook"><i class="fab fa-facebook"></i></a>
+        <a href="https://www.instagram.com/parqueretirorio/" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="https://www.youtube.com/@parquedeestudoereflexaoret6772" target="_blank" rel="noopener" title="YouTube"><i class="fab fa-youtube"></i></a>
+        <a href="blogger.html" title="Blog"><i class="fab fa-blogger-b"></i></a>
+        <a href="https://whatsapp.com/channel/0029VbDmMh9ElagzPYbsg22t" target="_blank" rel="noopener" title="Canal do Parque Retiro no WhatsApp" aria-label="Canal do Parque Retiro no WhatsApp" data-wz="canal"><i class="fab fa-whatsapp"></i></a>
+    </div>
+    <p class="rodape-news"><a href="newsletter.html"><i class="fas fa-envelope"></i> Receba o Comunicado do Parque por e-mail</a></p>
+    <p>&copy; 2026 Parque de Estudo e Reflexão Retiro - Maricá, Rio de Janeiro, Brasil | Instituto Pangeia</p>
+</footer>
+
+<script src="script.js"></script>
+<script src="config-dados.js"></script>
+<script src="adaptador-remoto.js"></script>
+<script src="publico.js"></script>
+<script src="vitrine-publica.js"></script>
+<script src="dados.js"></script>
+<script src="com-feedback.js"></script>
+<script src="area.js"></script>
+<script src="banners.js"></script>
+<script src="idioma.js"></script>
+<script src="ajuda-conteudo.js"></script>
+<script src="ajuda.js"></script>
+</body>
+</html>

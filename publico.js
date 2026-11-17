@@ -26,6 +26,8 @@ const VITRINES = {
   vol_acoes: l => lista(l).map(limpa),
   // Rifa, Vaquinha e Encomendas (15/11/2026): o site mostra o que está cadastrado e quanto já foi reservado/arrecadado,
   // sem nome completo, contato nem comprovante de ninguém.
+  // Atividades públicas (Bloco 2 — 17/11/2026): exibe só as ativas; remove data de criação.
+  atividades_pub: l => lista(l).filter(a => a && a.ativo).map(a => { const x = limpa(a); delete x.criadoEm; return x; }),
   rifas: l => lista(l).map(r => { const x = limpa(r); delete x.historico; delete x.tentativaMsg; if (x.apuracao) x.apuracao = limpa(x.apuracao); if (x.uso) x.uso = limpa(x.uso); return x; }),
   rifa_part: l => lista(l).filter(p => p && p.status !== 'recusado').map(p => ({ id: p.id, rifa: p.rifa, numeros: lista(p.numeros), status: p.status, nome: nomeCurto(p.nome) })),
   vaquinhas: l => lista(l).map(limpa),
@@ -37,7 +39,9 @@ const VITRINES = {
 const PAGINAS = {
   atividades: ['atividades'], atividade: ['atividades'], '': ['atividades', 'livros'],
   biblioteca: ['livros'], fotos: ['album', 'eventos'], estela: ['estela'], lojinha: ['loja_itens'], voluntario: ['vol_acoes'],
-  rifa: ['rifas', 'rifa_part'], vaquinha: ['vaquinhas', 'vaq_part'], livraria: ['livraria_itens', 'livraria_enc'], encomenda: ['livraria_itens', 'livraria_enc']
+  rifa: ['rifas', 'rifa_part'], vaquinha: ['vaquinhas', 'vaq_part'], livraria: ['livraria_itens', 'livraria_enc'], encomenda: ['livraria_itens', 'livraria_enc'],
+  encontro: ['atividades_pub'],
+  feedback: []
 };
 
 // Regras de cada caixa: limpam o envio e dizem como ele entra na coleção (sem nunca apagar o que já existe).
@@ -78,6 +82,53 @@ const CAIXAS = {
   },
   album: {
     limpa: d => d && d.id && /^data:image\/(jpeg|png|webp);base64,/.test(d.foto || '') ? { id: txt(d.id, 40), foto: d.foto, evento: txt(d.evento, 40), dataFoto: txt(d.dataFoto, 10), autor: txt(d.autor, 120), mostrarAutor: !!d.mostrarAutor, legenda: '', email: '', data: txt(d.data, 10) || hoje(), status: 'pendente', origem: 'publica' } : null,
+    junta: (l, d) => { if (l.some(x => x.id === d.id)) return false; l.push(d); return true; }
+  },
+  // Inscrições em atividades (Bloco 2 — 17/11/2026)
+  inscricoes: {
+    limpa: d => {
+      if (!d || !d.atividade || !d.consentimento) return null;
+      const partes = txt(d.nome, 120).trim().split(/\s+/).filter(Boolean);
+      if (partes.length < 2) return null;
+      if (!emailOk(String(d.email || '').toLowerCase())) return null;
+      return {
+        id:            txt(d.id, 40) || ('i' + Date.now().toString(36)),
+        atividade:     txt(d.atividade, 40),
+        atividade_nome: txt(d.atividade_nome, 200),
+        nome:          partes.join(' '),
+        email:         String(d.email).toLowerCase().slice(0, 160),
+        telefone:      txt(d.telefone, 30),
+        cidade:        txt(d.cidade, 100),
+        extra:         txt(d.extra, 500),
+        data_atividade: txt(d.data_atividade, 20),
+        status:        'interesse',
+        origem:        'publica',
+        criadoEm:      txt(d.criadoEm, 30) || new Date().toISOString(),
+        consentimento: true,
+        chegou:        false,
+        cancelado:     false
+      };
+    },
+    junta: (l, d) => { if (l.some(x => x.id === d.id)) return false; l.push(d); return true; }
+  },
+  // Feedback de visita (Bloco 6 — 17/11/2026)
+  feedback: {
+    limpa: d => {
+      if (!d) return null;
+      return {
+        id:          txt(d.id, 40) || ('f' + Date.now().toString(36)),
+        atividade:   txt(d.atividade, 40),
+        como_soube:  txt(d.como_soube, 200),
+        destaque:    txt(d.destaque, 1000),
+        melhorar:    txt(d.melhorar, 1000),
+        voltaria:    ['sim', 'talvez', 'nao'].includes(d.voltaria) ? d.voltaria : '',
+        quer_avisos: !!d.quer_avisos,
+        email:       d.quer_avisos && emailOk(String(d.email || '').toLowerCase())
+                       ? String(d.email).toLowerCase().slice(0, 160) : '',
+        criadoEm:    txt(d.criadoEm, 30) || new Date().toISOString(),
+        origem:      'publica'
+      };
+    },
     junta: (l, d) => { if (l.some(x => x.id === d.id)) return false; l.push(d); return true; }
   }
 };
