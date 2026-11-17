@@ -17,27 +17,27 @@ returns jsonb
 language plpgsql security definer
 as $$
 declare
-  v_lista jsonb;
+  v_lista      jsonb;
+  v_novo       jsonb := '[]'::jsonb;
+  v_encontrado boolean := false;
+  v_row        record;
 begin
   select dados into v_lista from registros where colecao = 'com_envios' limit 1;
   if v_lista is null then v_lista := '[]'::jsonb; end if;
 
-  -- Atualiza se já existe, senão adiciona
-  declare v_novo jsonb := '[]'::jsonb; v_encontrado boolean := false;
-  begin
-    for v_item in select * from jsonb_array_elements(v_lista)
-    loop
-      if (v_item->>'id') = (p_envio->>'id') then
-        v_novo := v_novo || jsonb_build_array(p_envio);
-        v_encontrado := true;
-      else
-        v_novo := v_novo || jsonb_build_array(v_item);
-      end if;
-    end loop;
-    if not v_encontrado then
+  for v_row in select value from jsonb_array_elements(v_lista)
+  loop
+    if (v_row.value->>'id') = (p_envio->>'id') then
       v_novo := v_novo || jsonb_build_array(p_envio);
+      v_encontrado := true;
+    else
+      v_novo := v_novo || jsonb_build_array(v_row.value);
     end if;
-  end;
+  end loop;
+
+  if not v_encontrado then
+    v_novo := v_novo || jsonb_build_array(p_envio);
+  end if;
 
   insert into registros (colecao, id, dados)
     values ('com_envios', 'lista', v_novo)
