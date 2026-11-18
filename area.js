@@ -1085,6 +1085,7 @@ V.album = (me, root) => {
   const cur = tem(me, 'album');
   let sub = 'minhas', filtro = 'pendente', evF = '*', msg = '';
   const SUB = [['minhas', 'Enviar e minhas fotos'], ['todas', 'Fotos por atividade']].concat(cur ? [['lote', 'Enviar em lote'], ['cur', 'Curadoria'], ['evs', 'Atividades']] : []);
+  if (hashParam('t') === 'album' && SUB.some(x => x[0] === hashParam('s'))) sub = hashParam('s');
   const todas = () => db.get('album', []).filter(fotoOk);
   const evFiltro = () => `<div class="form-row"><label for="a-ev">Atividade</label><select id="a-ev"><option value="*">Todas as atividades</option>${eventos().map(e => `<option value="${e.id}"${evF === e.id ? ' selected' : ''}>${esc(e.nome)}</option>`).join('')}<option value=""${evF === '' ? ' selected' : ''}>Sem evento</option></select></div>`;
   const passa = f => evF === '*' || (f.evento || '') === evF || (evF === '' && !nomeEv(f.evento));
@@ -1319,6 +1320,11 @@ V.patrimonio = (me, root) => {
 
 /* ---------- Documentos e Calendários / Relatórios Consolidados (módulos em documentos.js e relatorios.js) ---------- */
 // Ferramentas que o painel entrega aos módulos externos. Para um módulo novo ler dados existentes, acrescente aqui.
+// Links diretos (ex.: area-restrita.html#t=documentos&s=dar): o destino sobrevive ao login e cada ferramenta lê a sub-aba pedida.
+const hashParam = k => new URLSearchParams(location.hash.slice(1)).get(k) || '';
+const guardaDestino = () => { try { if (/(^|&)t=/.test(location.hash.slice(1))) sessionStorage.setItem('pr_destino', location.hash); } catch (e) {} };
+const destinoArea = () => { let d = ''; try { d = sessionStorage.getItem('pr_destino') || ''; sessionStorage.removeItem('pr_destino'); } catch (e) {} return 'area-restrita.html' + (/^#[\w=&%.-]+$/.test(d) ? d : ''); };
+window.PR_LINK = { param: hashParam };
 let irPara = null; // definido em painel(): abre outra aba do painel (usado pelos botões "Planejar publicações" dos calendários)
 const ajudaModulos = () => ({ irPara, db, esc, $, uid, hoje, fmtData, csv, reduz, norm, tem, safeUrl, NIV, livros, emprest, exm, ativos, livre, pedidos, quartoDe, camaTxt, CC, MOEDA, money, normConta });
 // Encomendas de livros (módulo em encomenda.js) para o responsável temporário de um lançamento; o Administrador usa a sub-aba da Livraria.
@@ -1545,7 +1551,7 @@ function painel() {
   const entrar = emApp ? 'app/' : 'login.html';
   if (SRV) {
     const s = SB.sessao(), est = PR_DADOS.estadoSync();
-    if (!s || est.estado === 'sem-sessao') { sessionStorage.removeItem('pr_sess'); location.replace(entrar); return; }
+    if (!s || est.estado === 'sem-sessao') { sessionStorage.removeItem('pr_sess'); guardaDestino(); location.replace(entrar); return; }
     sessionStorage.setItem('pr_sess', s.user.email);
     if (est.estado === 'offline' && !db.get('users', []).length) { $('#app').innerHTML = `<p class="tip-box" role="alert"><strong>Não foi possível falar com o servidor.</strong> Confira a internet e <a href="area-restrita.html">tente de novo</a>. ${esc(est.erro || '')}</p>`; return; }
   }
@@ -1554,7 +1560,7 @@ function painel() {
   // Acesso temporário (script.js): enquanto estiver ativo, quem clicou na mandala entra sem login.
   const cfgTemp = window.PR_ACESSO_TEMPORARIO, temp = !!(cfgTemp && cfgTemp.ativo && sessionStorage.getItem('pr_temp') === '1');
   if (temp && (!me || statusDe(me) !== 'aprovado')) me = { email: 'acesso-temporario', nome: 'Acesso temporário', nivel: NIV[cfgTemp.nivel] ? cfgTemp.nivel : 'administrador', status: 'aprovado', funcoes: [] };
-  if (!me || statusDe(me) !== 'aprovado') { sessionStorage.removeItem('pr_sess'); location.replace(entrar); return; }
+  if (!me || statusDe(me) !== 'aprovado') { sessionStorage.removeItem('pr_sess'); guardaDestino(); location.replace(entrar); return; }
   const n = NIV[me.nivel];
   if (window.PR_IMP2611 && window.PR_IMP2611.autoImportar) window.PR_IMP2611.autoImportar(db, me, hoje); // planilhas de nov/2026 já entram na primeira visita do administrador
   const tabs = abasDe(me);
@@ -1695,7 +1701,7 @@ function loginServidor() {
   const ret = SB.lerRetornoDoEmail();
   if (ret && ret.tipo !== 'recovery' && !ret.erro) { history.replaceState(null, '', location.pathname); } // volta da confirmação de e-mail
   const s = SB.sessao(), eu = s && db.get('users', []).find(u => u.email === s.user.email);
-  if (!ret && eu && statusDe(eu) === 'aprovado') { sessionStorage.setItem('pr_sess', eu.email); location.replace('area-restrita.html'); return; }
+  if (!ret && eu && statusDe(eu) === 'aprovado') { sessionStorage.setItem('pr_sess', eu.email); location.replace(destinoArea()); return; }
   let modo = ret && ret.tipo === 'recovery' ? 'nova' : (!ret && location.hash === '#criar-conta' ? 'cadastro' : 'entrar'), aviso = '', ocupado = false;
   if (ret && ret.erro) aviso = 'O link do e-mail não funcionou (' + ret.erro + '). Se for de senha, peça outro em "Esqueci minha senha".';
   else if (ret && ret.tipo === 'signup') aviso = 'E-mail confirmado! Agora aguarde: o administrador vai aprovar ou não o seu acesso. Você pode tentar entrar depois da aprovação.';
@@ -1730,7 +1736,7 @@ function loginServidor() {
     const r = await SB.entrar(em, sn);
     if (r.erro) return falha(r.erro);
     if (r.pendente) return falha(STATUS_MSG[r.perfil.status] || STATUS_MSG.pendente);
-    sessionStorage.setItem('pr_sess', r.perfil.email); location.href = 'area-restrita.html';
+    sessionStorage.setItem('pr_sess', r.perfil.email); location.href = destinoArea();
   });
   const cadastra = () => espera(async () => {
     const n = $('#n').value.trim().replace(/\s+/g, ' '), em = $('#e').value.trim().toLowerCase(), sn = $('#s').value, s2 = $('#s2').value, w = $('#w').value.trim();
@@ -1767,7 +1773,7 @@ function login() {
   if (window.PR_DADOS && PR_DADOS.modo === 'supabase') return loginServidor();
   const users = db.get('users', []);
   const logado = users.find(u => u.email === sessionStorage.getItem('pr_sess'));
-  if (logado && statusDe(logado) === 'aprovado') { location.replace('area-restrita.html'); return; }
+  if (logado && statusDe(logado) === 'aprovado') { location.replace(destinoArea()); return; }
   const primeiro = !users.some(u => u.nivel === 'administrador' && statusDe(u) === 'aprovado'); // o primeiro cadastro sempre vira Administrador
   let modo = location.hash === '#criar-conta' ? 'cadastro' : 'entrar', aviso = '';
 
@@ -1799,7 +1805,7 @@ function login() {
     if (!u || u.hash !== await hash(s, u.salt)) return falha('E-mail ou senha incorretos. Confira e tente de novo.');
     const st = statusDe(u);
     if (st !== 'aprovado') return falha(STATUS_MSG[st] || STATUS_MSG.pendente);
-    sessionStorage.setItem('pr_sess', em); location.href = 'area-restrita.html';
+    sessionStorage.setItem('pr_sess', em); location.href = destinoArea();
   }
 
   async function enviaCadastro(ev) {
@@ -1818,7 +1824,7 @@ function login() {
     const adm = !l.some(u => u.nivel === 'administrador' && statusDe(u) === 'aprovado'); // primeiro cadastro = Administrador
     l.push({ nome: n, email: em, whatsapp: zapDigitos(w), lgpd: lgpdLe('cc'), nivel: adm ? 'administrador' : 'leitor', status: adm ? 'aprovado' : 'pendente', funcoes: [], criado: hoje(), salt, hash: await hash(s, salt) });
     if (!db.set('users', l)) return falha('Não foi possível salvar o cadastro neste navegador.');
-    if (adm) { sessionStorage.setItem('pr_sess', em); location.href = 'area-restrita.html'; return; }
+    if (adm) { sessionStorage.setItem('pr_sess', em); location.href = destinoArea(); return; }
     modo = 'entrar'; aviso = 'Cadastro enviado! Agora aguarde: o administrador vai aprovar ou não o seu acesso.'; desenha();
   }
 

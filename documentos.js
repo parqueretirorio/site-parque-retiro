@@ -264,6 +264,10 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
   const anoHoje = +hoje().slice(0, 4);
   const areas = AREAS.filter(a => a.lugar === lugar), cals = lugar === 'docs' ? CALS : [];
   let sub = (areas[0] || cals[0]).id, form = null, msg = '', imp = null, trs = null; // trs: transcrição sendo conferida // imp: pacote de atas sendo conferido antes de importar
+  let abreZoom = false;
+  { const L = window.PR_LINK, ps = L && L.param('t') === 'documentos' ? L.param('s') : ''; // link direto: #t=documentos&s=dar | s=pend | s=atas&z=zoom|trs
+    abreZoom = ps === 'atas' && L.param('z') === 'zoom';
+    if (ps && (['pend', 'dar'].includes(ps) || areas.some(a => a.id === ps) || cals.some(c => c.id === ps))) sub = ps; }
   const F = { ano: '', cat: '', q: '', aberto: false };                       // filtros da lista de documentos
   const mesHoje = +hoje().slice(5, 7) - 1;
   const W = { ini: domingoDe(hoje()) }; // semana mostrada no calendário semanal (domingo)
@@ -469,6 +473,7 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
       rd.onload = () => { const r = lerTranscricao(rd.result, f.name); if (!r.falas.length) { msg = 'Não encontrei texto de transcrição neste arquivo. Use o .vtt do Zoom ou a legenda (.vtt/.srt) baixada do YouTube Studio.'; draw(); return; }
         const dt = r.data || hoje(); trs = Object.assign(r, { arquivo: f.name.slice(0, 120), titulo: 'Reunião de ' + fmtData(dt), video: '' }); msg = ''; draw(); const bx = $('#trs-box', el); if (bx) bx.scrollIntoView({ block: 'start' }); }; rd.readAsText(f); };
     const bz = $('#d-zoom', el); if (bz) bz.onclick = () => { ZM.aberto = true; ZM.ate = ''; ZM.ano = false; carregaZoom(); };
+    if (bz && abreZoom) { abreZoom = false; ZM.aberto = true; ZM.ate = ''; ZM.ano = true; carregaZoom(); return; }
     if (ZM.aberto && $('#zm-box', el)) {
       $('#zm-x', el).onclick = () => { ZM.aberto = false; draw(); };
       const za = $('#zm-ano', el); if (za) za.onclick = () => { ZM.ano = true; carregaZoom(); };

@@ -128,3 +128,27 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
     window.addEventListener('resize', () => { if (!mq.matches) setMenu(false); });
 });
+
+/* Chat ao vivo (Tawk.to): botão "Chat" acima do botão do WhatsApp. O serviço externo só é carregado quando a pessoa
+   clica (nada de terceiros antes disso). Liga com livechat.ativo e o código "propriedade/widget" em config-dados.js.
+   Não aparece na área restrita, no login nem no app. */
+document.addEventListener('DOMContentLoaded', () => {
+    const c = (window.PR_CONFIG_DADOS && window.PR_CONFIG_DADOS.livechat) || {};
+    if (c.provedor !== 'tawkto' || c.ativo !== true || !/^[A-Za-z0-9]+\/[A-Za-z0-9]+$/.test(c.id || '')) return;
+    if (/(^|\/)(area-restrita|login)\.html$/.test(location.pathname) || document.getElementById('pr-chat-btn')) return;
+    const idioma = (document.documentElement.lang || 'pt').slice(0, 2), es = idioma === 'es';
+    const b = document.createElement('button');
+    b.type = 'button'; b.id = 'pr-chat-btn'; b.className = 'chat-float';
+    b.setAttribute('aria-label', es ? 'Chatear con el Parque Retiro' : 'Conversar com o Parque Retiro pelo chat');
+    b.title = b.getAttribute('aria-label'); b.innerHTML = '<i class="fas fa-comments"></i>';
+    document.body.appendChild(b); document.body.classList.add('tem-chat');
+    b.addEventListener('click', () => {
+        if (b.dataset.carregando) return; b.dataset.carregando = '1'; b.disabled = true;
+        const T = window.Tawk_API = window.Tawk_API || {}; window.Tawk_LoadStart = new Date();
+        T.customStyle = { visibility: { desktop: { position: 'br', xOffset: 30, yOffset: 100 }, mobile: { position: 'br', xOffset: 20, yOffset: 100 } } };
+        T.onLoad = () => { b.remove(); try { T.maximize(); } catch (e) {} };
+        const s = document.createElement('script'); s.async = true; s.src = 'https://embed.tawk.to/' + c.id; s.charset = 'UTF-8'; s.setAttribute('crossorigin', '*');
+        s.onerror = () => { b.disabled = false; delete b.dataset.carregando; };
+        document.head.appendChild(s);
+    });
+});

@@ -15,6 +15,9 @@ window.PR_CONFIG_DADOS = {
     url: 'https://yhzsuokwglznehvbclwd.supabase.co',
     chavePublica: 'sb_publishable_0ctrZKumwET1OtLe7jVMKw_AxyzJAuR'
   },        // string, ou função () => 'token da sessão' (definida pelo login real, fase seguinte)
+  // Chat ao vivo (Tawk.to), ao lado do WhatsApp. Para ligar: ativo: true e id = 'PROPRIEDADE/WIDGET' (do endereço do widget no
+  // Tawk.to, Administração › Widget de chat). Esse código é público (não é senha). Enquanto ativo for false, nada aparece.
+  livechat: { provedor: 'tawkto', ativo: false, id: '' },
   // Rifa Solidária: de onde buscar o resultado da Loteria Federal para apurar o sorteio automaticamente.
   // Se o serviço não responder (ou o navegador bloquear), o Responsável digita os 5 prêmios na aba Sorteio.
   rifa: { fontesResultado: ['https://servicebus2.caixa.gov.br/portaldeloterias/api/federal/'] }
