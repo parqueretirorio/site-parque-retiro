@@ -129,26 +129,27 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', () => { if (!mq.matches) setMenu(false); });
 });
 
-/* Chat ao vivo (Tawk.to): botão "Chat" acima do botão do WhatsApp. O serviço externo só é carregado quando a pessoa
-   clica (nada de terceiros antes disso). Liga com livechat.ativo e o código "propriedade/widget" em config-dados.js.
-   Não aparece na área restrita, no login nem no app. */
+/* Contato direto: chat ao vivo (Tawk.to) + e-mail, no lugar do botão do WhatsApp. Só entra quando config-dados.js liga o chat
+   (livechat.ativo e o código "propriedade/widget"); até lá o botão do WhatsApp continua. O Canal e a Comunidade do WhatsApp não mudam.
+   O serviço externo só é carregado quando a pessoa clica em "chat". Não aparece na área restrita, no login nem no app. */
 document.addEventListener('DOMContentLoaded', () => {
     const c = (window.PR_CONFIG_DADOS && window.PR_CONFIG_DADOS.livechat) || {};
     if (c.provedor !== 'tawkto' || c.ativo !== true || !/^[A-Za-z0-9]+\/[A-Za-z0-9]+$/.test(c.id || '')) return;
     if (/(^|\/)(area-restrita|login)\.html$/.test(location.pathname) || document.getElementById('pr-chat-btn')) return;
-    const idioma = (document.documentElement.lang || 'pt').slice(0, 2), es = idioma === 'es';
-    const b = document.createElement('button');
-    b.type = 'button'; b.id = 'pr-chat-btn'; b.className = 'chat-float';
-    b.setAttribute('aria-label', es ? 'Chatear con el Parque Retiro' : 'Conversar com o Parque Retiro pelo chat');
-    b.title = b.getAttribute('aria-label'); b.innerHTML = '<i class="fas fa-comments"></i>';
-    document.body.appendChild(b); document.body.classList.add('tem-chat');
+    const es = (document.documentElement.lang || 'pt').slice(0, 2) === 'es';
+    const mk = (tag, id, cls, rotulo, icone) => { const e = document.createElement(tag); e.id = id; e.className = cls; e.setAttribute('aria-label', rotulo); e.title = rotulo; e.innerHTML = '<i class="fas ' + icone + '"></i>'; document.body.appendChild(e); return e; };
+    document.querySelectorAll('.whatsapp-float').forEach(a => a.remove());
+    document.body.classList.add('tem-chat');
+    const em = mk('a', 'pr-email-btn', 'email-float', es ? 'Escribir al Parque Retiro por e-mail' : 'Escrever para o Parque Retiro por e-mail', 'fa-envelope');
+    em.href = 'mailto:' + (c.email || 'parqueretirorio@gmail.com');
+    const b = mk('button', 'pr-chat-btn', 'chat-float', es ? 'Chatear con el Parque Retiro' : 'Conversar com o Parque Retiro pelo chat', 'fa-comments'); b.type = 'button';
     b.addEventListener('click', () => {
         if (b.dataset.carregando) return; b.dataset.carregando = '1'; b.disabled = true;
         const T = window.Tawk_API = window.Tawk_API || {}; window.Tawk_LoadStart = new Date();
-        T.customStyle = { visibility: { desktop: { position: 'br', xOffset: 30, yOffset: 100 }, mobile: { position: 'br', xOffset: 20, yOffset: 100 } } };
+        T.customStyle = { visibility: { desktop: { position: 'br', xOffset: 30, yOffset: 30 }, mobile: { position: 'br', xOffset: 20, yOffset: 30 } } };
         T.onLoad = () => { b.remove(); try { T.maximize(); } catch (e) {} };
-        const s = document.createElement('script'); s.async = true; s.src = 'https://embed.tawk.to/' + c.id; s.charset = 'UTF-8'; s.setAttribute('crossorigin', '*');
-        s.onerror = () => { b.disabled = false; delete b.dataset.carregando; };
-        document.head.appendChild(s);
+        const sc = document.createElement('script'); sc.async = true; sc.src = 'https://embed.tawk.to/' + c.id; sc.charset = 'UTF-8'; sc.setAttribute('crossorigin', '*');
+        sc.onerror = () => { b.disabled = false; delete b.dataset.carregando; };
+        document.head.appendChild(sc);
     });
 });
