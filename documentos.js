@@ -259,18 +259,11 @@ const msgStatus = (D, link, lang = 'pt') => {
   return L.join('\n');
 };
 // Pesquisa/consulta por ponto (para o Grupo de Mestres) e cobrança gentil ao responsável. Nada é enviado sozinho: abre o WhatsApp com o texto pronto.
-const NUMS = ['1️⃣', '2️⃣', '3️⃣', '4️⃣'];
 const MSG2 = {
-  pt: { cTit: r => `*Consulta sobre um encaminhamento — ${r}*`, semResp: 'Este ponto está *sem responsável*.', semData: 'Este ponto está *sem prazo*.', resp: 'Responsável: ', prazo: 'Prazo: ', atraso: 'Prazo vencido em ', passo: 'Próximo passo: ',
-    intro: 'Preciso da ajuda de vocês para dar andamento a este ponto.', pedido: 'Respondam com o *número* da opção (e, se for o caso, o nome e a data):',
-    ops: ['Posso assumir este ponto', 'Posso ajudar quem assumir', 'Sugiro um prazo (digam qual)', 'Já está resolvido ou tenho novidade (contem)'],
-    fim: l => `Eu registro as respostas em Área restrita › Documentos e Calendários › Dar encaminhamento: ${l}`, obrig: 'Obrigado! 🙏',
+  pt: { semResp: 'Este ponto está *sem responsável*.', semData: 'Este ponto está *sem prazo*.', resp: 'Responsável: ', prazo: 'Prazo: ', atraso: 'Prazo vencido em ', passo: 'Próximo passo: ',
     ola: n => n ? `Olá, ${n}! 😊` : 'Olá! 😊', pIntro: r => `Passando para saber como está este encaminhamento da ${r}:`,
     pPerg: 'Como está? Se já andou, me conte. Se precisar de ajuda, de prazo ou de outra pessoa junto, é só falar.', pFim: l => `Você também pode atualizar direto em Área restrita › Documentos e Calendários › Dar encaminhamento: ${l}` },
-  es: { cTit: r => `*Consulta sobre un encaminamiento — ${r}*`, semResp: 'Este punto está *sin responsable*.', semData: 'Este punto está *sin plazo*.', resp: 'Responsable: ', prazo: 'Plazo: ', atraso: 'Plazo vencido el ', passo: 'Próximo paso: ',
-    intro: 'Necesito la ayuda de ustedes para dar curso a este punto.', pedido: 'Respondan con el *número* de la opción (y, si corresponde, el nombre y la fecha):',
-    ops: ['Puedo asumir este punto', 'Puedo ayudar a quien lo asuma', 'Sugiero un plazo (digan cuál)', 'Ya está resuelto o tengo novedades (cuenten)'],
-    fim: l => `Yo registro las respuestas en Área restringida › Documentos y Calendarios › Dar seguimiento: ${l}`, obrig: '¡Gracias! 🙏',
+  es: { semResp: 'Este punto está *sin responsable*.', semData: 'Este punto está *sin plazo*.', resp: 'Responsable: ', prazo: 'Plazo: ', atraso: 'Plazo vencido el ', passo: 'Próximo paso: ',
     ola: n => n ? `¡Hola, ${n}! 😊` : '¡Hola! 😊', pIntro: r => `Paso para saber cómo va este encaminamiento de la ${r}:`,
     pPerg: '¿Cómo va? Si ya avanzó, cuéntame. Si necesitas ayuda, un plazo u otra persona para acompañarte, avísame.', pFim: l => `También puedes actualizarlo directo en Área restringida › Documentos y Calendarios › Dar seguimiento: ${l}` }
 };
@@ -281,12 +274,22 @@ const linhasPonto = (T, i, lang) => {
   if (passo) L.push('➡️ ' + T.passo + passo);
   return L;
 };
-const msgConsulta = (D, i, link, lang = 'pt') => { const T = MSG2[lang] || MSG2.pt;
-  return [T.cTit(nomeLang(D, lang)), '', ...linhasPonto(T, i, lang), '', T.intro, '', T.pedido, ...T.ops.map((o, k) => `${NUMS[k]} ${o}`), '', T.fim(link), '', T.obrig].join('\n'); };
+// Enquete do WhatsApp por ponto: o site não cria a enquete sozinho (o WhatsApp não permite); entrega a pergunta e as opções prontas para copiar e colar.
+const ENQ = {
+  pt: { q: t => `${t}: como vamos dar encaminhamento?`, prazo: d => `Prazo: ${d}`,
+    semResp: ['Posso assumir este ponto', 'Posso ajudar quem assumir', 'Preciso de mais informações', 'Já está resolvido ou tem novidade'],
+    comResp: ['Posso ajudar com este ponto', 'Preciso de mais informações', 'Já está resolvido ou tem novidade', 'Sugiro outra pessoa para assumir'] },
+  es: { q: t => `${t}: ¿cómo lo encaminamos?`, prazo: d => `Plazo: ${d}`,
+    semResp: ['Puedo asumir este punto', 'Puedo ayudar a quien lo asuma', 'Necesito más información', 'Ya está resuelto o tengo novedades'],
+    comResp: ['Puedo ayudar con este punto', 'Necesito más información', 'Ya está resuelto o hay novedades', 'Sugiero que otra persona lo asuma'] }
+};
+const enquete = (D, i, lang = 'pt', hoje = () => new Date().toISOString().slice(0, 10)) => { const T = ENQ[lang] || ENQ.pt, ops = (i.semResp ? T.semResp : T.comResp).slice();
+  if (i.semData || i.atraso) { let q = addDia(hoje(), 1); while (new Date(q + 'T12:00:00').getDay() !== 4) q = addDia(q, 1); [q, addDia(q, 7), addDia(q, 21)].forEach(d => ops.push(T.prazo(fmtBR(d)))); }
+  return { pergunta: T.q(curto(textoLang(i.e, lang), 110)), opcoes: ops }; };
 const msgCobrar = (D, i, link, lang = 'pt', nome = '') => { const T = MSG2[lang] || MSG2.pt;
   return [T.ola(nome), T.pIntro(nomeLang(D, lang)), '', ...linhasPonto(T, i, lang), '', T.pPerg, '', T.pFim(link)].join('\n'); };
 const waNum = v => { const d = String(v || '').replace(/\D/g, ''); return d.length < 10 ? '' : d.length <= 11 ? '55' + d : d; };
-window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codigoOk, sugereCodigo, darEncaminhamento, msgResumo, msgStatus, msgConsulta, msgCobrar, waNum, salvarEnc, curto, lerTranscricao, abrir(me, root, H, lugar = 'docs') { // lugar: 'docs' (Documentos e Calendários) ou 'mapa' (Documentação IP)
+window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codigoOk, sugereCodigo, darEncaminhamento, msgResumo, msgStatus, enquete, msgCobrar, waNum, salvarEnc, curto, lerTranscricao, abrir(me, root, H, lugar = 'docs') { // lugar: 'docs' (Documentos e Calendários) ou 'mapa' (Documentação IP)
   const { db, esc, $, uid, hoje, fmtData, norm } = H;
   const pode = H.tem(me, 'documentos'); // administrador ou Responsável pelos Documentos e Calendários
   const anoHoje = +hoje().slice(0, 4);
@@ -662,9 +665,13 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
         ${i.data && i.data < hoje() ? '<span class="badge-status" style="background:#a31d21;color:#fff">Em atraso</span>' : ''} <small>${i.e.atualizado ? 'atualizado há ' : 'parado há '}${i.parado} dia(s)</small></p>
       <strong>${esc(i.e.texto)}</strong>${i.e.passo ? `<p style="margin:4px 0"><i class="fas fa-shoe-prints" aria-hidden="true"></i> Próximo passo: ${esc(i.e.passo)}</p>` : ''}
       ${!i.semResp ? `<p style="margin:4px 0"><small>${respHtml(i.e.resp)}</small></p>` : ''}
-      <p class="no-print" style="margin:6px 0;display:flex;flex-wrap:wrap;gap:8px" data-wa="${esc(i.e.id)}">
-        <a class="btn-visit" target="_blank" rel="noopener" href="${esc(waLink('', msgConsulta(D, i, link, DE.lang)))}" title="Abre o WhatsApp com uma consulta curta sobre este ponto, para você escolher o grupo"><i class="fab fa-whatsapp" aria-hidden="true"></i> Pesquisar no grupo</a>
-        ${i.semResp ? '' : (cs => cs.length ? cs.map(c => `<a class="btn-visit" target="_blank" rel="noopener" href="${esc(waLink(c.zap, msgCobrar(D, i, link, DE.lang, c.primeiro)))}" title="Abre o WhatsApp com ${esc(c.nome)}"><i class="fas fa-user-check" aria-hidden="true"></i> Falar com ${esc(c.primeiro)}</a>${c.zap ? '' : ' <small>(cadastro sem WhatsApp)</small>'}`).join('') : `<a class="btn-visit" target="_blank" rel="noopener" href="${esc(waLink('', msgCobrar(D, i, link, DE.lang)))}" title="A pessoa ainda não tem cadastro: o WhatsApp abre para você escolher o contato"><i class="fas fa-comment-dots" aria-hidden="true"></i> Falar com o responsável</a>`)(contatosResp(i.e.resp))}</p>
+      <div class="no-print" style="margin:6px 0;display:flex;flex-wrap:wrap;gap:8px" data-wa="${esc(i.e.id)}">
+        ${(q => `<details class="no-print" style="flex-basis:100%" data-enq><summary class="btn-visit" style="display:inline-block;cursor:pointer"><i class="fab fa-whatsapp" aria-hidden="true"></i> Criar enquete</summary>
+          <div class="tip-box" style="display:block;margin-top:6px"><p><small>No grupo do WhatsApp: toque em <b>+</b> (ou no clipe) › <b>Enquete</b> e cole. Você pode ajustar o texto aqui antes de copiar.</small></p>
+          <label>Pergunta</label><input data-enq-q maxlength="250" value="${esc(q.pergunta)}">
+          <label>Opções (uma por linha, até 12)</label><textarea data-enq-o rows="${q.opcoes.length + 1}" maxlength="1200">${esc(q.opcoes.join('\n'))}</textarea>
+          <p style="margin:6px 0 0;display:flex;flex-wrap:wrap;gap:8px"><button type="button" class="btn-visit" data-cp="q"><i class="fas fa-copy" aria-hidden="true"></i> Copiar pergunta</button><button type="button" class="btn-visit" data-cp="o"><i class="fas fa-copy" aria-hidden="true"></i> Copiar opções</button></p></div></details>`)(enquete(D, i, DE.lang, hoje))}
+        ${i.semResp ? '' : (cs => cs.length ? cs.map(c => `<a class="btn-visit" target="_blank" rel="noopener" href="${esc(waLink(c.zap, msgCobrar(D, i, link, DE.lang, c.primeiro)))}" title="Abre o WhatsApp com ${esc(c.nome)}"><i class="fas fa-user-check" aria-hidden="true"></i> Falar com ${esc(c.primeiro)}</a>${c.zap ? '' : ' <small>(cadastro sem WhatsApp)</small>'}`).join('') : `<a class="btn-visit" target="_blank" rel="noopener" href="${esc(waLink('', msgCobrar(D, i, link, DE.lang)))}" title="A pessoa ainda não tem cadastro: o WhatsApp abre para você escolher o contato"><i class="fas fa-comment-dots" aria-hidden="true"></i> Falar com o responsável</a>`)(contatosResp(i.e.resp))}</div>
       ${pode ? `<div style="display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-top:8px">
         <div><label for="de-rs${n}" style="display:block;font-weight:600;font-size:.85em">Quem assume</label><input id="de-rs${n}" data-k="resp" maxlength="80" value="${esc(semResp(i.e.resp) ? '' : i.e.resp)}" placeholder="Nome(s)"></div>
         <div><label for="de-dt${n}" style="display:block;font-weight:600;font-size:.85em">Prazo</label><input id="de-dt${n}" data-k="data" type="date" value="${esc(i.data)}"></div>
@@ -681,6 +688,9 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
       const wa = $('#de-wa', el), atual = () => { wa.href = 'https://wa.me/?text=' + encodeURIComponent(tx.value); }; atual(); tx.oninput = atual;
       $('#de-cp', el).onclick = async () => { try { await navigator.clipboard.writeText(tx.value); } catch (x) { tx.select(); try { document.execCommand('copy'); } catch (y) {} } $('#de-cp', el).innerHTML = '<i class="fas fa-check"></i> Copiado'; };
     }
+    el.querySelectorAll('[data-cp]').forEach(b => b.onclick = async () => { const f = b.closest('[data-enq]').querySelector(b.dataset.cp === 'q' ? '[data-enq-q]' : '[data-enq-o]'), h0 = b.innerHTML;
+      try { await navigator.clipboard.writeText(f.value); } catch (x) { f.select(); try { document.execCommand('copy'); } catch (y) {} }
+      b.textContent = 'Copiado ✓'; setTimeout(() => { b.innerHTML = h0; }, 1800); });
     el.querySelectorAll('[data-de-ok]').forEach(b => b.onclick = () => {
       if (!pode) return; const box = b.closest('[data-de]'), [di, ei] = box.dataset.de.split('|'), v = k => box.querySelector(`[data-k="${k}"]`).value.trim();
       const r = salvarEnc(db, di, ei, { resp: v('resp'), data: v('data'), passo: v('passo'), es: v('es'), status: v('status') }, me.nome, hoje());

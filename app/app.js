@@ -498,7 +498,12 @@ function documentos(sub) {
         <p>${i.semResp ? '' : '<i class="fas fa-user" aria-hidden="true"></i> ' + esc(i.e.resp) + ' · '}${i.data ? t('b2_prazo', { d: fmtDia(i.data) }) : ''}</p>
         ${i.e.passo ? `<p class="desc"><i class="fas fa-shoe-prints" aria-hidden="true"></i> ${esc(i.e.passo)}</p>` : ''}
         <p class="desc">${t(i.e.atualizado ? 'b2_darAtualizado' : 'b2_darParado', { n: i.parado })}</p>
-        <p class="acoes"><a class="bt bt-claro" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(PD.msgConsulta(D, i, linkArea, darLang))}"><i class="fab fa-whatsapp" aria-hidden="true"></i> ${t('b2_darPesq')}</a>${i.semResp ? '' : ` <a class="bt bt-claro" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(PD.msgCobrar(D, i, linkArea, darLang))}"><i class="fas fa-comment-dots" aria-hidden="true"></i> ${t('b2_darFalar')}</a>`}</p>
+        ${(q => `<details class="enq" data-enq><summary class="bt bt-claro"><i class="fab fa-whatsapp" aria-hidden="true"></i> ${t('b2_darEnq')}</summary>
+          <p class="desc">${t('b2_darEnqDica')}</p>
+          <label>${t('b2_darEnqP')}</label><input data-enq-q maxlength="250" value="${esc(q.pergunta)}">
+          <label>${t('b2_darEnqO')}</label><textarea data-enq-o rows="${q.opcoes.length + 1}" maxlength="1200">${esc(q.opcoes.join('\n'))}</textarea>
+          <div class="acoes"><button type="button" class="bt bt-claro" data-cp="q"><i class="fas fa-copy" aria-hidden="true"></i> ${t('b2_darCopP')}</button><button type="button" class="bt bt-claro" data-cp="o"><i class="fas fa-copy" aria-hidden="true"></i> ${t('b2_darCopO')}</button></div></details>`)(PD.enquete(D, i, darLang))}
+        ${i.semResp ? '' : `<p class="acoes"><a class="bt bt-claro" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(PD.msgCobrar(D, i, linkArea, darLang))}"><i class="fas fa-comment-dots" aria-hidden="true"></i> ${t('b2_darFalar')}</a></p>`}
         ${pode ? `<details><summary>${t('b2_darEditar')}</summary><div class="form-b2">
           <label for="dq${n}">${t('b2_darQuem')}</label><input id="dq${n}" data-k="resp" maxlength="80" value="${esc(i.semResp ? '' : i.e.resp)}">
           <label for="dd${n}">${t('b2_darPrazo')}</label><input id="dd${n}" data-k="data" type="date" value="${esc(i.data)}">
@@ -521,6 +526,9 @@ function documentos(sub) {
   tela.innerHTML = topo(nomeAba('documentos'), true) + aviso() + `<main class="b2">${abasSub(SUBS, sub, 'documentos')}${mostraFlash()}${corpo}<a class="bt bt-claro" href="#agenda"><i class="fas fa-calendar-alt" aria-hidden="true"></i> ${t('b2_verAgenda')}</a>${rodapeFerr('documentos')}</main>`;
   if (sub === 'dar' && DAR) {
     const dr = $('#dr'); if (dr) dr.onchange = () => { darR = dr.value; darMsg = ''; documentos('dar'); };
+    tela.querySelectorAll('[data-cp]').forEach(b => b.onclick = async () => { const f = b.closest('[data-enq]').querySelector(b.dataset.cp === 'q' ? '[data-enq-q]' : '[data-enq-o]'), h0 = b.innerHTML;
+      try { await navigator.clipboard.writeText(f.value); } catch (x) { f.select(); try { document.execCommand('copy'); } catch (y) {} }
+      b.textContent = t('b2_darCopiado'); setTimeout(() => { b.innerHTML = h0; }, 1800); });
     tela.querySelectorAll('[data-dl]').forEach(a => a.onclick = ev => { ev.preventDefault(); darLang = a.dataset.dl; documentos('dar'); const x = $('#dmsg'); if (x) x.scrollIntoView({ block: 'start' }); });
     tela.querySelectorAll('[data-dm]').forEach(a => a.onclick = ev => { ev.preventDefault(); darMsg = a.dataset.dm; documentos('dar'); const x = $('#dmsg'); if (x) x.scrollIntoView({ block: 'start' }); });
     const tx = $('#dtxt');
