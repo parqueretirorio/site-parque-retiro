@@ -40,7 +40,7 @@ async def main():
         await pg.screenshot(path=OUT + '/app-1b-atualizar.png')
         await ctx.unroute('**/app/versao.json*')
         # página Entrar do site: ícone do app, versão e botão Baixar o app
-        await pg.goto(B + '/login.html'); await pg.wait_for_function("document.getElementById('app-ver').textContent.includes('13/11/2026')")
+        await pg.goto(B + '/login.html'); await pg.wait_for_function("document.getElementById('app-ver').textContent.includes('20/11/2026')")
         ok(await pg.locator('#app-promo img').count() == 1 and 'Versão 1.6.6' in await pg.inner_text('#app-promo') and await pg.locator('#app-promo a[href="app/"]').count() == 1, "página Entrar do site mostra o app, a versão e 'Baixar o app'")
         await pg.screenshot(path=OUT + '/app-0-login-site.png', full_page=True)
         await pg.goto(B + '/app/?servidor=1'); await pg.wait_for_selector('#fe')
