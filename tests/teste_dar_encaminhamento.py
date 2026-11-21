@@ -40,6 +40,28 @@ async def main():
         t = await pg.input_value('#de-txt')
         ok(t.startswith('*Pendências que ficaram') and 'Precisam de alguém' in t and 'area-restrita.html' in t, "versão curta (resumo) disponível")
         await pg.click('[data-dm=status]'); await pg.wait_for_timeout(200)
+        # pesquisa/consulta por ponto e cobrança ao responsável, pelo WhatsApp
+        from urllib.parse import unquote
+        ok(await pg.locator('#de-lista [data-wa]').count() == n and await pg.locator('#de-lista [data-wa] >> text=Pesquisar no grupo').count() == n, "cada ponto tem o botão Pesquisar no grupo")
+        h0 = unquote(await pg.locator('#de-lista [data-wa] a').first.get_attribute('href'))
+        ok(h0.startswith('https://wa.me/?text=*Consulta sobre um encaminhamento — 2ª Reunião de Escola 2026*') and '1️⃣ Posso assumir este ponto' in h0 and '4️⃣' in h0 and 'Dar encaminhamento' in h0, "a consulta traz o tema, as opções numeradas e o link para registrar")
+        ok(await pg.locator('#de-lista [data-wa] >> text=Falar com').count() > 0, "pontos com responsável têm o botão Falar com…")
+        sem = pg.locator('#de-lista [data-de]').filter(has=pg.locator('.badge-status', has_text='Sem responsável')).first
+        ok(await sem.locator('[data-wa] a').count() == 1, "ponto sem responsável tem só a pesquisa no grupo (ninguém para cobrar)")
+        com = pg.locator('#de-lista [data-de]').filter(has_not=pg.locator('.badge-status', has_text='Sem responsável')).first
+        hc = unquote(await com.locator('[data-wa] a').nth(1).get_attribute('href'))
+        ok(hc.startswith('https://wa.me/?text=Olá! 😊') and 'Como está?' in hc, "responsável sem cadastro: o WhatsApp abre para escolher o contato")
+        await com.locator('[data-k=resp]').fill('Leonidas Teste'); await com.locator('[data-de-ok]').click(); await pg.wait_for_timeout(400)
+        pt_l = pg.locator('#de-lista [data-de]', has_text='Responsável: Leonidas Teste')
+        ok(await pt_l.count() == 1 and await pt_l.locator('.fa-user-check').count() >= 1, "o responsável aparece marcado como pessoa com cadastro")
+        hl = pt_l.locator('[data-wa] a', has_text='Falar com Leonidas')
+        ok(await hl.count() == 1, "responsável com cadastro: botão Falar com Leonidas")
+        hl_h = unquote(await hl.first.get_attribute('href'))
+        ok(hl_h.startswith('https://wa.me/5521999990000?text=Olá, Leonidas! 😊'), "abre direto o WhatsApp da pessoa (55 + DDD + número)")
+        await pg.click('[data-dl=es]'); await pg.wait_for_timeout(250)
+        hes = unquote(await pg.locator('#de-lista [data-wa] a').first.get_attribute('href'))
+        ok('*Consulta sobre un encaminamiento —' in hes and '1️⃣ Puedo asumir este punto' in hes, "a consulta também sai em espanhol")
+        await pg.click('[data-dl=pt]'); await pg.wait_for_timeout(250)
         # dar encaminhamento a um sem responsável e sem data
         box = pg.locator('#de-lista [data-de]').first
         txt = await box.locator('strong').first.inner_text()

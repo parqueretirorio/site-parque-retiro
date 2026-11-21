@@ -258,7 +258,35 @@ const msgStatus = (D, link, lang = 'pt') => {
   L.push('', T.fimS(link), '', T.abraco);
   return L.join('\n');
 };
-window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codigoOk, sugereCodigo, darEncaminhamento, msgResumo, msgStatus, salvarEnc, curto, lerTranscricao, abrir(me, root, H, lugar = 'docs') { // lugar: 'docs' (Documentos e Calendários) ou 'mapa' (Documentação IP)
+// Pesquisa/consulta por ponto (para o Grupo de Mestres) e cobrança gentil ao responsável. Nada é enviado sozinho: abre o WhatsApp com o texto pronto.
+const NUMS = ['1️⃣', '2️⃣', '3️⃣', '4️⃣'];
+const MSG2 = {
+  pt: { cTit: r => `*Consulta sobre um encaminhamento — ${r}*`, semResp: 'Este ponto está *sem responsável*.', semData: 'Este ponto está *sem prazo*.', resp: 'Responsável: ', prazo: 'Prazo: ', atraso: 'Prazo vencido em ', passo: 'Próximo passo: ',
+    intro: 'Preciso da ajuda de vocês para dar andamento a este ponto.', pedido: 'Respondam com o *número* da opção (e, se for o caso, o nome e a data):',
+    ops: ['Posso assumir este ponto', 'Posso ajudar quem assumir', 'Sugiro um prazo (digam qual)', 'Já está resolvido ou tenho novidade (contem)'],
+    fim: l => `Eu registro as respostas em Área restrita › Documentos e Calendários › Dar encaminhamento: ${l}`, obrig: 'Obrigado! 🙏',
+    ola: n => n ? `Olá, ${n}! 😊` : 'Olá! 😊', pIntro: r => `Passando para saber como está este encaminhamento da ${r}:`,
+    pPerg: 'Como está? Se já andou, me conte. Se precisar de ajuda, de prazo ou de outra pessoa junto, é só falar.', pFim: l => `Você também pode atualizar direto em Área restrita › Documentos e Calendários › Dar encaminhamento: ${l}` },
+  es: { cTit: r => `*Consulta sobre un encaminamiento — ${r}*`, semResp: 'Este punto está *sin responsable*.', semData: 'Este punto está *sin plazo*.', resp: 'Responsable: ', prazo: 'Plazo: ', atraso: 'Plazo vencido el ', passo: 'Próximo paso: ',
+    intro: 'Necesito la ayuda de ustedes para dar curso a este punto.', pedido: 'Respondan con el *número* de la opción (y, si corresponde, el nombre y la fecha):',
+    ops: ['Puedo asumir este punto', 'Puedo ayudar a quien lo asuma', 'Sugiero un plazo (digan cuál)', 'Ya está resuelto o tengo novedades (cuenten)'],
+    fim: l => `Yo registro las respuestas en Área restringida › Documentos y Calendarios › Dar seguimiento: ${l}`, obrig: '¡Gracias! 🙏',
+    ola: n => n ? `¡Hola, ${n}! 😊` : '¡Hola! 😊', pIntro: r => `Paso para saber cómo va este encaminamiento de la ${r}:`,
+    pPerg: '¿Cómo va? Si ya avanzó, cuéntame. Si necesitas ayuda, un plazo u otra persona para acompañarte, avísame.', pFim: l => `También puedes actualizarlo directo en Área restringida › Documentos y Calendarios › Dar seguimiento: ${l}` }
+};
+const linhasPonto = (T, i, lang) => {
+  const e = i.e, passo = lang === 'es' && e.passoEs ? e.passoEs : e.passo, L = [`📌 ${curto(textoLang(e, lang), 220)} [${i.d.codigo}]`];
+  L.push(i.semResp ? '🙋 ' + T.semResp : '👤 ' + T.resp + respLang(e.resp, lang));
+  L.push(i.semData ? '📅 ' + T.semData : '📅 ' + (i.atraso ? T.atraso : T.prazo) + fmtBR(i.data));
+  if (passo) L.push('➡️ ' + T.passo + passo);
+  return L;
+};
+const msgConsulta = (D, i, link, lang = 'pt') => { const T = MSG2[lang] || MSG2.pt;
+  return [T.cTit(nomeLang(D, lang)), '', ...linhasPonto(T, i, lang), '', T.intro, '', T.pedido, ...T.ops.map((o, k) => `${NUMS[k]} ${o}`), '', T.fim(link), '', T.obrig].join('\n'); };
+const msgCobrar = (D, i, link, lang = 'pt', nome = '') => { const T = MSG2[lang] || MSG2.pt;
+  return [T.ola(nome), T.pIntro(nomeLang(D, lang)), '', ...linhasPonto(T, i, lang), '', T.pPerg, '', T.pFim(link)].join('\n'); };
+const waNum = v => { const d = String(v || '').replace(/\D/g, ''); return d.length < 10 ? '' : d.length <= 11 ? '55' + d : d; };
+window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codigoOk, sugereCodigo, darEncaminhamento, msgResumo, msgStatus, msgConsulta, msgCobrar, waNum, salvarEnc, curto, lerTranscricao, abrir(me, root, H, lugar = 'docs') { // lugar: 'docs' (Documentos e Calendários) ou 'mapa' (Documentação IP)
   const { db, esc, $, uid, hoje, fmtData, norm } = H;
   const pode = H.tem(me, 'documentos'); // administrador ou Responsável pelos Documentos e Calendários
   const anoHoje = +hoje().slice(0, 4);
@@ -287,6 +315,10 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
     const html = partes.map(p => { if (/^(\s*,\s*|\s+e\s+|\s*[()]\s*|\s*:\s*)$/.test(p) || !p.trim()) return esc(p); const u = cadastroDe(p.trim()); if (!u) return esc(p); algum = true; return `<strong title="Tem cadastro: ${esc(u.nome)}"><i class="fas fa-user-check" aria-hidden="true" style="color:#2e7d32"></i> ${esc(p)}</strong>`; }).join('');
     return `<i class="fas fa-user" aria-hidden="true"></i> Responsável: ${html}${algum ? '' : ' <em>(sem cadastro)</em>'}`;
   };
+  // Pessoas do responsável que têm cadastro aprovado (com o WhatsApp, quando o cadastro tem): para o botão "Falar com ..." do Dar encaminhamento.
+  const contatosResp = txt => { const out = [], vistos = {};
+    String(txt).split(/\s*,\s*|\s+e\s+|\s*[()]\s*|\s*:\s*/).forEach(p => { p = p.trim(); if (!p) return; const u = cadastroDe(p); if (u && !vistos[u.nome]) { vistos[u.nome] = 1; out.push({ nome: u.nome, primeiro: u.nome.split(/\s+/)[0], zap: waNum(u.whatsapp) }); } });
+    return out; };
   const cor = c => c === CAT_FIXA ? '#6a3d9a' : CORES[Math.max(0, catsAtiv().indexOf(c)) % CORES.length];
   const novaCat = (chave, nome, base) => { // registra categoria nova sem duplicar
     nome = String(nome || '').trim().replace(/\s+/g, ' ').slice(0, 60); if (!nome) return '';
@@ -604,6 +636,7 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
 
   /* ---------- Dar encaminhamento: só o que ficou pendente de UMA Reunião de Escola (por padrão a mais recente),
      para nada ficar parado: completar responsável, prazo e próximo passo, e avisar o Grupo de Mestres. ---------- */
+  const waLink = (num, texto) => 'https://wa.me/' + (num || '') + '?text=' + encodeURIComponent(texto);
   const DE = { r: '', msg: 'status', lang: 'pt' }; // msg: 'status' (cada ponto, padrão) ou 'resumo' (versão curta)
   const encArea = el => {
     const D = darEncaminhamento(db, hoje(), DE.r); DE.r = D.r;
@@ -629,6 +662,9 @@ window.PR_DOCUMENTOS = { AREAS, CALS, CAT_FIXA, fixas, eventos, gerirFixas, codi
         ${i.data && i.data < hoje() ? '<span class="badge-status" style="background:#a31d21;color:#fff">Em atraso</span>' : ''} <small>${i.e.atualizado ? 'atualizado há ' : 'parado há '}${i.parado} dia(s)</small></p>
       <strong>${esc(i.e.texto)}</strong>${i.e.passo ? `<p style="margin:4px 0"><i class="fas fa-shoe-prints" aria-hidden="true"></i> Próximo passo: ${esc(i.e.passo)}</p>` : ''}
       ${!i.semResp ? `<p style="margin:4px 0"><small>${respHtml(i.e.resp)}</small></p>` : ''}
+      <p class="no-print" style="margin:6px 0;display:flex;flex-wrap:wrap;gap:8px" data-wa="${esc(i.e.id)}">
+        <a class="btn-visit" target="_blank" rel="noopener" href="${esc(waLink('', msgConsulta(D, i, link, DE.lang)))}" title="Abre o WhatsApp com uma consulta curta sobre este ponto, para você escolher o grupo"><i class="fab fa-whatsapp" aria-hidden="true"></i> Pesquisar no grupo</a>
+        ${i.semResp ? '' : (cs => cs.length ? cs.map(c => `<a class="btn-visit" target="_blank" rel="noopener" href="${esc(waLink(c.zap, msgCobrar(D, i, link, DE.lang, c.primeiro)))}" title="Abre o WhatsApp com ${esc(c.nome)}"><i class="fas fa-user-check" aria-hidden="true"></i> Falar com ${esc(c.primeiro)}</a>${c.zap ? '' : ' <small>(cadastro sem WhatsApp)</small>'}`).join('') : `<a class="btn-visit" target="_blank" rel="noopener" href="${esc(waLink('', msgCobrar(D, i, link, DE.lang)))}" title="A pessoa ainda não tem cadastro: o WhatsApp abre para você escolher o contato"><i class="fas fa-comment-dots" aria-hidden="true"></i> Falar com o responsável</a>`)(contatosResp(i.e.resp))}</p>
       ${pode ? `<div style="display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-top:8px">
         <div><label for="de-rs${n}" style="display:block;font-weight:600;font-size:.85em">Quem assume</label><input id="de-rs${n}" data-k="resp" maxlength="80" value="${esc(semResp(i.e.resp) ? '' : i.e.resp)}" placeholder="Nome(s)"></div>
         <div><label for="de-dt${n}" style="display:block;font-weight:600;font-size:.85em">Prazo</label><input id="de-dt${n}" data-k="data" type="date" value="${esc(i.data)}"></div>

@@ -1,7 +1,7 @@
 {
-  "versao": "1.6.5",
-  "data": "2026-11-13",
+  "versao": "1.6.6",
+  "data": "2026-11-20",
   "novidades": [
-    "Dar encaminhamento: uma linha em branco entre um ponto e outro nas mensagens, para ficar mais fácil de ler"
+    "Dar encaminhamento: em cada ponto, botão para pesquisar no grupo pelo WhatsApp (com opções de resposta) e para falar com o responsável"
   ]
 }

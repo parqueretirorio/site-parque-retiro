@@ -24,7 +24,7 @@ let me = null;
 // Mensagens do login vêm em português do adaptador; aqui viram o idioma do app.
 const traduzErro = m => /incorretos/.test(m) ? t('errCred') : /confirmar seu e-mail/.test(m) ? t('errConf') : /Sem conexão/.test(m) ? t('errRede') : /Muitas tentativas/.test(m) ? t('errMuitas') : m;
 
-const VERSAO = '1.6.5', DATA_VERSAO = '13/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
+const VERSAO = '1.6.6', DATA_VERSAO = '20/11/2026'; // ao publicar mudança no app: trocar aqui, em versao.json e em sw.js
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 
 /* ---------- Instalar o app e atualizações ---------- */
@@ -498,6 +498,7 @@ function documentos(sub) {
         <p>${i.semResp ? '' : '<i class="fas fa-user" aria-hidden="true"></i> ' + esc(i.e.resp) + ' · '}${i.data ? t('b2_prazo', { d: fmtDia(i.data) }) : ''}</p>
         ${i.e.passo ? `<p class="desc"><i class="fas fa-shoe-prints" aria-hidden="true"></i> ${esc(i.e.passo)}</p>` : ''}
         <p class="desc">${t(i.e.atualizado ? 'b2_darAtualizado' : 'b2_darParado', { n: i.parado })}</p>
+        <p class="acoes"><a class="bt bt-claro" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(PD.msgConsulta(D, i, linkArea, darLang))}"><i class="fab fa-whatsapp" aria-hidden="true"></i> ${t('b2_darPesq')}</a>${i.semResp ? '' : ` <a class="bt bt-claro" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(PD.msgCobrar(D, i, linkArea, darLang))}"><i class="fas fa-comment-dots" aria-hidden="true"></i> ${t('b2_darFalar')}</a>`}</p>
         ${pode ? `<details><summary>${t('b2_darEditar')}</summary><div class="form-b2">
           <label for="dq${n}">${t('b2_darQuem')}</label><input id="dq${n}" data-k="resp" maxlength="80" value="${esc(i.semResp ? '' : i.e.resp)}">
           <label for="dd${n}">${t('b2_darPrazo')}</label><input id="dd${n}" data-k="data" type="date" value="${esc(i.data)}">

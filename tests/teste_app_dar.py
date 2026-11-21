@@ -1,4 +1,4 @@
-# Teste: app CONecta Retiro (1.6.5) > "Dar encaminhamento" (atalho no início e aba em Documentos e Calendários),
+# Teste: app CONecta Retiro (1.6.6) > "Dar encaminhamento" (atalho no início e aba em Documentos e Calendários),
 # contra o PostgreSQL local com as migrações do Supabase.  Rodar:  python3 tests/teste_app_dar.py [pacote.json]
 import asyncio, subprocess, time, os, sys, json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -45,6 +45,12 @@ async def main():
         await pg.click('[data-dm=resumo]'); await pg.wait_for_selector('#dtxt')
         ok((await pg.input_value('#dtxt')).startswith('*Pendências que ficaram'), "versão curta disponível")
         await pg.click('[data-dm=status]'); await pg.wait_for_selector('#dtxt')
+        from urllib.parse import unquote
+        nA = await pg.locator('[data-de]').count()
+        ok(await pg.locator('a:has-text("Pesquisar no grupo")').count() == nA, "app: cada ponto tem Pesquisar no grupo")
+        hp = unquote(await pg.locator('a:has-text("Pesquisar no grupo")').first.get_attribute('href'))
+        ok(hp.startswith('https://wa.me/?text=*Consulta sobre um encaminhamento') and '1️⃣' in hp, "app: a consulta traz o tema e as opções numeradas")
+        ok(await pg.locator('a:has-text("Falar com o responsável")').count() > 0, "app: pontos com responsável têm Falar com o responsável")
         c = pg.locator('[data-de]').first; await c.locator('summary').click()
         await c.locator('[data-k=resp]').fill('Leonidas França'); await c.locator('[data-k=data]').fill('2026-12-05'); await c.locator('[data-k=passo]').fill('Chamar no grupo'); await c.locator('[data-dok]').click(); await pg.wait_for_timeout(500)
         ok(await pg.evaluate("PR_DADOS.db.get('docs',[]).flatMap(d=>d.enc||[]).some(e=>e.resp==='Leonidas França'&&e.data==='2026-12-05'&&e.passo&&e.atualizado)"), "salvar no app grava quem assume, prazo e próximo passo")
