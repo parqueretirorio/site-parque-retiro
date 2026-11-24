@@ -1,0 +1,9 @@
+# Parque de Estudo e Reflexão Retiro
+User-agent: *
+Allow: /
+Disallow: /area-restrita.html
+Disallow: /login.html
+Disallow: /app/
+Disallow: /cadastro-wifi.html
+
+Sitemap: https://parqueretiro.org.br/sitemap.xml
