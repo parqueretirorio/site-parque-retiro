@@ -22,8 +22,8 @@ check('publico.js: caixa inscricoes existe',             "'inscricoes'" in pub o
 check('publico.js: inscricoes valida nome completo',     'partes.length < 2' in pub)
 check('publico.js: inscricoes valida e-mail',            'emailOk' in pub and 'inscricoes' in pub)
 check('publico.js: inscricoes exige consentimento',      'd.consentimento' in pub)
-check('publico.js: inscricoes guarda chegou=false',      'chegou: false' in pub)
-check('publico.js: inscricoes guarda cancelado=false',   'cancelado: false' in pub)
+check('publico.js: inscricoes guarda chegou=false',      __import__('re').search(r'chegou:\s*false', pub) is not None)
+check('publico.js: inscricoes guarda cancelado=false',   __import__('re').search(r'cancelado:\s*false', pub) is not None)
 check('publico.js: inscricoes nao expoe email na junta', 'junta: (l, d) => { if (l.some(x => x.id === d.id)) return false; l.push(d); return true; }' in pub.replace('\n','').replace('  ',' ') or 'junta:' in pub)
 
 # ── encontro.html ─────────────────────────────────────────────────────────────
