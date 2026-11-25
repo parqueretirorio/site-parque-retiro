@@ -14,6 +14,13 @@ for p in urls:
     if p.endswith('.html'):
         t=open(p,encoding='utf-8').read()
         ok('noindex' not in t,p+': no sitemap e sem noindex')
+# Páginas duplicadas: só a versão principal fica no sitemap; a cópia aponta para ela com canonical (decisão de 25/11)
+for cop,princ in (('cmeh','centro-mundial-estudos-humanistas'),('convergencia-culturas','convergencia-das-culturas')):
+    t=open(cop+'.html',encoding='utf-8').read()
+    ok(('rel="canonical" href="https://parqueretiro.org.br/'+princ+'.html"') in t,cop+': canonical aponta para '+princ)
+    ok(cop+'.html' not in urls and princ+'.html' in urls,cop+': fora do sitemap; '+princ+': no sitemap')
+ok('elementos.html' in urls,'elementos: no sitemap')
+ok('encomenda.html' not in urls,'encomenda: fora do sitemap (formulário)')
 rob=open('robots.txt').read()
 for p in ('ajuda','noticias-conecta','calendario'):
     ok(p not in rob,p+': fora do robots.txt (senão o Google não veria o noindex)')
