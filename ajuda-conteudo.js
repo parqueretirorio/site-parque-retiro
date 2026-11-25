@@ -4268,6 +4268,26 @@ window.PR_AJUDA_CONTEUDO = {
    "Calendário Anual",
    "O ano inteiro e o cadastro das datas fixas anuais."
   ],
+  "r.documentos.pf": [
+   "Todas as pendências",
+   "Mostra todos os encaminhamentos em aberto das atas, sem filtro. O número ao lado do nome do filtro é a quantidade de itens.",
+   "documentos-calendarios"
+  ],
+  "r.documentos.pf.semData": [
+   "Pendências sem data",
+   "Mostra só os encaminhamentos em aberto que ainda não têm data (nem a própria, nem a de uma atividade ligada a eles). Serve para lembrar de combinar um prazo.",
+   "documentos-calendarios"
+  ],
+  "r.documentos.pf.semResp": [
+   "Pendências sem responsável",
+   "Mostra só os encaminhamentos em aberto sem responsável ou marcados como \"A definir\". Serve para lembrar de escolher quem vai cuidar de cada um.",
+   "documentos-calendarios"
+  ],
+  "r.documentos.pf.atraso": [
+   "Pendências em atraso",
+   "Mostra só os encaminhamentos em aberto cuja data já passou. Quando um deles for resolvido, marque Feito para ele sair da lista.",
+   "documentos-calendarios"
+  ],
   "r.documentos.d-novo": [
    "Novo documento",
    "Abre o formulário para cadastrar uma ata ou outro documento, com seus encaminhamentos."

@@ -5553,6 +5553,30 @@
    "artigo": null
   },
   {
+   "id": "r.documentos.pf",
+   "titulo": "Todas as pendências",
+   "texto": "Mostra todos os encaminhamentos em aberto das atas, sem filtro. O número ao lado do nome do filtro é a quantidade de itens.",
+   "artigo": "documentos-calendarios"
+  },
+  {
+   "id": "r.documentos.pf.semData",
+   "titulo": "Pendências sem data",
+   "texto": "Mostra só os encaminhamentos em aberto que ainda não têm data (nem a própria, nem a de uma atividade ligada a eles). Serve para lembrar de combinar um prazo.",
+   "artigo": "documentos-calendarios"
+  },
+  {
+   "id": "r.documentos.pf.semResp",
+   "titulo": "Pendências sem responsável",
+   "texto": "Mostra só os encaminhamentos em aberto sem responsável ou marcados como \"A definir\". Serve para lembrar de escolher quem vai cuidar de cada um.",
+   "artigo": "documentos-calendarios"
+  },
+  {
+   "id": "r.documentos.pf.atraso",
+   "titulo": "Pendências em atraso",
+   "texto": "Mostra só os encaminhamentos em aberto cuja data já passou. Quando um deles for resolvido, marque Feito para ele sair da lista.",
+   "artigo": "documentos-calendarios"
+  },
+  {
    "id": "r.documentos.s.atas",
    "titulo": "Atas das Reuniões de Escola",
    "texto": "Atas organizadas por ano, com os encaminhamentos de cada reunião.",
