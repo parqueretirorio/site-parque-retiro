@@ -3362,9 +3362,9 @@ window.PR_AJUDA_CONTEUDO = {
    "Abre o canal do Parque no YouTube, em uma nova aba.",
    "menu-do-site"
   ],
-  "global.rede.blogger": [
-   "Blogger",
-   "Abre a página do Blogger do Parque.",
+  "global.rede.blog": [
+   "Blog",
+   "Abre a página do Blog do Parque.",
    "menu-do-site"
   ],
   "menu.comece-aqui": [
@@ -3546,7 +3546,7 @@ window.PR_AJUDA_CONTEUDO = {
    "Parques no Mundo",
    "Os Parques de Estudo e Reflexão em outros países."
   ],
-  "menu.blogger": [
+  "menu.blog": [
    "Blog",
    "Matérias selecionadas sobre paz e não violência (dentro de Notícias)."
   ],
@@ -6074,7 +6074,7 @@ window.PR_AJUDA_CONTEUDO = {
   "p.livros-audios-app": "menu-do-site",
   "p.oficios": "menu-do-site",
   "p.parques-mundo": "menu-do-site",
-  "p.blogger": "menu-do-site",
+  "p.blog": "menu-do-site",
   "r.acervo": "biblioteca-gestao",
   "r.acervo.bs.livraria": "livraria-gestao",
   "r.enc_livros": "encomendas-livros",

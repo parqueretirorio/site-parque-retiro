@@ -3585,9 +3585,9 @@
    "artigo": "receber-comunicado"
   },
   {
-   "id": "global.rede.blogger",
-   "titulo": "Blogger",
-   "texto": "Abre a página do Blogger do Parque.",
+   "id": "global.rede.blog",
+   "titulo": "Blog",
+   "texto": "Abre a página do Blog do Parque.",
    "artigo": "menu-do-site"
   },
   {
@@ -3675,7 +3675,7 @@
    "artigo": null
   },
   {
-   "id": "menu.blogger",
+   "id": "menu.blog",
    "titulo": "Blog",
    "texto": "Matérias selecionadas sobre paz e não violência (dentro de Notícias).",
    "artigo": null
@@ -7118,7 +7118,7 @@
   "p.livros-audios-app": "menu-do-site",
   "p.oficios": "menu-do-site",
   "p.parques-mundo": "menu-do-site",
-  "p.blogger": "menu-do-site",
+  "p.blog": "menu-do-site",
   "r.acervo": "biblioteca-gestao",
   "r.acervo.bs.livraria": "livraria-gestao",
   "r.enc_livros": "encomendas-livros",

@@ -38,7 +38,7 @@
 37	Comunicação, Redes Sociais e Site
 38	Multiuso
 39	Parques no Mundo
-40	Blogger
+40	Blog
 41	Entrar
 42	A Comunidade para o Desenvolvimento Humano
 43	Organismo social e cultural do Movimento Humanista, dedicado a uma nova cultura baseada no Humanismo Universalista.
@@ -124,7 +124,7 @@
 123	Biblioteca do Parque | Parque de Estudo e Reflexão Retiro
 124	Textos e novidades do Parque de Estudo e Reflexão Retiro.
 125	Esta página está em construção. O conteúdo será publicado em breve.
-126	Blogger | Parque de Estudo e Reflexão Retiro
+126	Blog | Parque de Estudo e Reflexão Retiro
 127	Bem-vindo ao Parque Retiro
 128	Cadastro de visitante
 129	Deixe seu e-mail para ficarmos em contato e enviarmos o Comunicado por e-mail do Parque.

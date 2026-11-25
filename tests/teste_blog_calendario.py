@@ -1,4 +1,4 @@
-# Teste: Dia do Testemunho (4 de maio, todos os anos) no calendário de uso e página Blogger com matérias selecionadas da Pressenza.
+# Teste: Dia do Testemunho (4 de maio, todos os anos) no calendário de uso e página Blog com matérias selecionadas da Pressenza.
 # Rodar a partir da pasta do site: python3 tests/teste_blog_calendario.py
 import subprocess, time, os
 from playwright.sync_api import sync_playwright
@@ -25,14 +25,14 @@ try:
         pg.click('.cal-day[data-data="2026-05-06"]'); ok(pg.is_hidden('#dia-data'), "dia comum esconde a linha de data comemorativa")
         pg.goto(U + "calendario.html?lang=en", wait_until="domcontentloaded"); pg.select_option('#cal-mes', '4'); pg.select_option('#cal-ano', '2026'); pg.wait_for_timeout(400)
         ok('Day of Testimony' in pg.inner_text('.cal-day[data-data="2026-05-04"]'), "em inglês: Day of Testimony")
-        pg.goto(U + "blogger.html?lang=pt", wait_until="domcontentloaded")
-        ok(pg.locator('.blog-card').count() == 10, "Blogger mostra 10 matérias")
-        ok(all(h.startswith('https://www.pressenza.com/') for h in pg.eval_on_selector_all('.blog-card a', 'a=>a.map(x=>x.href)')), "cada matéria leva à fonte original na Pressenza")
+        pg.goto(U + "blog.html?lang=pt", wait_until="domcontentloaded")
+        ok(pg.locator('.blog-card').count() == 10, "Blog mostra 10 matérias")
+        ok(all(h.startswith('https://www.pressenza.com/') or h.endswith('blog-escola-parque-dos-sonhos.html') for h in pg.eval_on_selector_all('.blog-card a', 'a=>a.map(x=>x.href)')), "cada matéria leva à fonte original na Pressenza")
         ok(pg.locator('.blog-card:has-text("Fonte: Pressenza")').count() == 10, "todas creditam a fonte")
         pg.click('.blog-filtro[data-f="clima"]'); ok(pg.locator('.blog-card:visible').count() == 2, "filtro Clima mostra 2")
         pg.click('.blog-filtro[data-f=""]'); ok(pg.locator('.blog-card:visible').count() == 10, "Todas volta a mostrar 10")
-        pg.goto(U + "blogger.html?lang=fr", wait_until="domcontentloaded"); pg.wait_for_timeout(500)
-        ok('Lire l' in pg.inner_text('.blog-card >> nth=0') and 'Source' in pg.inner_text('.blog-card >> nth=0'), "interface do Blogger traduzida (FR)")
+        pg.goto(U + "blog.html?lang=fr", wait_until="domcontentloaded"); pg.wait_for_timeout(500)
+        ok('Lire l' in pg.inner_text('.blog-card >> nth=0') and 'Source' in pg.inner_text('.blog-card >> nth=0'), "interface do Blog traduzida (FR)")
         ok(pg.evaluate("document.querySelector('.blog-card h3').getAttribute('lang')") == 'pt-BR', "título da matéria continua no original")
         ok(not errs, f"sem erros de JavaScript {errs}"); ok(not ext, f"nenhuma requisição externa {ext}")
         b.close()

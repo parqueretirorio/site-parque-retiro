@@ -159,7 +159,7 @@
 "Abra o site em outro navegador e confira. Depois use": "Abre el sitio en otro navegador y verifica. Después usa",
 "Abra o site em outro navegador e confira. Depois use <strong>Limpar edições já publicadas</strong>.": "Abre el sitio en otro navegador y verifica. Después usa <strong>Limpiar ediciones ya publicadas</strong>.",
 "Abre a Biblioteca do Parque com todos os livros.": "Abre la Biblioteca del Parque con todos los libros.",
-"Abre a página do Blogger do Parque.": "Abre la página de Blogger del Parque.",
+"Abre a página do Blog do Parque.": "Abre la página del Blog del Parque.",
 "Abre a página do Parque Retiro no Facebook, em uma nova aba.": "Abre la página del Parque Retiro en Facebook, en una nueva pestaña.",
 "Abre o WhatsApp (no computador, o WhatsApp Web).": "Abre WhatsApp (en la computadora, WhatsApp Web).",
 "Abre o canal do Parque no YouTube, em uma nova aba.": "Abre el canal del Parque en YouTube, en una nueva pestaña.",

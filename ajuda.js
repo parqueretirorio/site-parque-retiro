@@ -105,7 +105,10 @@ const podeEditar = () => {
 };
 // Artigos "para a equipe" (área restrita) só aparecem para quem entrou na área restrita; na área pública só há ajuda da área pública.
 const logado = () => !!usuario() || !!sess('pr_sess') || sess('pr_temp') === '1';
-const visivel = a => a && (a.status !== 'rascunho' || podeEditar()) && ((a.publico || 'todos') !== 'equipe' || logado());
+// A ajuda da área restrita (artigos "para a equipe") só aparece dentro da área restrita (painel e Central da área restrita), nunca na Central pública.
+const restrita = () => !!document.body && (document.body.dataset.page === 'painel' || document.body.dataset.page === 'ajuda-restrita');
+const CENTRAL = () => restrita() ? 'ajuda-area-restrita.html' : 'ajuda.html';
+const visivel = a => a && (a.status !== 'rascunho' || podeEditar()) && ((a.publico || 'todos') !== 'equipe' || (logado() && restrita()));
 const artigos = () => exib().artigos.filter(visivel);
 const artigo = id => artigos().find(a => a.id === id) || null;
 const categoria = id => exib().categorias.find(c => c.id === id) || null;
@@ -323,7 +326,7 @@ function fmt(s) {
     .replace(/\n/g, '<br>');
 }
 const BASE = (() => { const s = document.currentScript && document.currentScript.src; return s ? s.replace(/[^/]*$/, '') : ''; })();
-const linkArtigo = id => BASE + 'ajuda.html?a=' + encodeURIComponent(id);
+const linkArtigo = id => BASE + CENTRAL() + '?a=' + encodeURIComponent(id);
 const srcImg = s => /^(https?:|data:image\/)/.test(s) ? s : BASE + String(s).replace(/^\.?\//, '');
 
 /* ----------------------------------------------------------------- busca ----------------------------------------------------------------- */
@@ -388,24 +391,18 @@ function criaUI() {
   const faixa = mk('div', { id: 'pr-aj-faixa', class: 'pr-aj-ui pr-aj-faixa', role: 'status', hidden: '' },
     '<i class="fas fa-hand-pointer" aria-hidden="true"></i><span>Modo ajuda ligado: ' + (toque() ? 'toque' : 'clique') + ' em qualquer botão, campo ou menu para ver a explicação. Nada é executado.</span><button type="button" class="pr-aj-faixa-sair">Sair do modo ajuda</button>');
   // O botão Ajuda é um link para a página ajuda.html (Central de Ajuda): nada de painel flutuante por cima da tela.
-  const botao = mk('a', { href: BASE + 'ajuda.html', id: 'pr-aj-botao', class: 'pr-aj-ui pr-aj-botao', 'aria-label': 'Ajuda: abrir a Central de Ajuda' },
+  const botao = mk('a', { href: BASE + CENTRAL(), id: 'pr-aj-botao', class: 'pr-aj-ui pr-aj-botao', 'aria-label': 'Ajuda: abrir a Central de Ajuda' },
     '<i class="fas fa-question" aria-hidden="true"></i><span class="pr-aj-botao-tx">Ajuda</span>');
   const vivo = mk('div', { class: 'pr-aj-ui pr-aj-sr', 'aria-live': 'polite' });
   document.body.append(tip, fundo, card, painel, faixa, vivo);
-  // Posição: item do menu principal, logo à esquerda de "Notícias" (antes, "Blogger") (ou no fim do menu, se a página não tiver o item).
+  // Posição: item do menu principal, o último do menu, depois de "Notícias".
   // Sem menu (páginas sem cabeçalho), continua flutuante no canto inferior esquerdo.
   const menu = document.querySelector('body > header nav');
   if (menu) {
-    const not = menu.querySelector(':scope > .nav-dropdown > a[href="noticias.html"]');
-    const blog = not ? not.parentElement : menu.querySelector(':scope > a[href="blogger.html"]'); // "Notícias" (com Blog e CONecta Retiro) ocupa o lugar do antigo "Blog"
     // Item de menu comum: sem o "?" e sem a classe do botão flutuante, para valerem as mesmas regras de fonte, cor e espaço dos demais itens
     botao.className = 'pr-aj-ui no-menu'; const ic = botao.querySelector('i'); if (ic) ic.remove(); botao.querySelector('span').className = '';
-    if (/(^|\/)ajuda\.html$/.test(location.pathname)) { botao.classList.add('active'); botao.setAttribute('aria-current', 'page'); }
-    if (blog) {
-      // Ajuda e Blogger num mesmo grupo sem quebra de linha: a Ajuda fica sempre colada, à esquerda do Blogger
-      const grupo = document.createElement('span'); grupo.className = 'nav-grupo-ajuda';
-      menu.insertBefore(grupo, blog); grupo.append(botao, blog);
-    } else menu.appendChild(botao);
+    if (/(^|\/)ajuda(-area-restrita)?\.html$/.test(location.pathname)) { botao.classList.add('active'); botao.setAttribute('aria-current', 'page'); }
+    menu.appendChild(botao); // Ajuda é o último item do menu, depois de Notícias
   } else document.body.appendChild(botao);
   ui = { tip, card, fundo, painel, faixa, botao, vivo };
   posBotao(); window.addEventListener('resize', posBotao);
@@ -578,7 +575,7 @@ function desenhaPainel(est) {
   p.innerHTML = `<div class="pr-aj-pcab">${pilha.length ? '<button type="button" class="pr-aj-x" data-volta aria-label="Voltar"><i class="fas fa-arrow-left" aria-hidden="true"></i></button>' : '<i class="fas fa-question-circle pr-aj-pico" aria-hidden="true"></i>'}<h2 id="pr-aj-painel-t">${esc(titulo)}</h2><button type="button" class="pr-aj-x" data-fecha aria-label="Fechar a ajuda"><i class="fas fa-times" aria-hidden="true"></i></button></div>
   <form class="pr-aj-busca" role="search"><label class="pr-aj-sr" for="pr-aj-q">Buscar na ajuda</label><i class="fas fa-search" aria-hidden="true"></i><input id="pr-aj-q" type="search" placeholder="Buscar na ajuda (ex.: reserva, backup, foto)" value="${est.v === 'busca' ? esc(est.q) : ''}" autocomplete="off"></form>
   <div class="pr-aj-pcorpo" tabindex="-1">${corpo}</div>
-  <div class="pr-aj-prod"><a href="${est.v === 'artigo' ? linkArtigo(est.id) : BASE + 'ajuda.html'}" target="_blank" rel="noopener"><i class="fas fa-external-link-alt" aria-hidden="true"></i> Abrir na Central de Ajuda completa</a>${podeEditar() && est.v === 'artigo' && pagina() === 'area-restrita' ? ` <button type="button" class="pr-aj-lnk" data-edart="${esc(est.id)}"><i class="fas fa-pen" aria-hidden="true"></i> Editar artigo</button>` : ''}</div>`;
+  <div class="pr-aj-prod"><a href="${est.v === 'artigo' ? linkArtigo(est.id) : BASE + CENTRAL()}" target="_blank" rel="noopener"><i class="fas fa-external-link-alt" aria-hidden="true"></i> Abrir na Central de Ajuda completa</a>${podeEditar() && est.v === 'artigo' && pagina() === 'area-restrita' ? ` <button type="button" class="pr-aj-lnk" data-edart="${esc(est.id)}"><i class="fas fa-pen" aria-hidden="true"></i> Editar artigo</button>` : ''}</div>`;
   p.querySelector('[data-fecha]').onclick = fechaPainel;
   const v = p.querySelector('[data-volta]'); if (v) v.onclick = () => { const e = pilha.pop(); ui.painel.dataset.v = JSON.stringify(e); desenhaPainel(e); };
   p.querySelectorAll('[data-cat]').forEach(b => b.onclick = () => vaiPara({ v: 'cat', id: b.dataset.cat }));
@@ -725,19 +722,20 @@ function prendeFoco(e) {
 
 /* ---------------------------------------------------------- página ajuda.html ---------------------------------------------------------- */
 function paginaCentral(raiz) {
+  if (restrita() && !logado()) { raiz.innerHTML = '<p class="tip-box" role="note"><i class="fas fa-lock" aria-hidden="true"></i> Esta é a ajuda da área restrita. <a href="login.html">Entre na área restrita</a> para ver.</p>'; return; }
   const pr = new URLSearchParams(location.search);
   let estado = { a: pr.get('a') || '', c: pr.get('c') || '', q: pr.get('q') || '', p: pr.get('p') || '' };
-  const url = s => 'ajuda.html' + (s.a ? '?a=' + encodeURIComponent(s.a) : s.q ? '?q=' + encodeURIComponent(s.q) : s.c ? '?c=' + encodeURIComponent(s.c) : s.p ? '?p=' + s.p : '');
+  const url = s => CENTRAL() + (s.a ? '?a=' + encodeURIComponent(s.a) : s.q ? '?q=' + encodeURIComponent(s.q) : s.c ? '?c=' + encodeURIComponent(s.c) : s.p ? '?p=' + s.p : '');
   const vai = (s, push) => { estado = s; if (push !== false) history.pushState(s, '', url(s)); desenha(); window.scrollTo(0, 0); };
   window.addEventListener('popstate', e => { estado = e.state || { a: '', c: '', q: '', p: '' }; desenha(); });
   function desenha() {
     const cats = exib().categorias, todos = artigos().filter(a => !estado.p || (a.publico || 'todos') === estado.p);
-    const cab = `<div class="pr-aj-trilha" role="navigation" aria-label="Você está em"><a href="ajuda.html" data-ir="{}">Central de Ajuda</a>${estado.c || estado.a ? (() => { const a = estado.a && artigo(estado.a), c = categoria(estado.c || (a && a.categoria)); return (c ? ` <span aria-hidden="true">›</span> <a href="ajuda.html?c=${esc(c.id)}" data-ir='${esc(JSON.stringify({ c: c.id }))}'>${esc(c.nome)}</a>` : '') + (a ? ` <span aria-hidden="true">›</span> <span aria-current="page">${esc(a.titulo)}</span>` : ''); })() : estado.q ? ' <span aria-hidden="true">›</span> <span aria-current="page">Busca</span>' : ''}</div>
+    const cab = `<div class="pr-aj-trilha" role="navigation" aria-label="Você está em"><a href="${CENTRAL()}" data-ir="{}">Central de Ajuda</a>${estado.c || estado.a ? (() => { const a = estado.a && artigo(estado.a), c = categoria(estado.c || (a && a.categoria)); return (c ? ` <span aria-hidden="true">›</span> <a href="${CENTRAL()}?c=${esc(c.id)}" data-ir='${esc(JSON.stringify({ c: c.id }))}'>${esc(c.nome)}</a>` : '') + (a ? ` <span aria-hidden="true">›</span> <span aria-current="page">${esc(a.titulo)}</span>` : ''); })() : estado.q ? ' <span aria-hidden="true">›</span> <span aria-current="page">Busca</span>' : ''}</div>
     <form class="pr-aj-busca pr-aj-busca-g" role="search"><label class="pr-aj-sr" for="pa-q">Buscar na Central de Ajuda</label><i class="fas fa-search" aria-hidden="true"></i><input id="pa-q" type="search" placeholder="O que você quer fazer? Ex.: pedir reserva, cadastrar livro, fazer backup" value="${esc(estado.q)}" autocomplete="off"><button class="btn-visit">Buscar</button></form>`;
     let corpo = '';
     if (estado.a) {
       const a = artigo(estado.a), irmaos = a ? artigos().filter(x => x.categoria === a.categoria).sort((x, y) => (x.ordem || 99) - (y.ordem || 99) || x.titulo.localeCompare(y.titulo, 'pt-BR')) : [];
-      corpo = `<div class="pr-aj-pg-art"><div class="pr-aj-pg-main">${renderArtigo(a, 'pagina')}<p class="pr-aj-util"><a href="ajuda.html" data-ir="{}"><i class="fas fa-th-large" aria-hidden="true"></i> Ver todas as categorias</a></p></div>
+      corpo = `<div class="pr-aj-pg-art"><div class="pr-aj-pg-main">${renderArtigo(a, 'pagina')}<p class="pr-aj-util"><a href="${CENTRAL()}" data-ir="{}"><i class="fas fa-th-large" aria-hidden="true"></i> Ver todas as categorias</a></p></div>
       ${irmaos.length > 1 ? `<aside class="pr-aj-pg-lado" aria-label="Outros artigos desta categoria"><h2>Nesta categoria</h2><ul>${irmaos.map(x => `<li><a href="${linkArtigo(x.id)}" data-aj-pg="${esc(x.id)}"${x.id === a.id ? ' aria-current="page"' : ''}>${esc(x.titulo)}</a></li>`).join('')}</ul></aside>` : ''}</div>`;
       if (a) document.title = a.titulo + ' | Central de Ajuda | Parque de Estudo e Reflexão Retiro';
     } else if (estado.q) {
@@ -767,7 +765,7 @@ function paginaCentral(raiz) {
     raiz.querySelectorAll('[data-dicas-pg]').forEach(c => c.onchange = () => grava('pr_ajuda_dicas', c.checked ? 'on' : 'off'));
   }
   const cartoes = l => l.length ? `<div class="pr-aj-grade">${l.map(a => `<a class="card pr-aj-cartao" href="${linkArtigo(a.id)}" data-aj-pg="${esc(a.id)}"><h3>${esc(a.titulo)}</h3>${a.resumo ? `<p>${esc(a.resumo)}</p>` : ''}<span class="pr-aj-chip pr-aj-chip-${esc(a.publico || 'todos')}">${esc(PUBLICO[a.publico] || PUBLICO.todos)}</span></a>`).join('')}</div>` : '<p class="pr-aj-vazio">Nenhum artigo aqui ainda.</p>';
-  const gradeCats = (cats, todos) => `<div class="pr-aj-grade pr-aj-grade-cats">${cats.map(c => { const l = todos.filter(a => a.categoria === c.id); return l.length ? `<a class="card pr-aj-cartao-cat" href="ajuda.html?c=${esc(c.id)}" data-pcat="${esc(c.id)}"><i class="fas ${esc(c.icone || 'fa-folder')}" aria-hidden="true"></i><h3>${esc(c.nome)}</h3>${c.descricao ? `<p>${esc(c.descricao)}</p>` : ''}<small>${l.length} artigo(s)</small></a>` : ''; }).join('')}</div>`;
+  const gradeCats = (cats, todos) => `<div class="pr-aj-grade pr-aj-grade-cats">${cats.map(c => { const l = todos.filter(a => a.categoria === c.id); return l.length ? `<a class="card pr-aj-cartao-cat" href="${CENTRAL()}?c=${esc(c.id)}" data-pcat="${esc(c.id)}"><i class="fas ${esc(c.icone || 'fa-folder')}" aria-hidden="true"></i><h3>${esc(c.nome)}</h3>${c.descricao ? `<p>${esc(c.descricao)}</p>` : ''}<small>${l.length} artigo(s)</small></a>` : ''; }).join('')}</div>`;
   history.replaceState(estado, '', location.href);
   desenha();
   document.addEventListener('pr-idioma', () => { cacheEx = null; desenha(); });
