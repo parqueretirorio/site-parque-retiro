@@ -40,9 +40,9 @@ async def main():
         r = await pg.evaluate("""()=>{const C=PR_AJUDA.conteudo(),ids=new Set(C.artigos.map(a=>a.id)),e=[];
           C.artigos.forEach(a=>{(a.relacionados||[]).forEach(x=>{if(!ids.has(x))e.push(a.id+'>'+x)});if(!C.categorias.some(c=>c.id===a.categoria))e.push('cat '+a.id)});
           C.dicas.forEach(d=>{if(d.artigo&&!ids.has(d.artigo))e.push('dica '+d.id)});Object.entries(C.contextos).forEach(([k,v])=>{if(!ids.has(v))e.push('ctx '+k)});
-          return {e, n:C.artigos.length, d:C.dicas.size, img:C.artigos.reduce((s,a)=>s+(a.imagens||[]).length,0), semRel:C.artigos.filter(a=>PR_AJUDA.relacionados(a).length<2).map(a=>a.id)}}""")
+          return {e, n:C.artigos.length, d:C.dicas.size, img:C.artigos.reduce((s,a)=>s+(a.imagens||[]).length,0), semRel:C.artigos.filter(a=>a.publico!=='equipe'&&PR_AJUDA.relacionados(a).length<1).map(a=>a.id)}}""")
         check(not r['e'], f"referências válidas ({r['n']} artigos, {r['d']} explicações): {r['e'][:5]}")
-        check(not r['semRel'], 'todo artigo tem pelo menos 2 conteúdos relacionados')
+        check(not r['semRel'], 'todo artigo público tem pelo menos 1 conteúdo relacionado visível (os da área restrita só aparecem dentro dela)')
         check(r['img'] >= 40, f"{r['img']} imagens ligadas aos artigos")
         imgs = await pg.evaluate("()=>PR_AJUDA.conteudo().artigos.flatMap(a=>(a.imagens||[]).map(i=>i.src)).filter(s=>!/^(https?:|data:)/.test(s))")
         falt = [s for s in imgs if not os.path.exists(os.path.join(SITE, s))]
@@ -83,11 +83,11 @@ async def main():
         await pg.click('.pr-aj-faixa-sair'); check(not await pg.evaluate('PR_AJUDA.emModo()'), 'sair do modo ajuda')
 
         print('6. Central de Ajuda (ajuda.html)')
-        await pg.goto(U + 'ajuda.html'); await pg.fill('#pa-q', 'backup'); await pg.press('#pa-q', 'Enter'); await pg.wait_for_selector('.pr-aj-cartao')
+        await pg.evaluate("sessionStorage.setItem('pr_sess','1')"); await pg.goto(U + 'ajuda-area-restrita.html'); await pg.fill('#pa-q', 'backup'); await pg.press('#pa-q', 'Enter'); await pg.wait_for_selector('.pr-aj-cartao')
         check('backup-e-restauracao' in await pg.eval_on_selector_all('.pr-aj-cartao', 'a=>a.map(x=>x.dataset.ajPg).join(" ")'), 'busca encontra "Backup e restauração"')
         await pg.goto(U + 'ajuda.html?a=pedir-reserva'); await pg.wait_for_selector('h1.pr-aj-titulo')
         check('Pedir reserva' in await pg.inner_text('h1.pr-aj-titulo') and await pg.locator('.pr-aj-fig img').count() >= 1, 'link direto para o artigo, com imagem')
-        await pg.goto(U + 'index.html?ajuda=backup-e-restauracao'); await pg.wait_for_selector('#pr-aj-painel [data-artigo="backup-e-restauracao"]')
+        await pg.goto(U + 'index.html?ajuda=pedir-reserva'); await pg.wait_for_selector('#pr-aj-painel [data-artigo="pedir-reserva"]')
         check(True, '?ajuda=artigo abre o painel em qualquer página')
 
         print('7. Área restrita: dicas em todas as ferramentas e cobertura')

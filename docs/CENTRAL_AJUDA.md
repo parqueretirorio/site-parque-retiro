@@ -20,6 +20,7 @@ Acessibilidade: dica ligada ao campo por `aria-describedby` (padrão de tooltip 
 | `ajuda.js` | Motor: chaves, dicas, cartão/folha, painel, modo ajuda, teclado, página da Central. Carregado em todas as páginas. |
 | `ajuda.css` | Visual da ajuda (carregado sozinho por `ajuda.js`; usa as cores de `style.css`). |
 | `ajuda-admin.js` | Ferramenta **Administração › Central de Ajuda**. |
+| `ajuda-area-restrita.html` | Central de Ajuda da área restrita (artigos "para a equipe"; exige sessão; `noindex`). A `ajuda.html` pública nunca mostra esses artigos, nem para quem está logado. |
 | `ajuda.html` | Central de Ajuda pública: busca, filtro (visitantes/equipe), categorias, artigo com trilha e "Nesta categoria". |
 | `ajuda/img/*.jpg` | 44 capturas da interface atual com os itens destacados (moldura vermelha numerada). |
 | `ajuda/conteudo.json` | A mesma base em JSON para o aplicativo (`node tools/exportar_ajuda.js`). |

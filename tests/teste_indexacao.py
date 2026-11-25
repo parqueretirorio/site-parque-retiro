@@ -6,7 +6,7 @@ def ok(c,m):
     print(('OK  ' if c else 'FALHA ')+m); f+= (not c)
 sm=open('sitemap.xml',encoding='utf-8').read()
 urls=re.findall(r'<loc>https://parqueretiro.org.br/([^<]*)</loc>',sm)
-for p in 'area-restrita login cadastro-wifi atividade pagar descadastro baixar ajuda noticias-conecta calendario'.split():
+for p in 'area-restrita login cadastro-wifi atividade pagar descadastro baixar ajuda ajuda-area-restrita noticias-conecta calendario'.split():
     t=open(p+'.html',encoding='utf-8').read()
     ok(re.search(r'<meta name="robots" content="noindex',t) is not None,p+': noindex')
     ok(p+'.html' not in urls,p+': fora do sitemap')
