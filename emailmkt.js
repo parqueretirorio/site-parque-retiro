@@ -258,7 +258,7 @@ function painelMetricas(box, camp, salvar) {
 }
 
 /* ---------- Botão fixo em cada ferramenta que produz conteúdo ---------- */
-const ABAS = { acervo: 'Biblioteca', album: 'Álbum Parque Retiro', estela: 'Estela', documentos: 'Documentos e Calendários', atividades: 'Atividades', multiuso: 'Multiuso', comunicacao: 'Comunicação, Redes Sociais e Site', lojinha: 'Lojinha', rifa: 'Rifa Solidária', vaquinha: 'Vaquinha Coletiva', vol_acoes: 'Ações de Voluntário', jardinagem: 'Jardinagem / Área Externa', ajude: 'Ajude o Parque' };
+const ABAS = { acervo: 'Biblioteca', album: 'Álbum Parque Retiro', estela: 'Estela', documentos: 'Documentos e Calendários', atividades: 'Atividades', multiuso: 'Multiuso', comunicacao: 'Comunicação, Redes Sociais e Site', lojinha: 'Lojinha', rifa: 'Rifa Solidária', vaquinha: 'Vaquinha Coletiva', vol_acoes: 'Ações de Voluntário', jardinagem: 'Jardinagem / Área Externa', ajude: 'Ajude o Parque', contatos: 'Listas de e-mail' };
 const podeGerar = me => !!me && (me.nivel === 'administrador' || me.nivel === 'editor' || (me.funcoes || []).length > 0);
 function barra(me, aba, el) {
   if (!el) return;
