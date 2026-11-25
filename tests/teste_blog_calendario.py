@@ -27,7 +27,7 @@ try:
         ok('Day of Testimony' in pg.inner_text('.cal-day[data-data="2026-05-04"]'), "em inglês: Day of Testimony")
         pg.goto(U + "blog.html?lang=pt", wait_until="domcontentloaded")
         ok(pg.locator('.blog-card').count() == 10, "Blog mostra 10 matérias")
-        ok(all(h.startswith('https://www.pressenza.com/') for h in pg.eval_on_selector_all('.blog-card a', 'a=>a.map(x=>x.href)')), "cada matéria leva à fonte original na Pressenza")
+        ok(all(h.startswith('https://www.pressenza.com/') or h.endswith('blog-escola-parque-dos-sonhos.html') for h in pg.eval_on_selector_all('.blog-card a', 'a=>a.map(x=>x.href)')), "cada matéria leva à fonte original na Pressenza")
         ok(pg.locator('.blog-card:has-text("Fonte: Pressenza")').count() == 10, "todas creditam a fonte")
         pg.click('.blog-filtro[data-f="clima"]'); ok(pg.locator('.blog-card:visible').count() == 2, "filtro Clima mostra 2")
         pg.click('.blog-filtro[data-f=""]'); ok(pg.locator('.blog-card:visible').count() == 10, "Todas volta a mostrar 10")

@@ -66,13 +66,13 @@ async def main():
 
         # ---------- 4. Site aberto: Blog e Silo
         await pg.goto(U+"index.html")
-        ordem=await pg.evaluate("()=>[...document.querySelectorAll('header nav > a')].map(a=>a.textContent.trim())")
-        ok(ordem.index('Blog')==ordem.index('Parques no Mundo')+1,"menu: Blog fica logo à direita de Parques no Mundo")
+        ordem=await pg.evaluate("()=>[...document.querySelectorAll('header nav > a, header nav > .nav-dropdown > a')].map(a=>a.textContent.trim())")
+        ok(ordem.index('Notícias')==ordem.index('Parques no Mundo')+1 and await pg.locator('header nav .nav-sub a[href="blog.html"]').count()==1,"menu: Notícias (com Blog dentro) fica logo à direita de Parques no Mundo")
         ic=await pg.evaluate("()=>[...document.querySelectorAll('footer .social-links a')].map(a=>a.querySelector('i').className)")
-        ok(ic[-1]=='fas fa-blog' and ic[-2]=='fab fa-youtube',f"pictograma do Blog ao lado das redes sociais ({ic})")
+        ok(ic[-2]=='fas fa-blog' and ic[-3]=='fab fa-youtube',f"pictograma do Blog ao lado das redes sociais ({ic})")
         subs=await pg.evaluate("()=>{const d=[...document.querySelectorAll('.nav-dropdown')].find(x=>x.querySelector(':scope>a').textContent.trim()==='Silo');return [...d.querySelectorAll('a')].map(a=>a.textContent.trim())}")
         ok(subs[:4]==['Silo','Mensagem de Silo','Comunidades da Mensagem','Organismos do Movimento'],f"menu Silo: Mensagem de Silo > Comunidades da Mensagem ({subs})")
-        for pgn,t in (('blog.html','Blog'),('mensagem-de-silo.html','Mensagem de Silo'),('comunidades-da-mensagem.html','Comunidades da Mensagem')):
+        for pgn,t in (('mensagem-de-silo.html','Mensagem de Silo'),('comunidades-da-mensagem.html','Comunidades da Mensagem')):
             await pg.goto(U+pgn); ok(t in await pg.inner_text('h1') and 'em construção' in (await pg.inner_text('.container')).lower(),f"página {pgn} existe e está em construção")
         ok(await pg.locator('a[href="blog.html"]').count()>=1,"menu da página nova também tem o Blog")
         await pg.goto(U+"silo.html"); ok(await pg.locator('.container a[href="mensagem-de-silo.html"]').count()==1,"página Silo leva à Mensagem de Silo")
