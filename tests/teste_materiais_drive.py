@@ -54,6 +54,8 @@ with sync_playwright() as pw:
     pg.goto(B + 'livros-audios-app.html?lang=pt'); pg.wait_for_timeout(700)
     ok(pg.eval_on_selector('a:text-is("A Morte")', 'e => e.getAttribute("href")') == 'baixar.html?arquivo=05_a_morte.mp3', 'A Morte aponta para baixar.html (mp3)')
     ok(pg.eval_on_selector('a:text-is("A Repetição")', 'e => e.href').endswith('/sentido_vida/01_a_repeticao.mp3'), 'A Repetição tem link')
+    ok(pg.eval_on_selector('a:text-is("Os Disfarces")', 'e => e.href').endswith('/jogos_de_imagens/03_os_disfarces.mp3'), 'Os Disfarces tem link')
+    ok('ainda não disponível' not in pg.inner_text('body'), 'nenhum aviso "ainda não disponível" restante')
     destinos.clear()
     pg.goto(B + 'baixar.html?lang=pt&arquivo=05_a_morte.mp3'); pg.wait_for_timeout(1200)
     ok(destinos and destinos[0] == 'https://drive.google.com/file/d/11dnd0FqKIJb1yJNWvi4tGQeqrie9mlxI/view', 'A Morte abre o mp3 do Drive')
