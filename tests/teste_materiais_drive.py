@@ -50,6 +50,13 @@ with sync_playwright() as pw:
             pg.goto(B + pagina + '?lang=' + lang); pg.wait_for_timeout(900)
             hrefs = pg.eval_on_selector_all('a[href*="baixar.html"]', 'els => els.map(e => e.getAttribute("href"))')
             ok(len(hrefs) >= 40, '%s [%s]: %d links para baixar.html' % (pagina, lang, len(hrefs)))
+    # 6) Livros, Áudios e App: A Morte (mp3 no Drive) e A Repetição (Caucaia) são links
+    pg.goto(B + 'livros-audios-app.html?lang=pt'); pg.wait_for_timeout(700)
+    ok(pg.eval_on_selector('a:text-is("A Morte")', 'e => e.getAttribute("href")') == 'baixar.html?arquivo=05_a_morte.mp3', 'A Morte aponta para baixar.html (mp3)')
+    ok(pg.eval_on_selector('a:text-is("A Repetição")', 'e => e.href').endswith('/sentido_vida/01_a_repeticao.mp3'), 'A Repetição tem link')
+    destinos.clear()
+    pg.goto(B + 'baixar.html?lang=pt&arquivo=05_a_morte.mp3'); pg.wait_for_timeout(1200)
+    ok(destinos and destinos[0] == 'https://drive.google.com/file/d/11dnd0FqKIJb1yJNWvi4tGQeqrie9mlxI/view', 'A Morte abre o mp3 do Drive')
     b.close()
 srv.shutdown()
 print('\nFALHAS: %d' % len(falhas)); sys.exit(1 if falhas else 0)

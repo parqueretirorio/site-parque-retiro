@@ -4,7 +4,7 @@
 // Para trocar o lugar de um arquivo (outro Drive, YouTube, outro endereço), mude só a linha dele aqui. Não é preciso mexer nas páginas.
 // Cada linha: "nome do arquivo": "ID do Drive"  (ou um endereço completo começando com https://).
 // Linha com "" (vazia) faz a página mostrar "em breve".
-// Fonte da lista: Apps Script na conta do Parque em 24/11/2026 (95 arquivos).
+// Fonte da lista: Apps Script na conta do Parque em 24/11/2026 (96 arquivos: os 95 do site antigo e A Morte, convertida de .wma para mp3 em 24/11/2026).
 (function () {
 'use strict';
 var DRIVE = 'https://drive.google.com/file/d/{id}/view';
@@ -38,6 +38,7 @@ var ARQUIVOS = {
   "04_a_subida.mp3": "1E6qDbalnaBVJFYX-rTfL20lFWUFPCAv9",
   "04_o_grande_erro.mp3": "1VtDXOiGN1Q6sgH2VUC-HcQqHyv8BOB6W",
   "05-Relax-completo.mp3": "1r8WmST33HOdIKimuRzJ1gTnf37iLyeBz",
+  "05_a_morte.mp3": "11dnd0FqKIJb1yJNWvi4tGQeqrie9mlxI",
   "05_a_perturbacao_e_o_guia_interno.mp3": "16kguntA0ezymL3EF0ttBPqYNOhjHFhRq",
   "05_as_nuvens.mp3": "1wW6q9MJoqDYPuEACoPO86FJiU4aQ9V07",
   "05_o_ressentimento.mp3": "1eaMZ2dQiPmCEkYGxWHQZVgNxRJqKK1HA",
