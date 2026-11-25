@@ -5334,6 +5334,12 @@
    "artigo": "equipe-convidados"
   },
   {
+   "id": "r.comunicacao.vv-a",
+   "titulo": "Atualizar",
+   "texto": "Busca de novo as visitas do site no servidor.",
+   "artigo": null
+  },
+  {
    "id": "r.contas.c-cc",
    "titulo": "Centro de custo",
    "texto": "Área do Parque que recebe ou paga o valor (Manutenção, Construção, Eventos, Campanhas, Alojamento...). Define em qual resumo o lançamento aparece.",

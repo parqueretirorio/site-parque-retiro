@@ -4773,6 +4773,10 @@ window.PR_AJUDA_CONTEUDO = {
    "Abrir",
    "Abre esta ferramenta."
   ],
+  "r.comunicacao.vv-a": [
+   "Atualizar",
+   "Busca de novo as visitas do site no servidor."
+  ],
   "r.comunicacao.s.cal": [
    "Calendário de Comunicação",
    "Publicações planejadas junto das atividades e datas fixas do Parque."
