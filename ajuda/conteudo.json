@@ -2255,9 +2255,60 @@
    "atualizadoEm": "2026-11-02"
   },
   {
-   "id": "equipe-convidados",
+   "id": "visitas-do-site",
    "categoria": "comunicacao",
    "ordem": 5,
+   "titulo": "Visitas do site e links com origem",
+   "resumo": "Mostra quantas pessoas visitaram o site e de onde vieram (Instagram, YouTube, Canal, grupos...). Para o WhatsApp, use sempre o link gerado na tela.",
+   "publico": "equipe",
+   "status": "publicado",
+   "palavras": [
+    "visitas",
+    "contador",
+    "origem",
+    "instagram",
+    "youtube",
+    "facebook",
+    "whatsapp",
+    "canal",
+    "comunidade",
+    "grupo",
+    "link",
+    "acessos",
+    "estatística"
+   ],
+   "onde": "**Comunicação, Redes Sociais e Site › Site** (a seção \"Visitas do site\" fica no alto da tela).",
+   "secoes": {
+    "oQueE": "Um contador interno que conta uma **visita** por sessão do navegador e as páginas abertas nela. Não guarda nome, e-mail, IP nem cookies: só números por dia, página e origem. Quem está logado na área restrita não é contado.",
+    "finalidade": "Saber se o site está sendo visitado e de onde as pessoas chegam, para decidir onde vale a pena divulgar.",
+    "passos": [
+     "Abra **Comunicação, Redes Sociais e Site › Site**. No alto aparecem as visitas de hoje, ontem, 7 e 30 dias.",
+     "Veja **De onde vieram as visitas** e escolha o período (7, 30, 90 ou 365 dias).",
+     "Para divulgar com origem, use **Gerar link com origem**: escolha onde vai postar (Canal, Comunidade, grupo...), a página que o link abre e clique em **Copiar link**.",
+     "Cole o link gerado na postagem. Ele termina em `?o=nome`; não coloque ponto nem espaço depois dele."
+    ],
+    "exemplos": [
+     "Canal do Parque: https://parqueretiro.org.br/?o=canal",
+     "Grupo dos Mestres: https://parqueretiro.org.br/?o=grupo-mestres"
+    ],
+    "cuidados": [
+     "O WhatsApp esconde de onde a pessoa veio: sem o link marcado, a visita aparece como \"Acesso direto\".",
+     "Instagram, YouTube, Facebook e Google costumam ser reconhecidos sozinhos, mas o link marcado é mais certo.",
+     "A contagem começa na data indicada na tela; não há histórico anterior.",
+     "Visita não é pessoa: quem volta em outro dia ou em outra aba conta de novo."
+    ]
+   },
+   "imagens": [],
+   "relacionados": [
+    "banners-do-site",
+    "painel-publicacoes"
+   ],
+   "atualizadoEm": "2026-11-25"
+  },
+  {
+   "id": "equipe-convidados",
+   "categoria": "comunicacao",
+   "ordem": 6,
    "titulo": "Equipe e convidados",
    "resumo": "Autorize pessoas a colaborar em projetos específicos como autor, revisor, aprovador ou publicador, com prazo de validade.",
    "publico": "equipe",
@@ -5547,15 +5598,15 @@
    "artigo": null
   },
   {
-   "id": "r.documentos.s.ano",
-   "titulo": "Calendário Anual",
-   "texto": "O ano inteiro e o cadastro das datas fixas anuais.",
-   "artigo": null
-  },
-  {
    "id": "r.documentos.pf",
    "titulo": "Todas as pendências",
    "texto": "Mostra todos os encaminhamentos em aberto das atas, sem filtro. O número ao lado do nome do filtro é a quantidade de itens.",
+   "artigo": "documentos-calendarios"
+  },
+  {
+   "id": "r.documentos.pf.atraso",
+   "titulo": "Pendências em atraso",
+   "texto": "Mostra só os encaminhamentos em aberto cuja data já passou. Quando um deles for resolvido, marque Feito para ele sair da lista.",
    "artigo": "documentos-calendarios"
   },
   {
@@ -5571,10 +5622,10 @@
    "artigo": "documentos-calendarios"
   },
   {
-   "id": "r.documentos.pf.atraso",
-   "titulo": "Pendências em atraso",
-   "texto": "Mostra só os encaminhamentos em aberto cuja data já passou. Quando um deles for resolvido, marque Feito para ele sair da lista.",
-   "artigo": "documentos-calendarios"
+   "id": "r.documentos.s.ano",
+   "titulo": "Calendário Anual",
+   "texto": "O ano inteiro e o cadastro das datas fixas anuais.",
+   "artigo": null
   },
   {
    "id": "r.documentos.s.atas",

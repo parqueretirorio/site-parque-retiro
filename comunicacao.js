@@ -643,7 +643,14 @@ window.PR_COMUNICACAO = { STATUS, abrir(me, root, H) {
       db.set(c.chave, x); msg = 'Item adicionado.'; draw();
     };
   };
-  R.site = el => { if (!window.PR_BANNERS_ADMIN) { el.innerHTML = '<p class="vazio">Não foi possível carregar o módulo de banners (arquivos banners.js e banners-admin.js).</p>'; return; } window.PR_BANNERS_ADMIN.abrir(el, H); };
+  R.site = el => {
+    // Visitas do site (com-visitas.js) em cima e, logo abaixo, os banners das páginas.
+    el.innerHTML = '<div id="site-visitas"></div><div id="site-banners"></div>';
+    const v = el.querySelector('#site-visitas'), b = el.querySelector('#site-banners');
+    if (window.PR_COM_VISITAS) window.PR_COM_VISITAS.abrir(v, H); else v.innerHTML = '<p class="vazio">Não foi possível carregar as visitas do site (arquivo com-visitas.js).</p>';
+    if (!window.PR_BANNERS_ADMIN) { b.innerHTML = '<p class="vazio">Não foi possível carregar o módulo de banners (arquivos banners.js e banners-admin.js).</p>'; return; }
+    window.PR_BANNERS_ADMIN.abrir(b, H);
+  };
   R.redes = el => catalogo(el, { chave: 'com_redes', get: redes, campo: 'rede', icone: 'fa-share-alt', visual: true, titulo: 'Redes sociais', novo: 'Nova rede social', intro: 'Redes usadas pelo Parque. Acrescente novas redes quando precisar; redes desativadas deixam de aparecer nas escolhas, mas as publicações antigas continuam salvas.' });
   R.proj = el => catalogo(el, { chave: 'com_projetos', get: projs, campo: 'projeto', icone: 'fa-flag', titulo: 'Projetos e campanhas', novo: 'Novo projeto ou campanha', intro: 'Cada publicação pode ser ligada a um projeto ou campanha (ex.: Festival de Verão, do Projeto 4 Estações; Marcha Mundial).' });
   R.tipos = el => catalogo(el, { chave: 'com_tipos', get: tipos, campo: 'tipo', icone: 'fa-photo-video', titulo: 'Tipos de publicação', novo: 'Novo tipo de publicação', intro: 'Formatos das publicações (post, carrossel, vídeo...). Acrescente outros quando surgirem.' });
