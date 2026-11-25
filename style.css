@@ -674,7 +674,6 @@ nav a[href="comece-aqui.html"].active {
 .social-card.youtube .social-header { background: #c00; }
 .social-card.pressenza .social-header { background: #2c3e50; }
 .social-card.comunicado .social-header { background: #E55B0A; }
-.social-card.comunicado { border-color: #E55B0A; }
 .social-card.whatsapp .social-header { background: #0b7065; }
 .social-body { padding: 15px; font-size: 0.88rem; }
 .social-body p { margin: 0 0 8px; }
