@@ -20,7 +20,7 @@ def linhas(sql):
 
 async def main():
     # ---------- arquivos: o contador está em todas as páginas públicas ----------
-    fora = {'area-restrita.html', 'ajuda-area-restrita.html', 'descadastro.html', 'cadastro-wifi.html'}
+    fora = {'area-restrita.html', 'ajuda-area-restrita.html', 'descadastro.html', 'cadastro-wifi.html', 'ir.html'}
     sem = [os.path.basename(f) for f in sorted(glob.glob(SITE + '/*.html')) if os.path.basename(f) not in fora and 'src="visitas.js"' not in open(f, encoding='utf-8').read()]
     ok(not sem, f"todas as páginas públicas carregam visitas.js (faltam: {sem})")
     com = [f for f in fora if f in os.listdir(SITE) and 'src="visitas.js"' in open(os.path.join(SITE, f), encoding='utf-8').read()]

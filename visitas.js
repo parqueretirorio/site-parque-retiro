@@ -15,7 +15,7 @@
 var CHAVE_SESSAO = 'pr-vis-sessao', CHAVE_LOGIN = 'pr-sb-sessao';
 var MEU_ENDERECO = (document.currentScript && document.currentScript.src) || '';
 // Páginas que nunca são contadas (área da equipe e telas pessoais)
-var FORA = { 'area-restrita': 1, 'ajuda-area-restrita': 1, 'descadastro': 1, 'cadastro-wifi': 1 };
+var FORA = { 'ir': 1, 'area-restrita': 1, 'ajuda-area-restrita': 1, 'descadastro': 1, 'cadastro-wifi': 1 };
 var ALIAS = { ig: 'instagram', insta: 'instagram', yt: 'youtube', fb: 'facebook', wa: 'whatsapp', zap: 'whatsapp', newsletter: 'email', 'e-mail': 'email', comunicado: 'email' };
 
 function limpa(v) {
@@ -29,6 +29,7 @@ function origemPorReferrer(ref, hostAtual) {
   if (!h) return '';
   var atual = String(hostAtual || '').toLowerCase().replace(/^www\./, '');
   if (h === atual) return '';
+  if (/(^|\.)linktr\.ee$/.test(h)) return 'linktree';
   if (/(^|\.)instagram\.com$/.test(h)) return 'instagram';
   if (/(^|\.)(youtube\.com|youtu\.be)$/.test(h)) return 'youtube';
   if (/(^|\.)(facebook\.com|fb\.com|fb\.me|fb\.watch|messenger\.com)$/.test(h)) return 'facebook';

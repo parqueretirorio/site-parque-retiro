@@ -2450,5 +2450,19 @@
 "Livraria": "Librería",
 "Como chegar": "Cómo llegar",
 "O Parque": "El Parque",
-"Aplicativo (instalar)": "Aplicación (instalar)"
+"Aplicativo (instalar)": "Aplicación (instalar)",
+"Cliques para as redes do Parque (passando pelo site)": "Clics hacia las redes del Parque (pasando por el sitio)",
+"Para onde foram": "A dónde fueron",
+"De onde vieram e para onde foram": "De dónde vinieron y a dónde fueron",
+"Ainda sem cliques neste período.": "Aún sin clics en este período.",
+"Para onde o link leva": "A dónde lleva el enlace",
+"Uma página do site (escolha abaixo)": "Una página del sitio (elige abajo)",
+"Os cliques para as redes ainda não foram instalados no servidor (falta aplicar a migração 0022 no Supabase).": "Los clics hacia las redes aún no se instalaron en el servidor (falta aplicar la migración 0022 en Supabase).",
+"Não foi possível carregar os cliques agora.": "No fue posible cargar los clics ahora.",
+"Últimos 7 dias": "Últimos 7 días",
+"Hoje": "Hoy",
+"Últimos 30 dias": "Últimos 30 días",
+"Comunidade do Parque Retiro (WhatsApp)": "Comunidad del Parque Retiro (WhatsApp)",
+"Canal do Parque Retiro (WhatsApp)": "Canal del Parque Retiro (WhatsApp)",
+"Outros destinos": "Otros destinos"
 });})();

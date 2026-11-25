@@ -49,7 +49,7 @@ async def main():
         check(not falt, f'todas as imagens existem no site {falt[:3]}')
 
         print('2. Todas as páginas carregam o botão de ajuda, sem erros')
-        pags = sorted(f for f in os.listdir(SITE) if f.endswith('.html') and f not in ('eventos.html', 'baixar.html'))
+        pags = sorted(f for f in os.listdir(SITE) if f.endswith('.html') and f not in ('eventos.html', 'baixar.html', 'ir.html'))
         for f in pags:
             await pg.goto(U + f); await pg.wait_for_selector('#pr-aj-botao', state='attached', timeout=5000)
         check(not errs, f'{len(pags)} páginas sem erro de JavaScript {errs[:2]}')

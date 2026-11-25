@@ -8,7 +8,11 @@ const ROTULOS = {
   instagram: 'Instagram', youtube: 'YouTube', facebook: 'Facebook', whatsapp: 'WhatsApp (conversas e contatos)',
   canal: 'Canal do Parque Retiro no WhatsApp', comunidade: 'Comunidade do Parque no WhatsApp (aviso geral)',
   email: 'Comunicado por e-mail', google: 'Google', busca: 'Outros buscadores', direto: 'Acesso direto (ou origem não informada)',
-  'outros-sites': 'Outros sites', outros: 'Outras marcas', x: 'X (Twitter)', linkedin: 'LinkedIn', telegram: 'Telegram', pressenza: 'Pressenza'
+  'outros-sites': 'Outros sites', outros: 'Outras marcas', x: 'X (Twitter)', linkedin: 'LinkedIn', telegram: 'Telegram', pressenza: 'Pressenza', linktree: 'Linktree'
+};
+const DESTINOS_ROTULO = {
+  comunidade: 'Comunidade do Parque Retiro (WhatsApp)', canal: 'Canal do Parque Retiro (WhatsApp)', instagram: 'Instagram do Parque',
+  'conecta-whatsapp': 'Grupo CONecta Retiro (WhatsApp)', youtube: 'YouTube do Parque', facebook: 'Facebook do Parque', outros: 'Outros destinos'
 };
 const PAGINAS_ROTULO = { index: 'Início', app: 'Aplicativo', newsletter: 'Comunicado', login: 'Entrar', baixar: 'Baixar materiais' };
 // Origens do gerador de links (valor, rótulo). "grupo-" pede o nome do grupo.
@@ -16,7 +20,7 @@ const ORIGENS_GERADOR = [
   ['instagram', 'Instagram'], ['youtube', 'YouTube'], ['facebook', 'Facebook'], ['whatsapp', 'WhatsApp (conversas e contatos)'],
   ['canal', 'Canal do Parque Retiro no WhatsApp'], ['comunidade', 'Comunidade do Parque no WhatsApp (aviso geral)'],
   ['grupo-mestres', 'Grupo dos Mestres (WhatsApp)'], ['grupo-geral', 'Bate-papo Geral do Parque (WhatsApp)'],
-  ['grupo-', 'Outro grupo da Comunidade (WhatsApp): informe o nome'], ['email', 'Comunicado por e-mail'], ['outro', 'Outra origem: informe o nome']
+  ['grupo-', 'Outro grupo da Comunidade (WhatsApp): informe o nome'], ['email', 'Comunicado por e-mail'], ['linktree', 'Linktree'], ['outro', 'Outra origem: informe o nome']
 ];
 const PAGINAS_GERADOR = [
   ['', 'Início'], ['newsletter.html', 'Comunicado (cadastro)'], ['atividades.html', 'Atividades'], ['reservas.html', 'Reservas'],
@@ -40,11 +44,17 @@ function rotuloOrigem(o) {
   return o;
 }
 const rotuloPagina = p => PAGINAS_ROTULO[p] || p;
+const rotuloDestino = d => DESTINOS_ROTULO[d] || d;
+// Link que PASSA pelo site e segue para uma rede do Parque (página ir.html, que conta o clique)
+function montaLinkIr(destino, origem) {
+  const o = limpa(origem), d = limpa(destino); if (!o || !d) return '';
+  return BASE + 'ir.html?d=' + d + '&o=' + o;
+}
 
 function abrir(el, H) {
   const esc = (H && H.esc) || (s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])));
   const nf = n => (+n || 0).toLocaleString('pt-BR');
-  let dias = 30, dados = null, erro = '', carregando = true;
+  let dias = 30, dados = null, erro = '', carregando = true, cliques = null, erroCliques = '';
 
   const dataBR = s => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || '')); return m ? `${m[3]}/${m[2]}/${m[1]}` : ''; };
   async function buscar() {
@@ -59,6 +69,14 @@ function abrir(el, H) {
     } catch (e) {
       erro = e && e.message === 'local' ? 'As visitas só aparecem com a área restrita ligada ao servidor do Parque.' : 'Não foi possível carregar as visitas agora. Verifique a conexão.';
     }
+    try {
+      cliques = null; erroCliques = '';
+      if (!window.PR_SUPABASE || !window.PR_SUPABASE.rpc) throw new Error('local');
+      const c = await window.PR_SUPABASE.rpc('pr_resumo_cliques', { p_dias: dias });
+      if (c && c.status === 200 && c.corpo && c.corpo.totais) cliques = c.corpo;
+      else if (c && c.status === 404) erroCliques = 'Os cliques para as redes ainda não foram instalados no servidor (falta aplicar a migração 0022 no Supabase).';
+      else erroCliques = 'Não foi possível carregar os cliques agora.';
+    } catch (e) { erroCliques = e && e.message === 'local' ? '' : 'Não foi possível carregar os cliques agora.'; }
     carregando = false; draw();
   }
 
@@ -83,12 +101,24 @@ function abrir(el, H) {
     }).join('') + `</div><div style="display:flex;justify-content:space-between;font-size:.75rem;color:#888"><span>${esc(dataBR(lista[0] && lista[0].dia))}</span><span>${esc(dataBR(lista[lista.length - 1] && lista[lista.length - 1].dia))}</span></div>`;
   }
 
+  function secaoCliques() {
+    const titulo = '<h4 class="subsection-title" style="margin-top:26px">Cliques para as redes do Parque (passando pelo site)</h4>';
+    if (erroCliques) return titulo + `<p class="vazio" role="alert">${esc(erroCliques)}</p>`;
+    if (!cliques) return '';
+    const t = cliques.totais || {}, dest = cliques.por_destino || [], pares = cliques.por_origem_destino || [];
+    const c = (rot, v) => `<div class="card" style="padding:14px 16px;text-align:center"><div style="font-size:.85rem;color:#666">${esc(rot)}</div><div style="font-size:1.9rem;font-weight:700;color:#E55B0A;line-height:1.2">${nf(v)}</div></div>`;
+    return titulo + `<p style="font-size:.85rem;color:#666;margin:0">Cada clique em um link do tipo <code>ir.html?d=…</code>: a pessoa passou pelo site e seguiu para a rede. Não identifica pessoas.</p>`
+      + `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:12px 0">${c('Hoje', t.hoje)}${c('Últimos 7 dias', t.ultimos_7)}${c('Últimos 30 dias', t.ultimos_30)}</div>`
+      + `<h5 style="margin:14px 0 6px">Para onde foram</h5>` + (dest.length ? barras(dest, 'cliques', x => rotuloDestino(x.destino)) : '<p class="vazio">Ainda sem cliques neste período.</p>')
+      + `<h5 style="margin:16px 0 6px">De onde vieram e para onde foram</h5>` + (pares.length ? barras(pares, 'cliques', x => rotuloOrigem(x.origem) + ' → ' + rotuloDestino(x.destino)) : '<p class="vazio">Ainda sem cliques neste período.</p>');
+  }
   function gerador() {
     return `<h4 class="subsection-title" style="margin-top:26px">Gerar link com origem</h4>
     <p>O WhatsApp não informa de onde a pessoa veio. Por isso, <strong>para saber se a visita veio do Canal, da Comunidade ou de um grupo, poste sempre o link gerado aqui</strong> (ele termina em <code>?o=nome</code>). Link sem a marca conta como “acesso direto”.</p>
     <div class="form-row"><label for="vg-o">Onde você vai postar o link</label><select id="vg-o">${ORIGENS_GERADOR.map(o => `<option value="${esc(o[0])}">${esc(o[1])}</option>`).join('')}</select></div>
     <div class="form-row" id="vg-nome-box" hidden><label for="vg-nome">Nome curto (ex.: comunicacao, jardinagem)</label><input id="vg-nome" type="text" maxlength="30" autocomplete="off"></div>
-    <div class="form-row"><label for="vg-p">Página que o link abre</label><select id="vg-p">${PAGINAS_GERADOR.map(p => `<option value="${esc(p[0])}">${esc(p[1])}</option>`).join('')}</select></div>
+    <div class="form-row"><label for="vg-d2">Para onde o link leva</label><select id="vg-d2"><option value="">Uma página do site (escolha abaixo)</option>${Object.keys(DESTINOS_ROTULO).filter(k => k !== 'outros').map(k => `<option value="${k}">Passa pelo site e vai para: ${esc(DESTINOS_ROTULO[k])}</option>`).join('')}</select></div>
+    <div class="form-row" id="vg-p-box"><label for="vg-p">Página que o link abre</label><select id="vg-p">${PAGINAS_GERADOR.map(p => `<option value="${esc(p[0])}">${esc(p[1])}</option>`).join('')}</select></div>
     <div class="form-row"><label for="vg-l">Link pronto (sem ponto no final)</label><input id="vg-l" type="text" readonly style="width:100%;font-family:monospace"></div>
     <p><button type="button" class="btn-visit" id="vg-c"><i class="fas fa-copy"></i> Copiar link</button> <span id="vg-m" class="vazio" role="status"></span></p>`;
   }
@@ -107,23 +137,25 @@ function abrir(el, H) {
         + `<h4 class="subsection-title">De onde vieram as visitas</h4>` + (origens.length ? barras(origens, 'visitas', x => rotuloOrigem(x.origem)) : '<p class="vazio">Sem visitas neste período.</p>')
         + `<h4 class="subsection-title" style="margin-top:22px">Páginas mais vistas</h4>` + (pags.length ? barras(pags, 'paginas_vistas', x => rotuloPagina(x.pagina)) : '<p class="vazio">Sem visitas neste período.</p>');
     }
+    corpo = (corpo || '') + secaoCliques();
     el.innerHTML = `<section aria-labelledby="vis-t" style="margin-bottom:34px">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><h3 id="vis-t" style="margin:0"><i class="fas fa-chart-line"></i> Visitas do site</h3><button type="button" class="btn-visit" id="vv-a"><i class="fas fa-sync-alt"></i> Atualizar</button></div>
       ${corpo}${gerador()}</section>`;
     const $ = s => el.querySelector(s);
     $('#vv-a').onclick = buscar;
     const sd = $('#vv-d'); if (sd) sd.onchange = () => { dias = +sd.value || 30; buscar(); };
-    const so = $('#vg-o'), sn = $('#vg-nome'), sp = $('#vg-p'), sl = $('#vg-l'), box = $('#vg-nome-box');
+    const so = $('#vg-o'), sn = $('#vg-nome'), sp = $('#vg-p'), sl = $('#vg-l'), box = $('#vg-nome-box'), sd2 = $('#vg-d2'), pbox = $('#vg-p-box');
     function atualizaLink() {
       const v = so.value, pedeNome = v === 'grupo-' || v === 'outro';
       box.hidden = !pedeNome;
       let origem = v;
       if (v === 'grupo-') origem = limpa(sn.value) ? 'grupo-' + limpa(sn.value) : '';
       else if (v === 'outro') origem = limpa(sn.value);
-      sl.value = origem ? montaLink(sp.value, origem) : '';
+      pbox.hidden = !!sd2.value;
+      sl.value = origem ? (sd2.value ? montaLinkIr(sd2.value, origem) : montaLink(sp.value, origem)) : '';
       sl.placeholder = pedeNome ? 'Informe o nome curto acima' : '';
     }
-    so.onchange = sn.oninput = sp.onchange = atualizaLink; atualizaLink();
+    so.onchange = sn.oninput = sp.onchange = sd2.onchange = atualizaLink; atualizaLink();
     $('#vg-c').onclick = async () => {
       const m = $('#vg-m'); if (!sl.value) { m.textContent = 'Escolha a origem (e o nome, se pedir).'; return; }
       try { await navigator.clipboard.writeText(sl.value); m.textContent = 'Link copiado.'; }
@@ -133,5 +165,5 @@ function abrir(el, H) {
   buscar();
 }
 
-window.PR_COM_VISITAS = { abrir, montaLink, limpa, rotuloOrigem };
+window.PR_COM_VISITAS = { abrir, montaLink, montaLinkIr, limpa, rotuloOrigem, rotuloDestino };
 })();

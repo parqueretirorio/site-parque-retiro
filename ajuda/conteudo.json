@@ -2285,9 +2285,11 @@
      "Abra **Comunicação, Redes Sociais e Site › Site**. No alto aparecem as visitas de hoje, ontem, 7 e 30 dias.",
      "Veja **De onde vieram as visitas** e escolha o período (7, 30, 90 ou 365 dias).",
      "Para divulgar com origem, use **Gerar link com origem**: escolha onde vai postar (Canal, Comunidade, grupo...), a página que o link abre e clique em **Copiar link**.",
-     "Cole o link gerado na postagem. Ele termina em `?o=nome`; não coloque ponto nem espaço depois dele."
+     "Cole o link gerado na postagem. Ele termina em `?o=nome`; não coloque ponto nem espaço depois dele.",
+     "Para medir quem clica e vai para uma rede do Parque (Canal, Comunidade, YouTube, Instagram, Facebook, grupo CONecta), escolha em **Para onde o link leva** uma opção \"Passa pelo site e vai para...\". O link abre uma página rápida do site, conta o clique e leva a pessoa ao destino. Veja os números em **Cliques para as redes do Parque**."
     ],
     "exemplos": [
+     "Linktree, item do Canal: https://parqueretiro.org.br/ir.html?d=canal&o=linktree",
      "Canal do Parque: https://parqueretiro.org.br/?o=canal",
      "Grupo dos Mestres: https://parqueretiro.org.br/?o=grupo-mestres"
     ],
