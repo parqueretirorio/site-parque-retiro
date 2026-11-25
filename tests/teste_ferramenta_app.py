@@ -21,7 +21,7 @@ async def main():
         ok('/app/' in pg.url and 'ferramenta' not in pg.url, "sem login, volta para a entrada do app (não a do site)")
         await pg.goto(U + "login.html#criar-conta")
         await pg.fill('#n', 'Admin Teste'); await pg.fill('#e', 'a@t.com'); await pg.fill('#s', 'senha12345'); await pg.fill('#s2', 'senha12345'); await pg.fill('#w', '21999990000'); await pg.check('#cc-lgpd-ok'); await pg.click('#f button.btn-large')
-        await pg.wait_for_url("**/area-restrita.html")
+        await pg.wait_for_url("**/area-restrita.html*")
         tabs = await pg.evaluate("PR_AREA.abasDe(PR_DADOS.db.get('users',[])[0]).map(t=>[t[0],t[2]])")
         largas = []
         for i, (t, nome) in enumerate(tabs):
