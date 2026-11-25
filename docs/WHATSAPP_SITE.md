@@ -8,7 +8,7 @@ Implementa a proposta "WhatsApp do Parque Retiro" (reunião Conecta Retiro): o C
 | --- | --- |
 | Página inicial | Bloco "Fique por dentro do Parque Retiro" com o botão **Seguir o Canal**, e um cartão do Canal junto das redes sociais |
 | Atividades | Chamada "Receba os avisos pelo Canal" |
-| Rodapé de todas as páginas | Ícone do Canal ao lado de Facebook, Instagram, YouTube e Blogger |
+| Rodapé de todas as páginas | Ícone do Canal ao lado de Facebook, Instagram, YouTube e Blog |
 | Voluntário | Convite "Faça parte da Comunidade do Parque Retiro" com o botão **Entrar na Comunidade** |
 | Quem somos > Opinião e Participação | Leva ao convite da Comunidade em Voluntário |
 | Quem somos > Como Apoiar e Como fazer > dúvidas sobre reservas | WhatsApp oficial (contato) |

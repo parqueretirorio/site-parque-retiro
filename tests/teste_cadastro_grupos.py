@@ -1,4 +1,4 @@
-# Teste: cadastro mínimo (nome completo, WhatsApp, e-mail) + autorização LGPD, menus Blogger e Silo (site aberto) e Grupos de Discussão
+# Teste: cadastro mínimo (nome completo, WhatsApp, e-mail) + autorização LGPD, menus Blog e Silo (site aberto) e Grupos de Discussão
 # (criar grupo com sigla, convite, conversa, enquete, presença, publicação com votação de 72 h e backup por sigla). Dados fictícios, no navegador.
 # Rodar a partir da pasta do site:  python3 tests/teste_cadastro_grupos.py
 import asyncio, subprocess, time, os, json, datetime
@@ -64,17 +64,17 @@ async def main():
         r=[x for x in await db(pg,'users') if x['email']=='rita@teste.com'][0]
         ok(r['lgpd']['aceite'] is True and r['lgpd']['imagem'] is False and await pg.locator('#cad-aviso').count()==0,"Rita aceita a LGPD (imagem fica desmarcada) e o aviso some")
 
-        # ---------- 4. Site aberto: Blogger e Silo
+        # ---------- 4. Site aberto: Blog e Silo
         await pg.goto(U+"index.html")
         ordem=await pg.evaluate("()=>[...document.querySelectorAll('header nav > a')].map(a=>a.textContent.trim())")
-        ok(ordem.index('Blogger')==ordem.index('Parques no Mundo')+1,"menu: Blogger fica logo à direita de Parques no Mundo")
+        ok(ordem.index('Blog')==ordem.index('Parques no Mundo')+1,"menu: Blog fica logo à direita de Parques no Mundo")
         ic=await pg.evaluate("()=>[...document.querySelectorAll('footer .social-links a')].map(a=>a.querySelector('i').className)")
-        ok(ic[-1]=='fab fa-blogger-b' and ic[-2]=='fab fa-youtube',f"pictograma do Blogger ao lado das redes sociais ({ic})")
+        ok(ic[-1]=='fab fa-blogger-b' and ic[-2]=='fab fa-youtube',f"pictograma do Blog ao lado das redes sociais ({ic})")
         subs=await pg.evaluate("()=>{const d=[...document.querySelectorAll('.nav-dropdown')].find(x=>x.querySelector(':scope>a').textContent.trim()==='Silo');return [...d.querySelectorAll('a')].map(a=>a.textContent.trim())}")
         ok(subs[:4]==['Silo','Mensagem de Silo','Comunidades da Mensagem','Organismos do Movimento'],f"menu Silo: Mensagem de Silo > Comunidades da Mensagem ({subs})")
-        for pgn,t in (('blogger.html','Blogger'),('mensagem-de-silo.html','Mensagem de Silo'),('comunidades-da-mensagem.html','Comunidades da Mensagem')):
+        for pgn,t in (('blogger.html','Blog'),('mensagem-de-silo.html','Mensagem de Silo'),('comunidades-da-mensagem.html','Comunidades da Mensagem')):
             await pg.goto(U+pgn); ok(t in await pg.inner_text('h1') and 'em construção' in (await pg.inner_text('.container')).lower(),f"página {pgn} existe e está em construção")
-        ok(await pg.locator('a[href="blogger.html"]').count()>=1,"menu da página nova também tem o Blogger")
+        ok(await pg.locator('a[href="blogger.html"]').count()>=1,"menu da página nova também tem o Blog")
         await pg.goto(U+"silo.html"); ok(await pg.locator('.container a[href="mensagem-de-silo.html"]').count()==1,"página Silo leva à Mensagem de Silo")
 
         # ---------- 5. Grupos: criar
@@ -114,7 +114,7 @@ async def main():
         await pg.click('[data-ga="publicar"]'); ok('72 horas' in await pg.inner_text('#g-c'),"aviso das 72 horas")
         await pg.fill('#b-t','Convite da Reunião'); await pg.fill('#b-x','Texto do convite.'); await pg.click('#b-f button'); ok('destino' in (await pg.inner_text('#b-er')).lower(),"sem destino é recusado")
         await pg.fill('#b-l','http://x.com/a.jpg'); await pg.check('input[name=bd][value="Instagram"]'); await pg.click('#b-f button'); ok('https' in await pg.inner_text('#b-er'),"link sem https é recusado")
-        await pg.fill('#b-l',''); await pg.check('input[name=bd][value="Blogger"]'); await pg.click('#b-f button'); await pg.wait_for_selector('[data-vp]')
+        await pg.fill('#b-l',''); await pg.check('input[name=bd][value="Blog"]'); await pg.click('#b-f button'); await pg.wait_for_selector('[data-vp]')
         pb=(await db(pg,'grupos_itens'))[-1]; dif=(datetime.datetime.fromisoformat(pb['prazo'].replace('Z','+00:00'))-datetime.datetime.fromisoformat(pb['em'].replace('Z','+00:00'))).total_seconds()/3600
         ok(pb['status']=='votando' and 71.9<dif<72.1,f"publicação nasce 'votando' com prazo de 72 h ({dif:.2f} h)")
         ok('restam' not in (await pg.inner_text('#g-c')).lower() and 'encerra em' in await pg.inner_text('#g-c'),"sem contador na tela: só a data de encerramento da votação de 72 h")

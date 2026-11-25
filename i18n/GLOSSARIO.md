@@ -7,7 +7,7 @@ Não re-extrair as chaves (os ids ficam presos a `_ordem.json`).
 
 ## Mantidos em português (por decisão)
 Nomes próprios: Parque Retiro, Instituto Pangeia, nomes dos demais Parques, EPT Maricá, Viação 1001, Asaas, PIX, CPF/CNPJ, ruas e linhas de ônibus (E15, E15A), nomes de pessoas.
-Também: "Silo", "Mensagem de Silo" e "Blogger" no menu, "Escola" no menu, @parqueretirorio.
+Também: "Silo", "Mensagem de Silo" e "Blog" no menu, "Escola" no menu, @parqueretirorio.
 
 ## Traduzidos, mas a revisar (termos doutrinários)
 Escola (School/Escuela/Scuola/École/Schule), Ofícios (Trades), Nivelação (Leveling), Mestres (Masters), Profundo (the Profound), Experiências Guiadas (Guided Experiences), Humanismo Universalista (Universalist Humanism), Não-violência Ativa (Active Nonviolence), Comissão (Committee), Centro de Trabalho/Estudo (Work/Study Center), Comunicado (Newsletter), "pulcritude" (Neatness).

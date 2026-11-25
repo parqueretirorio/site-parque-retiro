@@ -1,9 +1,9 @@
 <?php
 /*
-  PRESSENZA AUTOMÁTICO - "Últimas da Pressenza" na página Blogger
+  PRESSENZA AUTOMÁTICO - "Últimas da Pressenza" na página Blog
   ----------------------------------------------------------------
   Este arquivo só funciona quando o site estiver num servidor com PHP
-  (o cPanel normalmente já tem). Sem PHP, a página Blogger continua
+  (o cPanel normalmente já tem). Sem PHP, a página Blog continua
   funcionando normalmente, só sem o bloco automático.
 
   Ele busca a lista de matérias da Pressenza, guarda uma cópia por
@@ -50,12 +50,12 @@ function baixa($url) {
         curl_setopt_array($c, array(
             CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => true, CURLOPT_MAXREDIRS => 3,
             CURLOPT_TIMEOUT => 8, CURLOPT_CONNECTTIMEOUT => 5,
-            CURLOPT_USERAGENT => 'ParqueRetiro-Blogger/1.0 (+leitura do feed publico)',
+            CURLOPT_USERAGENT => 'ParqueRetiro-Blog/1.0 (+leitura do feed publico)',
         ));
         $r = curl_exec($c); $ok = curl_getinfo($c, CURLINFO_HTTP_CODE) === 200; curl_close($c);
         return $ok ? $r : false;
     }
-    $ctx = stream_context_create(array('http' => array('timeout' => 8, 'header' => "User-Agent: ParqueRetiro-Blogger/1.0\r\n")));
+    $ctx = stream_context_create(array('http' => array('timeout' => 8, 'header' => "User-Agent: ParqueRetiro-Blog/1.0\r\n")));
     return @file_get_contents($url, false, $ctx);
 }
 

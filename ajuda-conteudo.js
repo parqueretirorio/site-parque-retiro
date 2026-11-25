@@ -3363,8 +3363,8 @@ window.PR_AJUDA_CONTEUDO = {
    "menu-do-site"
   ],
   "global.rede.blogger": [
-   "Blogger",
-   "Abre a página do Blogger do Parque.",
+   "Blog",
+   "Abre a página do Blog do Parque.",
    "menu-do-site"
   ],
   "menu.comece-aqui": [

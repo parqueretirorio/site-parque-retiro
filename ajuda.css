@@ -18,7 +18,7 @@
     .pr-aj-botao-tx { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 }
 
-/* Botão Ajuda como item do menu principal (à esquerda de Blogger): é um link comum do menu e herda fonte, cor e espaços dos outros itens (style.css) */
+/* Botão Ajuda como item do menu principal (à direita de Notícias): é um link comum do menu e herda fonte, cor e espaços dos outros itens (style.css) */
 .nav-grupo-ajuda { display: inline-flex; align-items: center; gap: 12px; white-space: nowrap; }
 @media (max-width: 768px) {
     .nav-grupo-ajuda { display: flex; flex-direction: column; align-items: stretch; gap: 0; width: 100%; }

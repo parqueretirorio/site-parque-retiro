@@ -1,15 +1,15 @@
 // Grupos de Discussão por tema (área restrita, Comissões Parque Retiro). Dados no navegador (chaves pr_grupos, pr_grupos_itens e pr_grupos_bkp_<SIGLA>).
 // Substitui, aos poucos, o uso do WhatsApp para conversar, votar enquetes, confirmar presença e aprovar publicações.
 // Regras decididas pelo responsável: qualquer Mestre (qualquer pessoa com conta aprovada) cria grupos; a entrada é por convite de quem criou
-// (ou do Administrador); a publicação nas redes e no Blogger só segue depois que o grupo aprovar, com prazo de 72 horas contado desde o
+// (ou do Administrador); a publicação nas redes e no Blog só segue depois que o grupo aprovar, com prazo de 72 horas contado desde o
 // lançamento; passado o prazo, se a maioria dos votos não for "aprovo" (ou ninguém votou), a publicação é CANCELADA.
 // Limites (sem servidor): cada navegador só enxerga o que ele mesmo gravou, então as mensagens de várias pessoas só se juntam com o servidor;
-// a publicação direta nas redes e no Blogger exige conectar contas externas (não ativado): o site entrega o texto aprovado pronto e os atalhos.
+// a publicação direta nas redes e no Blog exige conectar contas externas (não ativado): o site entrega o texto aprovado pronto e os atalhos.
 // Backup por sigla: a cada alteração o site guarda uma cópia do grupo em pr_grupos_bkp_<SIGLA> (entra no backup geral) e o criador ou o
 // Administrador baixa o arquivo. A gravação automática na pasta de dados do servidor fica para quando houver servidor.
 (function () {
 const HORAS = 72, REACOES = ['👍', '❤️', '🙏', '👏'];
-const DESTINOS = [['Instagram', 'https://www.instagram.com/parqueretirorio/'], ['Facebook', 'https://www.facebook.com/parqueretiro/'], ['YouTube', 'https://www.youtube.com/@parquedeestudoereflexaoret6772'], ['Blogger', 'blogger.html'], ['Site do Parque', 'index.html']];
+const DESTINOS = [['Instagram', 'https://www.instagram.com/parqueretirorio/'], ['Facebook', 'https://www.facebook.com/parqueretiro/'], ['YouTube', 'https://www.youtube.com/@parquedeestudoereflexaoret6772'], ['Blog', 'blogger.html'], ['Site do Parque', 'index.html']];
 const PRES = [['presencial', 'Presencial'], ['virtual', 'Virtual'], ['talvez', 'Ainda não sei'], ['nao', 'Não vou']];
 const ST_PUB = { votando: 'Em votação', aprovada: 'Aprovada pelo grupo', cancelada: 'Cancelada', publicada: 'Publicada' };
 
@@ -208,7 +208,7 @@ window.PR_GRUPOS = { HORAS, abrir(me, root, H) {
   const publicar = (g, el) => {
     resolve(g);
     const ps = itens().filter(i => i.g === g.id && i.tipo === 'pub').reverse();
-    el.innerHTML = `<p class="tip-box" role="note"><i class="fas fa-info-circle"></i> Toda publicação precisa da aprovação do grupo: os membros têm <strong>${HORAS} horas</strong> para votar. Passado o prazo, se a maioria dos votos não for "aprovo" (ou ninguém votar), a publicação é <strong>cancelada</strong>. A publicação direta nas redes e no Blogger ainda não está ativada: depois da aprovação o site entrega o texto pronto e os atalhos.</p>
+    el.innerHTML = `<p class="tip-box" role="note"><i class="fas fa-info-circle"></i> Toda publicação precisa da aprovação do grupo: os membros têm <strong>${HORAS} horas</strong> para votar. Passado o prazo, se a maioria dos votos não for "aprovo" (ou ninguém votar), a publicação é <strong>cancelada</strong>. A publicação direta nas redes e no Blog ainda não está ativada: depois da aprovação o site entrega o texto pronto e os atalhos.</p>
     <form id="b-f" class="form-reserva" novalidate><h4>Propor publicação</h4>
       <div class="form-row"><label for="b-t">Título *</label><input id="b-t" maxlength="120"></div>
       <div class="form-row"><label for="b-x">Texto *</label><textarea id="b-x" rows="5" maxlength="3000"></textarea></div>
