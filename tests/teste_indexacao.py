@@ -1,4 +1,4 @@
-# Teste: páginas não públicas com noindex; sitemap sem elas; Ajuda por último no menu; sem "Blogger" visível no menu/páginas.
+# Teste: páginas não públicas com noindex; sitemap sem elas; Ajuda por último no menu; nada chamado blogger no site.
 import re,glob,sys
 f=0
 def ok(c,m):
@@ -17,6 +17,6 @@ for p in urls:
 rob=open('robots.txt').read()
 for p in ('ajuda','noticias-conecta','calendario'):
     ok(p not in rob,p+': fora do robots.txt (senão o Google não veria o noindex)')
-for p in ('blogger.html','blogger-escola-parque-dos-sonhos.html','ajuda-conteudo.js'):
+for p in ('blog.html','blog-escola-parque-dos-sonhos.html','ajuda-conteudo.js'):
     ok('Blogger' not in open(p,encoding='utf-8').read(),p+': sem "Blogger"')
 sys.exit(1 if f else 0)

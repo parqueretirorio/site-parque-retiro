@@ -9,7 +9,7 @@
 // Administrador baixa o arquivo. A gravação automática na pasta de dados do servidor fica para quando houver servidor.
 (function () {
 const HORAS = 72, REACOES = ['👍', '❤️', '🙏', '👏'];
-const DESTINOS = [['Instagram', 'https://www.instagram.com/parqueretirorio/'], ['Facebook', 'https://www.facebook.com/parqueretiro/'], ['YouTube', 'https://www.youtube.com/@parquedeestudoereflexaoret6772'], ['Blog', 'blogger.html'], ['Site do Parque', 'index.html']];
+const DESTINOS = [['Instagram', 'https://www.instagram.com/parqueretirorio/'], ['Facebook', 'https://www.facebook.com/parqueretiro/'], ['YouTube', 'https://www.youtube.com/@parquedeestudoereflexaoret6772'], ['Blog', 'blog.html'], ['Site do Parque', 'index.html']];
 const PRES = [['presencial', 'Presencial'], ['virtual', 'Virtual'], ['talvez', 'Ainda não sei'], ['nao', 'Não vou']];
 const ST_PUB = { votando: 'Em votação', aprovada: 'Aprovada pelo grupo', cancelada: 'Cancelada', publicada: 'Publicada' };
 

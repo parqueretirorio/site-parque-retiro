@@ -228,7 +228,7 @@ function ajuda() {
     <div id="aguia"><h2>${H('comoUsar')}</h2>
     <div class="lista">${g.map(x => `<a class="linha" href="#guia/${x.id}"><i class="fas ${x.icone}" aria-hidden="true"></i><span>${esc(x.titulo)}</span><i class="fas fa-chevron-right seta" aria-hidden="true"></i></a>`).join('')}</div>
     ${tabs.length ? `<h2>${H('porFerramenta')}</h2><div class="lista">${tabs.map(tb => `<a class="linha" href="#ajuda-f/${encodeURIComponent(tb[0])}"><i class="fas ${tb[1]}" aria-hidden="true"></i><span>${esc(I.aba(tb[0], tb[2]))}</span><i class="fas fa-question-circle seta" aria-hidden="true"></i></a>`).join('')}</div>` : ''}
-    <a class="bt bt-claro" href="../ajuda.html" target="_blank" rel="noopener"><i class="fas fa-book-open" aria-hidden="true"></i> ${H('centralSite')}</a></div>
+    </div>
     ${rodapeAjuda()}
   </main>`;
   const bv = $('.voltar-entrar'); if (bv) bv.onclick = ev => { ev.preventDefault(); history.replaceState(null, '', location.pathname + location.search); rota(); };
