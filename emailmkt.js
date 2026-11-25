@@ -282,7 +282,7 @@ function abrirContatos(me, root) {
     const bruto = S.l === 'mestres1' || S.l === 'mestrescom' ? [] : contatos().filter(c => c.lista === S.l).sort((a, b) => String(b.criado).localeCompare(String(a.criado)));
     root.innerHTML = `<h3><i class="fas fa-address-book"></i> Listas de e-mail</h3>
     <p>Quem recebe o Comunicado por e-mail. <strong>Mestres 1</strong> e <strong>Mestres Comissão</strong> vêm de Gestão de Responsáveis (Mestres Comissão são os que têm ao menos uma responsabilidade). As outras listas são preenchidas pelos cadastros do site ou por você.</p>
-    <p class="tip-box" role="note">Para o cadastro público, use os endereços <strong>newsletter.html</strong> (Aderente) e <strong>cadastro-wifi.html</strong> (Visitante, para o portal do wifi). Enquanto o site não tiver servidor, o cadastro de cada pessoa fica no navegador dela; então cadastre aqui, ou importe, quem já tem consentimento.</p>
+    <p class="tip-box" role="note">Para o cadastro público, use os endereços <strong>newsletter.html</strong> (Aderente) e <strong>cadastro-wifi.html</strong> (Visitante, para o portal do wifi). Os cadastros feitos no site chegam aqui sozinhos quando você entra na área restrita; também dá para cadastrar ou importar aqui quem já deu consentimento.</p>
     <details id="ct-hist"><summary><strong>Comunicados enviados e métricas</strong></summary><div id="ct-hb"></div></details>
     <div class="tabs sub" role="tablist">${Object.keys(LISTAS).map(k => `<button type="button" class="tab-btn${k === S.l ? ' active' : ''}" data-l="${k}">${esc(LISTAS[k].nome)} (${membros(k).length})</button>`).join('')}</div>
     <p class="vazio">${esc(def.desc)}</p>
