@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Abrindo o arquivo | Parque de Estudo e Reflexão Retiro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <style>
+        .baixar { max-width: 560px; margin: 12vh auto; padding: 0 20px; text-align: center; font-family: inherit; }
+        .baixar h1 { font-size: 1.4rem; margin-bottom: 12px; }
+        .baixar p { line-height: 1.5; }
+        .baixar .nome { word-break: break-all; font-size: .9rem; opacity: .75; }
+        .baixar a.botao { display: inline-block; margin-top: 14px; padding: 10px 20px; border-radius: 8px; background: #E55B0A; color: #fff; text-decoration: none; }
+    </style>
+</head>
+<body>
+<main class="baixar" id="baixar" aria-live="polite">
+    <h1 id="titulo">Abrindo o arquivo…</h1>
+    <p class="nome" id="nome"></p>
+    <p id="texto"></p>
+    <a class="botao" id="botao" href="index.html" hidden></a>
+</main>
+<script src="materiais.js"></script>
+<script>
+(function () {
+'use strict';
+// Esta página recebe ?arquivo=NOME, consulta a agenda de endereços (materiais.js) e leva a pessoa ao arquivo.
+// O NOME é usado só como chave de consulta: a página nunca abre endereço vindo da barra de endereços.
+var T = {
+  pt: ['Abrindo o arquivo…', 'Se o arquivo não abrir sozinho, use o botão abaixo.', 'Abrir o arquivo', 'Em breve', 'Este arquivo ainda não está disponível. Em breve estará aqui.', 'Voltar ao início'],
+  es: ['Abriendo el archivo…', 'Si el archivo no se abre solo, use el botón de abajo.', 'Abrir el archivo', 'Próximamente', 'Este archivo aún no está disponible. Pronto estará aquí.', 'Volver al inicio'],
+  it: ['Apertura del file…', 'Se il file non si apre da solo, usa il pulsante qui sotto.', 'Apri il file', 'Prossimamente', 'Questo file non è ancora disponibile. Sarà presto qui.', 'Torna alla home'],
+  fr: ['Ouverture du fichier…', 'Si le fichier ne s’ouvre pas tout seul, utilisez le bouton ci-dessous.', 'Ouvrir le fichier', 'Bientôt', 'Ce fichier n’est pas encore disponible. Il sera bientôt ici.', 'Retour à l’accueil'],
+  en: ['Opening the file…', 'If the file does not open by itself, use the button below.', 'Open the file', 'Coming soon', 'This file is not available yet. It will be here soon.', 'Back to home'],
+  de: ['Datei wird geöffnet…', 'Wenn sich die Datei nicht von selbst öffnet, nutzen Sie die Schaltfläche unten.', 'Datei öffnen', 'Demnächst', 'Diese Datei ist noch nicht verfügbar. Sie wird bald hier sein.', 'Zur Startseite']
+};
+function lang() {
+  var q = /[?&]lang=([a-z]{2})/.exec(location.search), l = q ? q[1] : null;
+  if (!l) { try { l = localStorage.getItem('pr_idioma'); } catch (e) { l = null; } }
+  if (!l) l = (navigator.language || 'pt').slice(0, 2).toLowerCase();
+  return T[l] ? l : 'pt';
+}
+var t = T[lang()], el = function (id) { return document.getElementById(id); };
+var m = /[?&]arquivo=([^&#]*)/.exec(location.search), nome = '';
+try { nome = m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : ''; } catch (e) { nome = ''; }
+var url = (window.PR_MATERIAIS && nome) ? window.PR_MATERIAIS.url(nome) : '';
+el('nome').textContent = nome;
+if (url) {
+  document.title = t[0];
+  el('titulo').textContent = t[0];
+  el('texto').textContent = t[1];
+  el('botao').textContent = t[2]; el('botao').href = url; el('botao').hidden = false;
+  setTimeout(function () { location.replace(url); }, 300);
+} else {
+  document.title = t[3];
+  el('titulo').textContent = t[3];
+  el('texto').textContent = t[4];
+  el('botao').textContent = t[5]; el('botao').href = 'index.html'; el('botao').hidden = false;
+}
+})();
+</script>
+</body>
+</html>
