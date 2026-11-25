@@ -105,7 +105,7 @@ Conecta Retiro
 | Usuários, auditoria, backup | — | — | — | — | — | tudo |
 | Wi-Fi (convidados) | cadastrar-se | — | — | — | Resp. de rede (a definir) | tudo |
 
-**Privacidade (LGPD):** mapear dados e finalidades; base legal (consentimento para foto/Estela/Wi-Fi marketing; atividade institucional para reservas e acesso); encarregado; prazos e eliminação; canal do titular; consentimento de imagem para o Álbum; incidente (plano de resposta); contrato com operadores (Supabase, Meta). Dados sensíveis marcados e com leitura restrita. Aba "Mapa de Contas": não guardar senhas.
+**Privacidade (LGPD):** mapear dados e finalidades; base legal (consentimento para foto/Estela e para receber comunicados do Parque pelo Wi-Fi; atividade institucional para reservas e acesso); encarregado; prazos e eliminação; canal do titular; consentimento de imagem para o Álbum; incidente (plano de resposta); contrato com operadores (Supabase, Meta). Dados sensíveis marcados e com leitura restrita. Aba "Mapa de Contas": não guardar senhas.
 
 ## 13. Riscos, dependências e o que ainda NÃO foi verificado
 - Servidor real, login real, backup automático, restauração em servidor, upload pelo celular: **não testados** (dependem de conta e infraestrutura).

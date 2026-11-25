@@ -1,4 +1,4 @@
-// Comunicação › E-mail marketing.
+// Comunicação › Comunicados por e-mail.
 //  - Campanhas: escolhe uma, várias ou todas as listas; personaliza com o nome da pessoa ({{primeiro_nome}}, {{nome}});
 //    filtra o público pelo perfil (interesses e engajamento).
 //  - Aquecimento: limite diário que cresce aos poucos (rampa), mandando primeiro para quem mais abre e clica.
@@ -147,7 +147,7 @@ function abrir(el, h) {
   const $ = s => el.querySelector(s);
   const aviso = `<p class="tip-box" role="note"><i class="fas fa-info-circle"></i> O envio automático começa quando o e-mail do domínio parqueretiro.org.br e o serviço de envio estiverem ligados. Até lá, o sistema prepara o <strong>lote do dia</strong> já personalizado e você envia pelo seu programa de e-mail; depois é só marcar como enviado.</p>`;
   const draw = () => {
-    el.innerHTML = `<h3><i class="fas fa-mail-bulk"></i> E-mail marketing</h3>
+    el.innerHTML = `<h3><i class="fas fa-mail-bulk"></i> Comunicados por e-mail</h3>
       <p>Campanhas por e-mail para uma, várias ou todas as listas, com o nome da pessoa no início e envio aos poucos (aquecimento), para que os e-mails cheguem na caixa de entrada.</p>
       <div class="tabs sub" role="tablist">${[['camp', 'Campanhas'], ['aq', 'Aquecimento'], ['perf', 'Perfis e interesses']].map(([k, n]) => `<button type="button" class="tab-btn${S.v === k ? ' active' : ''}" data-ev="${k}">${n}</button>`).join('')}</div>
       ${S.msg ? `<p class="tip-box" role="status" id="ek-msg">${esc(S.msg)}</p>` : ''}<div id="ek-c"></div>`;

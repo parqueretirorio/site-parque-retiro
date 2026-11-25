@@ -1,4 +1,4 @@
-// Função de servidor do Supabase: envia e-mails do E-mail marketing (e do convite para a área restrita)
+// Função de servidor do Supabase: envia e-mails dos comunicados por e-mail (e do convite para a área restrita)
 // pelo Gmail do Parque (parqueretirorio@gmail.com), com a senha de app guardada SÓ no servidor.
 //
 // Quem pode usar: pessoa logada, aprovada, com nível Administrador ou com a responsabilidade "comunicacao".

@@ -2442,13 +2442,13 @@ window.PR_AJUDA_CONTEUDO = {
     "lembrete",
     "gmail"
    ],
-   "onde": "**Comissões Parque Retiro › Comunicação, Redes Sociais e Site › E-mail marketing**, botão **Convite para a área restrita**.",
+   "onde": "**Comissões Parque Retiro › Comunicação, Redes Sociais e Site › Comunicados por e-mail**, botão **Convite para a área restrita**.",
    "secoes": {
     "oQueE": "Um e-mail pronto, em português ou espanhol, com o botão **Criar minha conta**, que abre direto o cadastro da área restrita. Quem já tem conta não recebe. Depois do envio, a tela mostra quem já tem acesso, quem está esperando aprovação e quem ainda não se cadastrou.",
     "finalidade": "Trazer para o CONecta Retiro os Mestres e as pessoas das comissões e da administração, sem precisar mandar o link uma a uma pelo WhatsApp.",
     "passos": [
      "Em **Listas de e-mail**, abra a lista **Convite área restrita** e use **Importar** (um por linha: e-mail, ou nome;e-mail).",
-     "Em **E-mail marketing**, toque em **Convite para a área restrita**. Confira o texto e a prévia; troque o **Idioma do convite** se for para quem fala espanhol.",
+     "Em **Comunicados por e-mail**, toque em **Convite para a área restrita**. Confira o texto e a prévia; troque o **Idioma do convite** se for para quem fala espanhol.",
      "Toque em **Salvar e montar a fila de envio**.",
      "Envie: **Enviar agora pelo Gmail do Parque** (quando o envio automático estiver ligado) ou **Abrir e-mail** em cada pessoa e depois **Marcar como enviados**.",
      "Acompanhe em **Quem já se cadastrou**. Os cadastros novos aparecem em **Gestão de Responsáveis** para aprovar e marcar as responsabilidades.",

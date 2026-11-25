@@ -1,4 +1,4 @@
-# Teste: Comunicação > "E-mail marketing" (com-emailmkt.js).
+# Teste: Comunicação > "Comunicados por e-mail" (com-emailmkt.js).
 # Rodar a partir da pasta do site:  python3 tests/teste_email_marketing.py
 import asyncio, subprocess, time, os
 from playwright.async_api import async_playwright
@@ -23,7 +23,7 @@ async def main():
         M=await pg.evaluate("PR_COM_EMKT.personaliza('Olá, {{primeiro_nome}}!',{nome:'ana LÚCIA'})"); ok(M=='Olá, Ana!',"personaliza com o primeiro nome: "+M)
         M=await pg.evaluate("PR_COM_EMKT.personaliza('Olá, {{primeiro_nome}}!',{nome:''})"); ok(M=='Olá!',"sem nome fica só 'Olá!'")
         await aba(pg,'comunicacao'); await pg.click('[data-s="emkt"]')
-        ok('E-mail marketing' in await pg.inner_text('#com-sub'),"sub-aba E-mail marketing abre")
+        ok('Comunicados por e-mail' in await pg.inner_text('#com-sub'),"sub-aba Comunicados por e-mail abre")
         await pg.click('#ek-nova')
         await pg.check('input[name="ek-l"][value="aderente"]'); await pg.wait_for_timeout(100)
         t=await pg.inner_text('#ek-tot'); ok(t.startswith('25 pessoa'),"uma lista: 25 pessoas ("+t[:30]+")")

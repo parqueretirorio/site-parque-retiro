@@ -1,4 +1,4 @@
-# Teste: Comunicação > E-mail marketing > "Convite para a área restrita".
+# Teste: Comunicação > Comunicados por e-mail > "Convite para a área restrita".
 # Rodar a partir da pasta do site:  python3 tests/teste_convite_area.py
 import asyncio, subprocess, time, os, json
 from playwright.async_api import async_playwright
