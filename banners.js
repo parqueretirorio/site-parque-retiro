@@ -7,14 +7,14 @@
 //  - Configuração publicada: arquivo banners/banners.json (gerado pela área restrita > Comunicação > Site).
 //  - Pré-visualização: quem está logado vê, neste navegador, o rascunho ainda não publicado.
 (function () {
-// w × h = medida EXATA em pixels. As medidas de quem já tinha banner vêm do arquivo real; as demais usam 1600 × 533 (3:1),
-// que é a largura máxima de exibição do site (max-width: 1600px).
+// w × h = medida EXATA em pixels. Todos os espaços usam 1600 × 533 (3:1), a largura máxima de exibição do site (max-width: 1600px).
+// (26/11/2026: Início, Quem somos e Sobre o Parque passaram de 2172 × 724 para 1600 × 533, a pedido do administrador.)
 const P = 1600, H3 = 533;
 const SLOTS = [
   // [slug, nome na tela, arquivo, grupo, largura, altura]
-  ['index', 'Início', 'index.html', 'Principal', 2172, 724],
-  ['comece-aqui', 'Quem somos', 'comece-aqui.html', 'Principal', 2172, 724],
-  ['o-parque', 'O Parque — Sobre o Parque', 'o-parque.html', 'O Parque', 2172, 724],
+  ['index', 'Início', 'index.html', 'Principal', P, H3],
+  ['comece-aqui', 'Quem somos', 'comece-aqui.html', 'Principal', P, H3],
+  ['o-parque', 'O Parque — Sobre o Parque', 'o-parque.html', 'O Parque', P, H3],
   ['elementos', 'O Parque — Elementos', 'elementos.html', 'O Parque', P, H3],
   ['como-chegar', 'O Parque — Como Chegar', 'como-chegar.html', 'O Parque', P, H3],
   ['atividades', 'O Parque — Atividades', 'atividades.html', 'O Parque', P, H3],
