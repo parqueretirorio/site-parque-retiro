@@ -2,7 +2,7 @@
 
 Onde: área restrita → **Comunicação e Redes Sociais** → sub-aba **Site** (acesso: administrador e Responsável pela Comunicação).
 
-Cada página do site (36 espaços, agrupados) tem um cartão com o nome, o arquivo e a **medida exata em pixels**:
+Cada página do site (37 espaços, agrupados) tem um cartão com o nome, o arquivo e a **medida exata em pixels**:
 - Todas as páginas, inclusive Início, Quem somos e O Parque — Sobre o Parque: **1600 × 533 px** (largura máxima de exibição do site; proporção 3:1). Até 25/11 essas três usavam 2172 × 724 px; mudou em 26/11.
 - Formatos: JPG, PNG ou WebP, até 15 MB. A imagem precisa ter a **proporção** do espaço; o sistema recusa outra proporção (explicando a medida certa) e converte imagens de mesma proporção para a medida exata.
 

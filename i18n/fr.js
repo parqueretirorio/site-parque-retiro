@@ -871,5 +871,20 @@
 "Novidades do Parque de Estudo e Reflexão Retiro e textos selecionados sobre paz e não violência.": "Nouvelles du Parc d'Étude et de Réflexion Retiro et textes choisis sur la paix et la non-violence.",
 "O que muda na plataforma do Parque, semana a semana: o site, o aplicativo, o WhatsApp oficial e a área restrita.": "Ce qui change sur la plateforme du Parc, semaine après semaine : le site, l'application, le WhatsApp officiel et l'espace réservé.",
 "Seleção de matérias da agência Pressenza sobre paz e não violência no Brasil, reunidas para a leitura de quem acompanha o Parque Retiro.": "Sélection d'articles de l'agence Pressenza sur la paix et la non-violence au Brésil, réunis pour ceux qui suivent le Parque Retiro.",
-"Ver todas as notícias do CONecta Retiro": "Voir toutes les actualités de CONecta Retiro"
+"Ver todas as notícias do CONecta Retiro": "Voir toutes les actualités de CONecta Retiro",
+"Festival de Verão": "Festival d'Été",
+"Salve a data: 20 de dezembro de 2026": "Notez la date : 20 décembre 2026",
+"O Parque Retiro vai fazer um Festival de Verão no dia <strong>20 de dezembro de 2026</strong>. Será também a apresentação do lançamento do <strong>CONecta Retiro</strong>, a plataforma digital do Parque. Reserve a data e venha viver esse dia conosco.": "Le Parque Retiro organisera un Festival d'Été le <strong>20 décembre 2026</strong>. Ce sera aussi la présentation du lancement de <strong>CONecta Retiro</strong>, la plateforme numérique du Parc. Réservez la date et venez vivre cette journée avec nous.",
+"Salve a data": "Notez la date",
+"Domingo, 20 de dezembro de 2026, no Parque de Estudo e Reflexão Retiro, em Maricá, Rio de Janeiro.": "Dimanche 20 décembre 2026, au Parc d'Étude et de Réflexion Retiro, à Maricá, Rio de Janeiro.",
+"Lançamento do CONecta Retiro": "Lancement de CONecta Retiro",
+"O Festival também será a apresentação do site novo, do aplicativo e das demais novidades da plataforma do Parque.": "Le Festival sera aussi la présentation du nouveau site, de l'application et des autres nouveautés de la plateforme du Parc.",
+"Em breve": "Bientôt",
+"O horário, a programação e o que levar serão divulgados nesta página e nos canais do Parque assim que estiverem confirmados.": "L'horaire, le programme et ce qu'il faut apporter seront annoncés sur cette page et sur les canaux du Parc dès qu'ils seront confirmés.",
+"Receba as novidades do Festival": "Recevez les nouvelles du Festival",
+"Para não perder nenhuma informação, escolha a forma que for mais fácil para você:": "Pour ne manquer aucune information, choisissez la façon qui vous est la plus facile :",
+"Receber o Comunicado por e-mail": "Recevoir le Communiqué par e-mail",
+"Seguir o Canal do Parque no WhatsApp": "Suivre la Chaîne du Parc sur WhatsApp",
+"Seguir o Parque no Instagram": "Suivre le Parc sur Instagram",
+"Quer saber como chegar ao Parque? Veja a página <a href=\"como-chegar.html\">Como chegar</a>.": "Vous voulez savoir comment arriver au Parc ? Consultez la page <a href=\"como-chegar.html\">Comment venir</a>."
 };

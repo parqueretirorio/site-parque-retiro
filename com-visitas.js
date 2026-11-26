@@ -25,7 +25,7 @@ const ORIGENS_GERADOR = [
 const PAGINAS_GERADOR = [
   ['', 'Início'], ['newsletter.html', 'Comunicado (cadastro)'], ['atividades.html', 'Atividades'], ['reservas.html', 'Reservas'],
   ['ajude-o-parque.html', 'Ajude o Parque'], ['rifa-solidaria.html', 'Rifa Solidária'], ['vaquinha-coletiva.html', 'Vaquinha Coletiva'],
-  ['livraria.html', 'Livraria'], ['como-chegar.html', 'Como chegar'], ['o-parque.html', 'O Parque'], ['app/', 'Aplicativo (instalar)'], ['login.html', 'Entrar']
+  ['livraria.html', 'Livraria'], ['festival.html', 'Festival de Verão'], ['como-chegar.html', 'Como chegar'], ['o-parque.html', 'O Parque'], ['app/', 'Aplicativo (instalar)'], ['login.html', 'Entrar']
 ];
 
 function limpa(v) {

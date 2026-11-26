@@ -53,6 +53,7 @@ const SLOTS = [
   ['voluntario', 'Ajude — Voluntário', 'voluntario.html', 'Ajude o Parque', P, H3],
   ['parques-mundo', 'Parques no Mundo', 'parques-mundo.html', 'Outras páginas', P, H3],
   ['estela-virtual', 'Estela Virtual', 'estela-virtual.html', 'Outras páginas', P, H3],
+  ['festival', 'Festival de Verão', 'festival.html', 'Outras páginas', P, H3],
   ['login', 'Entrar (login)', 'login.html', 'Outras páginas', P, H3]
 ].map(a => ({ slug: a[0], nome: a[1], arquivo: a[2], grupo: a[3], w: a[4], h: a[5] }));
 
