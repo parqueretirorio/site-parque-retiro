@@ -23,6 +23,7 @@ ESPERADO = {
  'conecta-whatsapp': 'https://chat.whatsapp.com/CfleoMcrPOmAKGEg3gToeq?s=cl&p=a&iam=2',
  'youtube': 'https://youtube.com/@parquedeestudoereflexaoret6772',
  'facebook': 'https://facebook.com/parqueretiro',
+ 'grupo-geral': 'https://chat.whatsapp.com/KXM4pLhBpDhErHHdaRvgu9',
  'grupo-silo': 'https://chat.whatsapp.com/Hpsgjvsj37xICYZj8BeXg1?s=cl&p=a&iam=2'}
 
 async def main():
@@ -41,7 +42,7 @@ async def main():
     ok(q("select cliques from cliques_saida_dia where origem='outros' and destino='outros'") == '2', "entradas estranhas viram outros/outros, sem erro")
     try: psql("select count(*) from cliques_saida_dia", papel='anon'); ok(False, "anon não deveria ler")
     except ErroBanco as e: ok('permission denied' in str(e), "visitante não lê a tabela de cliques")
-    try: psql("insert into cliques_saida_dia(dia, origem, destino) values (current_date,'a','b')", papel='anon'); ok(False, "anon não deveria gravar direto")
+    try: psql("insert into cliques_saida_dia(dia, origem, destino) values ((now() at time zone 'America/Sao_Paulo')::date,'a','b')", papel='anon'); ok(False, "anon não deveria gravar direto")
     except ErroBanco as e: ok('permission denied' in str(e), "visitante não grava direto (só pela função)")
     ok(q("select count(*) from cliques_saida_dia", papel='authenticated', uid=uid) == '0', "mesmo logado, a tabela está fechada por RLS")
     try: psql("select pr_resumo_cliques(30)", papel='anon'); ok(False, "anon não deveria ver o resumo")
@@ -49,7 +50,7 @@ async def main():
     r = json.loads(q("select pr_resumo_cliques(30)::text", papel='authenticated', uid=uid))
     ok(r['totais']['hoje'] == 6, f"resumo logado: 6 cliques hoje (veio {r['totais']['hoje']})")
     ok(r['por_destino'][0] == {'destino': 'canal', 'cliques': 3}, "destino mais clicado primeiro (canal, 3)")
-    psql("insert into cliques_saida_dia(dia, origem, destino, cliques) select current_date, 'lixo'||g, 'd'||g, 1 from generate_series(1,600) g")
+    psql("insert into cliques_saida_dia(dia, origem, destino, cliques) select (now() at time zone 'America/Sao_Paulo')::date, 'lixo'||g, 'd'||g, 1 from generate_series(1,600) g")
     reg('canal', 'origem-nova-depois-do-freio')
     ok(q("select count(*) from cliques_saida_dia where origem='origem-nova-depois-do-freio'") == '0', "freio: acima de 500 combinações por dia, origem nova não cria linha")
     ok(reg('canal', 'linktree') == '{"ok": true}' and q("select cliques from cliques_saida_dia where origem='linktree' and destino='canal'") == '4', "freio não atrapalha quem já está contado")
@@ -83,7 +84,7 @@ async def main():
         pg = await vi.new_page(); await pg.goto(B + '/ir.html?d=https://site-mal-intencionado.com'); await pg.wait_for_timeout(1500)
         ok(pg.url.startswith(B + '/ir.html'), "destino que não está na lista NÃO redireciona (sem redirecionamento aberto)")
         hrefs = await pg.eval_on_selector_all('#b a', 'a => a.map(x => x.getAttribute("href"))')
-        ok(len([h for h in hrefs if h.startswith('ir.html?d=')]) == 7 and 'index.html' in hrefs, "mostra os 7 destinos e o site")
+        ok(len([h for h in hrefs if h.startswith('ir.html?d=')]) == 8 and 'index.html' in hrefs, "mostra os 8 destinos e o site")
         ok(not sb.cliques_log, "destino desconhecido não conta clique")
         await pg.close()
         # botão de reserva presente na página do destino (caso o redirecionamento automático falhe)

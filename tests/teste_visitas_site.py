@@ -48,7 +48,7 @@ async def main():
     ok(q("select count(*) from pg_tables where tablename='visitas_site_dia'") == '1', "a tabela continua existindo depois das entradas estranhas")
     try: psql("select count(*) from visitas_site_dia", papel='anon'); ok(False, "anon não deveria ler a tabela")
     except ErroBanco as e: ok('permission denied' in str(e), "visitante não lê a tabela de visitas")
-    try: psql("insert into visitas_site_dia(dia, origem, pagina) values (current_date, 'a', 'b')", papel='anon'); ok(False, "anon não deveria gravar direto")
+    try: psql("insert into visitas_site_dia(dia, origem, pagina) values ((now() at time zone 'America/Sao_Paulo')::date, 'a', 'b')", papel='anon'); ok(False, "anon não deveria gravar direto")
     except ErroBanco as e: ok('permission denied' in str(e), "visitante não grava direto na tabela (só pela função)")
     ok(q("select count(*) from visitas_site_dia", papel='authenticated', uid=uid) == '0', "mesmo logado, a tabela está fechada por RLS (só a função do painel lê)")
     try: psql("select pr_resumo_visitas(30)", papel='anon'); ok(False, "anon não deveria ver o resumo")
