@@ -2557,5 +2557,12 @@
 "Qual o percentual de acessos por celular?": "¿Cuál es el porcentaje de accesos por celular?",
 "Quais cidades e estados geram mais visitantes?": "¿Qué ciudades y estados generan más visitantes?",
 "Qual a evolução do tráfego ao longo dos meses?": "¿Cómo evoluciona el tráfico a lo largo de los meses?",
-"Qual campanha apresentou o melhor resultado?": "¿Qué campaña tuvo el mejor resultado?"
+"Qual campanha apresentou o melhor resultado?": "¿Qué campaña tuvo el mejor resultado?",
+"Números do site (visitas e links)": "Números del sitio (visitas y enlaces)",
+"Baixar números de visitas e links (CSV)": "Descargar números de visitas y enlaces (CSV)",
+"Ainda não baixado neste navegador.": "Aún no descargado en este navegador.",
+"Ainda falta aplicar a migração 0025 no servidor (Supabase) para baixar os números.": "Aún falta aplicar la migración 0025 en el servidor (Supabase) para descargar los números.",
+"Entre de novo na área restrita para baixar os números.": "Vuelve a entrar al área restringida para descargar los números.",
+"Não foi possível baixar os números agora. Tente de novo em instantes.": "No se pudieron descargar los números ahora. Inténtalo de nuevo en unos instantes.",
+"O backup acima <strong>não inclui</strong> o contador de visitas, os cliques para as redes e os links rastreáveis (ficam em tabelas à parte, só com números somados por dia). Baixe este arquivo junto com o backup de sexta e guarde na mesma pasta.": "La copia de arriba <strong>no incluye</strong> el contador de visitas, los clics hacia las redes ni los enlaces rastreables (están en tablas aparte, solo con números sumados por día). Descarga este archivo junto con la copia del viernes y guárdalo en la misma carpeta."
 });})();

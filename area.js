@@ -1439,6 +1439,30 @@ V.backup = (me, root) => {
     try { localStorage.setItem('pr-migrado', new Date().toISOString()); } catch (e) { /* ignora */ }
     msg = `Pronto! ${novos} conjunto(s) entraram no servidor, ${somados} receberam itens que faltavam e ${mantidos} já estavam iguais (ou foram mantidos como estavam no servidor).`; draw();
   }
+  // Exporta, em um único CSV (separador ;, com BOM para o Excel), as tabelas de contagem das migrações 0021–0024, que o backup .json não cobre.
+  const csvNumeros = d => {
+    const cab = ['tabela', 'dia', 'origem', 'pagina', 'destino', 'codigo', 'tipo', 'so', 'navegador', 'visitas', 'paginas_vistas', 'cliques',
+      'nome', 'categoria', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'observacoes', 'ativo', 'criado_em'];
+    const cel = v => { v = v == null ? '' : String(v); return /[;"\n\r]/.test(v) || /^[=+\-@]/.test(v) ? '"' + (/^[=+\-@]/.test(v) ? "'" : '') + v.replace(/"/g, '""') + '"' : v; };
+    const linhas = [cab.join(';')], add = (t, arr) => (arr || []).forEach(r => linhas.push(cab.map(c => c === 'tabela' ? t : cel(r[c])).join(';')));
+    add('visitas_por_origem_e_pagina', d.visitas); add('dispositivos', d.dispositivos); add('cliques_para_as_redes', d.cliques);
+    add('links_cadastrados', d.links); add('acessos_por_link', d.acessos_links);
+    return '\ufeff' + linhas.join('\r\n') + '\r\n';
+  };
+  const ultimoNumeros = () => { try { const t = localStorage.getItem('pr-numeros-baixado'); return t ? 'Último download neste navegador: ' + t.slice(8, 10) + '/' + t.slice(5, 7) + '/' + t.slice(0, 4) + '.' : 'Ainda não baixado neste navegador.'; } catch (e) { return ''; } };
+  async function baixarNumeros() {
+    const r = await PR_SUPABASE.rpc('pr_exportar_numeros_visitas', {});
+    if (!(r && r.status === 200 && r.corpo && r.corpo.visitas)) {
+      msg = r && (r.status === 404 || (r.corpo && /does not exist|Could not find the function|PGRST202/i.test(String(r.corpo.message || r.corpo.code || '')))) ? 'Ainda falta aplicar a migração 0025 no servidor (Supabase) para baixar os números.'
+        : r && (r.status === 401 || r.status === 403) ? 'Entre de novo na área restrita para baixar os números.' : 'Não foi possível baixar os números agora. Tente de novo em instantes.';
+      draw(); return;
+    }
+    const hoje = new Date(Date.now() - 3 * 3600e3).toISOString().slice(0, 10);
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csvNumeros(r.corpo)], { type: 'text/csv;charset=utf-8' })); a.download = 'numeros-site-parque-retiro-' + hoje + '.csv'; a.click();
+    try { localStorage.setItem('pr-numeros-baixado', hoje); } catch (e) { /* ignora */ }
+    const n = ['visitas', 'dispositivos', 'cliques', 'links', 'acessos_links'].reduce((x, k) => x + (r.corpo[k] || []).length, 0);
+    msg = 'Números baixados (' + n + ' linha(s)). Guarde o arquivo junto com o backup.'; draw();
+  }
   const draw = () => {
     const u = D.uso(), d = D.diasDesdeBackup(), aud = D.auditoria().slice(-25).reverse(), lx = D.lixeira();
     const alerta = d === null ? 'Nenhum backup foi baixado ainda.' : d > 7 ? `O último backup foi há ${d} dias.` : '';
@@ -1448,6 +1472,9 @@ V.backup = (me, root) => {
     ${msg ? `<p class="tip-box" role="status">${esc(msg)}</p>` : ''}
     <p>Espaço usado no navegador: <strong>${fmtB(u.bytes)}</strong> de ~${fmtB(u.limiteAprox)} ${u.bytes > u.limiteAprox * 0.8 ? '<span class="form-erro">(quase cheio)</span>' : ''}</p>
     <p><button class="btn-visit" id="bk-baixar"><i class="fas fa-download"></i> Baixar backup completo</button></p>
+    <h4>Números do site (visitas e links)</h4>
+    <p>O backup acima <strong>não inclui</strong> o contador de visitas, os cliques para as redes e os links rastreáveis (ficam em tabelas à parte, só com números somados por dia). Baixe este arquivo junto com o backup de sexta e guarde na mesma pasta.</p>
+    <p><button class="btn-visit" id="bk-numeros"><i class="fas fa-file-csv"></i> Baixar números de visitas e links (CSV)</button> <span class="vazio" id="bk-num-ultimo">${esc(ultimoNumeros())}</span></p>
     <h4>Restaurar de um backup</h4>
     <div class="form-row"><label for="bk-arq">Arquivo de backup (.json)</label><input id="bk-arq" type="file" accept="application/json,.json"></div>
     <div id="bk-prev"></div>
@@ -1455,6 +1482,7 @@ V.backup = (me, root) => {
     ${aud.length ? `<div style="overflow-x:auto"><table class="doc-table"><thead><tr><th>Quando</th><th>Quem</th><th>Coleção</th><th>O que mudou</th></tr></thead><tbody>${aud.map(a => `<tr><td>${esc(a.t.slice(0, 19).replace('T', ' '))}</td><td>${esc(a.por)}</td><td>${esc(a.colecao)}</td><td>${a.restauradoDe ? 'Restauração de backup de ' + esc(a.restauradoDe.slice(0, 10)) : a.total === undefined ? 'alterado' : `+${a.novos} / ~${a.alterados} / −${a.removidos}`}</td></tr>`).join('')}</tbody></table></div>` : '<p class="vazio">Sem registros ainda.</p>'}
     <p class="vazio">Itens excluídos recuperáveis na lixeira: ${lx.length}. <button class="btn-visit" id="bk-lixo" ${lx.length ? '' : 'disabled'}>Baixar lixeira (JSON)</button></p>`;
     const bt = $('#bk-trazer', root); if (bt) bt.onclick = trazer;
+    $('#bk-numeros', root).onclick = baixarNumeros;
     $('#bk-baixar', root).onclick = async () => { await D.baixarBackup(); baixou = true; msg = 'Backup baixado. Confira o arquivo na pasta de downloads.'; draw(); };
     $('#bk-lixo', root).onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(D.lixeira(), null, 1)], { type: 'application/json' })); a.download = 'lixeira-parque-retiro.json'; a.click(); };
     $('#bk-arq', root).onchange = async ev => {

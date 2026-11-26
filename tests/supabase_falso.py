@@ -245,6 +245,8 @@ class SupabaseFalso:
             elif fn == 'pr_relatorio_visitas':
                 dd = lambda v: 'null' if not v else lit(v) + '::date'
                 r = psql(f"select pr_relatorio_visitas({dd((corpo or {}).get('p_ini'))}, {dd((corpo or {}).get('p_fim'))})", self.db, 'authenticated', uid)
+            elif fn == 'pr_exportar_numeros_visitas':
+                r = psql("select pr_exportar_numeros_visitas()", self.db, 'authenticated', uid)
             elif fn == 'pr_resumo_cliques':
                 r = psql(f"select pr_resumo_cliques({int((corpo or {}).get('p_dias', 30))})", self.db, 'authenticated', uid)
             elif fn == 'pr_resumo_visitas':

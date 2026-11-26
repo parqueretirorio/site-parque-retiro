@@ -2957,6 +2957,7 @@ window.PR_AJUDA_CONTEUDO = {
     "finalidade": "",
     "passos": [
      "Clique em **Baixar backup completo**. O arquivo .json vai para a pasta de downloads; guarde-o em outro lugar (e-mail, nuvem, pen drive).",
+     "Clique também em **Baixar números de visitas e links (CSV)**: o backup completo não inclui o contador de visitas nem os links rastreáveis. Guarde o arquivo na mesma pasta do backup.",
      "A tela avisa quando o último backup tem mais de 7 dias.",
      "Para restaurar: em **Arquivo de backup (.json)**, escolha o arquivo. O sistema confere a integridade e mostra a comparação por coleção.",
      "Baixe antes o backup do estado atual (o botão de restaurar só é liberado depois disso).",
@@ -5488,6 +5489,10 @@ window.PR_AJUDA_CONTEUDO = {
   "r.backup.bk-baixar": [
    "Baixar backup completo",
    "Gera um arquivo .json com todos os dados da área restrita, com verificação de integridade. Guarde em outro lugar, como cópia de segurança."
+  ],
+  "r.backup.bk-numeros": [
+   "Baixar números de visitas e links (CSV)",
+   "Baixa uma planilha (CSV) com os números somados por dia do contador de visitas, dos cliques para as redes e dos links rastreáveis. O backup completo não inclui esses números; guarde este arquivo junto com ele."
   ],
   "r.backup.bk-arq": [
    "Arquivo de backup",

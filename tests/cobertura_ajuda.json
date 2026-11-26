@@ -636,6 +636,7 @@
  },
  "r.backup": {
   "r.backup.bk-baixar": "escrita",
+  "r.backup.bk-numeros": "escrita",
   "r.backup.bk-arq": "escrita",
   "r.backup.bk-lixo": "escrita"
  },
