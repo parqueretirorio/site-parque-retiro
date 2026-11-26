@@ -12,7 +12,7 @@ const ROTULOS = {
 };
 const DESTINOS_ROTULO = {
   comunidade: 'Comunidade do Parque Retiro (WhatsApp)', canal: 'Canal do Parque Retiro (WhatsApp)', instagram: 'Instagram do Parque',
-  'conecta-whatsapp': 'Grupo CONecta Retiro (WhatsApp)', youtube: 'YouTube do Parque', facebook: 'Facebook do Parque', outros: 'Outros destinos'
+  'conecta-whatsapp': 'Grupo CONecta Retiro (WhatsApp)', youtube: 'YouTube do Parque', facebook: 'Facebook do Parque', 'grupo-silo': 'Grupo A Mensagem de Silo (WhatsApp)', outros: 'Outros destinos'
 };
 const PAGINAS_ROTULO = { index: 'Início', app: 'Aplicativo', newsletter: 'Comunicado', login: 'Entrar', baixar: 'Baixar materiais' };
 // Origens do gerador de links (valor, rótulo). "grupo-" pede o nome do grupo.

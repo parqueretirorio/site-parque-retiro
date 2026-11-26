@@ -11,7 +11,8 @@ var DESTINOS = {
   instagram: { nome: 'Instagram do Parque Retiro', url: 'https://www.instagram.com/parqueretirorio/' },
   'conecta-whatsapp': { nome: 'Grupo CONecta Retiro (WhatsApp)', url: 'https://chat.whatsapp.com/CfleoMcrPOmAKGEg3gToeq?s=cl&p=a&iam=2' },
   youtube: { nome: 'YouTube do Parque Retiro', url: 'https://youtube.com/@parquedeestudoereflexaoret6772' },
-  facebook: { nome: 'Facebook do Parque Retiro', url: 'https://facebook.com/parqueretiro' }
+  facebook: { nome: 'Facebook do Parque Retiro', url: 'https://facebook.com/parqueretiro' },
+  'grupo-silo': { nome: 'Grupo A Mensagem de Silo (WhatsApp)', url: 'https://chat.whatsapp.com/Hpsgjvsj37xICYZj8BeXg1?s=cl&p=a&iam=2' }
 };
 var CHAVE_LOGIN = 'pr-sb-sessao';
 var ALIAS = { ig: 'instagram', insta: 'instagram', yt: 'youtube', fb: 'facebook', wa: 'whatsapp', zap: 'whatsapp', newsletter: 'email', 'e-mail': 'email', comunicado: 'email' };

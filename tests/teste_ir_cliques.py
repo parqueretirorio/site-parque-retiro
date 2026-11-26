@@ -22,7 +22,8 @@ ESPERADO = {
  'instagram': 'https://www.instagram.com/parqueretirorio/',
  'conecta-whatsapp': 'https://chat.whatsapp.com/CfleoMcrPOmAKGEg3gToeq?s=cl&p=a&iam=2',
  'youtube': 'https://youtube.com/@parquedeestudoereflexaoret6772',
- 'facebook': 'https://facebook.com/parqueretiro'}
+ 'facebook': 'https://facebook.com/parqueretiro',
+ 'grupo-silo': 'https://chat.whatsapp.com/Hpsgjvsj37xICYZj8BeXg1?s=cl&p=a&iam=2'}
 
 async def main():
     sql = open(SITE + '/supabase/migrations/0022_cliques_saida.sql', encoding='utf-8').read()
@@ -82,7 +83,7 @@ async def main():
         pg = await vi.new_page(); await pg.goto(B + '/ir.html?d=https://site-mal-intencionado.com'); await pg.wait_for_timeout(1500)
         ok(pg.url.startswith(B + '/ir.html'), "destino que não está na lista NÃO redireciona (sem redirecionamento aberto)")
         hrefs = await pg.eval_on_selector_all('#b a', 'a => a.map(x => x.getAttribute("href"))')
-        ok(len([h for h in hrefs if h.startswith('ir.html?d=')]) == 6 and 'index.html' in hrefs, "mostra os 6 destinos e o site")
+        ok(len([h for h in hrefs if h.startswith('ir.html?d=')]) == 7 and 'index.html' in hrefs, "mostra os 7 destinos e o site")
         ok(not sb.cliques_log, "destino desconhecido não conta clique")
         await pg.close()
         # botão de reserva presente na página do destino (caso o redirecionamento automático falhe)

@@ -2464,5 +2464,6 @@
 "Últimos 30 dias": "Últimos 30 días",
 "Comunidade do Parque Retiro (WhatsApp)": "Comunidad del Parque Retiro (WhatsApp)",
 "Canal do Parque Retiro (WhatsApp)": "Canal del Parque Retiro (WhatsApp)",
-"Outros destinos": "Otros destinos"
+"Outros destinos": "Otros destinos",
+"Grupo A Mensagem de Silo (WhatsApp)": "Grupo El Mensaje de Silo (WhatsApp)"
 });})();
