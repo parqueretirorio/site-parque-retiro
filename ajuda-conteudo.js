@@ -2291,7 +2291,9 @@ window.PR_AJUDA_CONTEUDO = {
         "Veja **De onde vieram as visitas** e escolha o período (7, 30, 90 ou 365 dias).",
         "Para divulgar com origem, use **Gerar link com origem**: escolha onde vai postar (Canal, Comunidade, grupo...), a página que o link abre e clique em **Copiar link**.",
         "Cole o link gerado na postagem. Ele termina em `?o=nome`; não coloque ponto nem espaço depois dele.",
-        "Para medir quem clica e vai para uma rede do Parque (Canal, Comunidade, YouTube, Instagram, Facebook, grupo CONecta), escolha em **Para onde o link leva** uma opção \"Passa pelo site e vai para...\". O link abre uma página rápida do site, conta o clique e leva a pessoa ao destino. Veja os números em **Cliques para as redes do Parque**."
+        "Para medir quem clica e vai para uma rede do Parque (Canal, Comunidade, YouTube, Instagram, Facebook, grupo CONecta), escolha em **Para onde o link leva** uma opção \"Passa pelo site e vai para...\". O link abre uma página rápida do site, conta o clique e leva a pessoa ao destino. Veja os números em **Cliques para as redes do Parque**.",
+        "Para campanhas com histórico, use o **Gerador de links rastreáveis**: informe nome, categoria, origem, meio, campanha, página de destino e observações, e clique em **Criar link rastreável**. Cada link ganha um código exclusivo (ex.: `l=a1b2c3`) e passa a contar as visitas e os cliques dele.",
+        "No **Histórico de links criados** você copia o link, gera o **QR Code** (baixe em PNG ou SVG), edita o nome e as observações, **desativa** ou reativa o link, filtra por período e **exporta em CSV** (abre no Excel). Link desativado continua abrindo o site, mas deixa de contar."
       ],
       "exemplos": [
         "Linktree, item do Canal: https://parqueretiro.org.br/ir.html?d=canal&o=linktree",

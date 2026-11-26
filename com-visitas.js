@@ -54,6 +54,8 @@ function montaLinkIr(destino, origem) {
 function abrir(el, H) {
   const esc = (H && H.esc) || (s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])));
   const nf = n => (+n || 0).toLocaleString('pt-BR');
+  el.innerHTML = '<div class="vis-a"></div><div class="vis-b" id="site-links"></div>';
+  const raiz = el.querySelector('.vis-a');
   let dias = 30, dados = null, erro = '', carregando = true, cliques = null, erroCliques = '';
 
   const dataBR = s => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || '')); return m ? `${m[3]}/${m[2]}/${m[1]}` : ''; };
@@ -138,10 +140,10 @@ function abrir(el, H) {
         + `<h4 class="subsection-title" style="margin-top:22px">Páginas mais vistas</h4>` + (pags.length ? barras(pags, 'paginas_vistas', x => rotuloPagina(x.pagina)) : '<p class="vazio">Sem visitas neste período.</p>');
     }
     corpo = (corpo || '') + secaoCliques();
-    el.innerHTML = `<section aria-labelledby="vis-t" style="margin-bottom:34px">
+    raiz.innerHTML = `<section aria-labelledby="vis-t" style="margin-bottom:34px">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><h3 id="vis-t" style="margin:0"><i class="fas fa-chart-line"></i> Visitas do site</h3><button type="button" class="btn-visit" id="vv-a"><i class="fas fa-sync-alt"></i> Atualizar</button></div>
       ${corpo}${gerador()}</section>`;
-    const $ = s => el.querySelector(s);
+    const $ = s => raiz.querySelector(s);
     $('#vv-a').onclick = buscar;
     const sd = $('#vv-d'); if (sd) sd.onchange = () => { dias = +sd.value || 30; buscar(); };
     const so = $('#vg-o'), sn = $('#vg-nome'), sp = $('#vg-p'), sl = $('#vg-l'), box = $('#vg-nome-box'), sd2 = $('#vg-d2'), pbox = $('#vg-p-box');
@@ -163,7 +165,141 @@ function abrir(el, H) {
     };
   }
   buscar();
+  abrirLinks(el.querySelector('.vis-b'), { esc, nf, dataBR });
 }
 
-window.PR_COM_VISITAS = { abrir, montaLink, montaLinkIr, limpa, rotuloOrigem, rotuloDestino };
+
+// ---------- Links rastreáveis com código (migração 0023, qr.js) ----------
+const CATEGORIAS = [
+  ['instagram', 'Instagram', 'instagram', 'social'], ['facebook', 'Facebook', 'facebook', 'social'], ['youtube', 'YouTube', 'youtube', 'social'],
+  ['whatsapp', 'WhatsApp', 'whatsapp', 'social'], ['linktree', 'Linktree', 'linktree', 'social'], ['email', 'E-mail', 'email', 'email'],
+  ['wifi', 'Wi-Fi', 'wifi', 'wifi'], ['eventos', 'Eventos', 'eventos', 'divulgacao'], ['comunicados', 'Comunicados', 'comunicados', 'divulgacao'],
+  ['campanhas-institucionais', 'Campanhas institucionais', 'institucional', 'campanha'], ['outros', 'Outros', '', '']
+];
+const rotuloCategoria = c => (CATEGORIAS.find(x => x[0] === c) || [0, c])[1];
+const limpaN = (v, n) => limpa(v).slice(0, n);
+// Endereço completo de um link registrado: página (ou passagem ir.html) + UTMs + código ?l=
+function linkRastreavel(l) {
+  const d = String(l.destino || '');
+  let url = BASE + (/^ir:/.test(d) ? 'ir.html?d=' + d.slice(3) : d.replace(/^\/+/, ''));
+  const ps = [['utm_source', l.utm_source], ['utm_medium', l.utm_medium], ['utm_campaign', l.utm_campaign], ['utm_content', l.utm_content], ['utm_term', l.utm_term], ['l', l.codigo]]
+    .filter(x => x[1]).map(x => x[0] + '=' + encodeURIComponent(x[1]));
+  return url + (url.indexOf('?') >= 0 ? '&' : '?') + ps.join('&');
+}
+const csvCelula = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+function csvLinks(lista) {
+  const cab = ['Nome', 'Categoria', 'Código', 'Origem (utm_source)', 'Meio (utm_medium)', 'Campanha (utm_campaign)', 'Conteúdo (utm_content)', 'Termo (utm_term)', 'Destino', 'Link', 'Status', 'Criado em', 'Visitas no período', 'Páginas vistas no período', 'Cliques no período', 'Observações'];
+  const linhas = lista.map(l => [l.nome, rotuloCategoria(l.categoria), l.codigo, l.utm_source, l.utm_medium, l.utm_campaign, l.utm_content, l.utm_term, l.destino, linkRastreavel(l), l.ativo ? 'Ativo' : 'Desativado', String(l.criado_em || '').slice(0, 10), l.visitas, l.paginas_vistas, l.cliques, l.observacoes]);
+  return '﻿' + [cab].concat(linhas).map(r => r.map(csvCelula).join(';')).join('\r\n');
+}
+function baixar(nome, conteudo, tipo) {
+  const url = /^data:/.test(conteudo) ? conteudo : URL.createObjectURL(new Blob([conteudo], { type: tipo }));
+  const a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove();
+  if (!/^data:/.test(conteudo)) setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+function abrirLinks(box, H) {
+  const { esc, nf } = H;
+  let lista = null, erro = '', dias = 30, editando = '', qr = '', msg = '';
+  const dataBR = s => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || '')); return m ? `${m[3]}/${m[2]}/${m[1]}` : ''; };
+  async function rpc(nome, corpo) {
+    if (!window.PR_SUPABASE || !window.PR_SUPABASE.rpc) throw new Error('local');
+    return window.PR_SUPABASE.rpc(nome, corpo);
+  }
+  const semFuncao = r => r && (r.status === 404 || (r.corpo && /does not exist|Could not find the function|PGRST202/i.test(String(r.corpo.message || r.corpo.code || ''))));
+  const falha = r => semFuncao(r) ? 'Os links rastreáveis ainda não foram instalados no servidor (falta aplicar a migração 0023 no Supabase).'
+    : r && (r.status === 401 || r.status === 403) ? 'Entre de novo na área restrita.'
+    : (r && r.corpo && r.corpo.message && r.status >= 400 && r.status < 500 ? r.corpo.message : 'Não foi possível concluir agora. Tente de novo em instantes.');
+  async function carregar() {
+    erro = '';
+    try {
+      const r = await rpc('pr_listar_links', { p_dias: dias });
+      if (r && r.status === 200 && r.corpo && Array.isArray(r.corpo.links)) lista = r.corpo.links; else { lista = lista || []; erro = falha(r); }
+    } catch (e) { lista = lista || []; erro = e && e.message === 'local' ? 'Os links rastreáveis só funcionam com a área restrita ligada ao servidor do Parque.' : 'Não foi possível carregar os links agora.'; }
+    draw();
+  }
+  function formulario() {
+    return `<form id="vl-f" autocomplete="off"><div class="form-row"><label for="vl-nome">Nome da campanha</label><input id="vl-nome" type="text" maxlength="120" required></div>
+      <div class="form-row"><label for="vl-cat">Categoria do link</label><select id="vl-cat">${CATEGORIAS.map(c => `<option value="${c[0]}">${esc(c[1])}</option>`).join('')}</select></div>
+      <div class="form-row"><label for="vl-dest">Página de destino</label><select id="vl-dest"><optgroup label="Páginas do site">${PAGINAS_GERADOR.map(p => `<option value="${esc(p[0])}">${esc(p[1])}</option>`).join('')}</optgroup><optgroup label="Passa pelo site e vai para uma rede">${Object.keys(DESTINOS_ROTULO).filter(k => k !== 'outros').map(k => `<option value="ir:${k}">${esc(DESTINOS_ROTULO[k])}</option>`).join('')}</optgroup></select></div>
+      <div class="form-row"><label for="vl-src">Origem (utm_source)</label><input id="vl-src" type="text" maxlength="40" required placeholder="ex.: instagram"></div>
+      <div class="form-row"><label for="vl-med">Meio de divulgação (utm_medium)</label><input id="vl-med" type="text" maxlength="40" placeholder="ex.: social, email"></div>
+      <div class="form-row"><label for="vl-camp">Nome da campanha (utm_campaign)</label><input id="vl-camp" type="text" maxlength="60" placeholder="ex.: entre-principios-e-vivencias"></div>
+      <div class="form-row"><label for="vl-cont">Conteúdo específico (utm_content)</label><input id="vl-cont" type="text" maxlength="60" placeholder="ex.: botao-topo"></div>
+      <div class="form-row"><label for="vl-term">Termo ou identificação adicional (utm_term)</label><input id="vl-term" type="text" maxlength="60"></div>
+      <div class="form-row"><label for="vl-obs">Observações internas</label><textarea id="vl-obs" maxlength="500" rows="2"></textarea></div>
+      <p><button type="submit" class="btn-visit" id="vl-criar"><i class="fas fa-plus"></i> Criar link rastreável</button> <span id="vl-m" class="vazio" role="status">${esc(msg)}</span></p></form>`;
+  }
+  function linha(l) {
+    const link = linkRastreavel(l), ed = editando === l.codigo;
+    return `<div class="card" style="padding:12px 14px;margin:10px 0;${l.ativo ? '' : 'opacity:.7'}" data-cod="${esc(l.codigo)}">
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><strong>${esc(l.nome)}</strong><span>${l.ativo ? 'Ativo' : 'Desativado'}</span></div>
+      <div style="font-size:.85rem;color:#666">${esc(rotuloCategoria(l.categoria))} · código <code>${esc(l.codigo)}</code> · criado em ${esc(dataBR(l.criado_em))}${l.observacoes ? ' · ' + esc(l.observacoes) : ''}</div>
+      <div style="font-size:.9rem;margin:6px 0"><strong>${nf(l.visitas)}</strong> visita(s) · <strong>${nf(l.paginas_vistas)}</strong> página(s) vista(s) · <strong>${nf(l.cliques)}</strong> clique(s) <span style="color:#888">(no período; total de visitas: ${nf(l.visitas_total)}, cliques: ${nf(l.cliques_total)})</span></div>
+      <input type="text" readonly value="${esc(link)}" style="width:100%;font-family:monospace;font-size:.8rem" aria-label="Link do ${esc(l.nome)}">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+        <button type="button" class="btn-visit" data-a="copiar"><i class="fas fa-copy"></i> Copiar</button>
+        <button type="button" class="btn-visit" data-a="qr"><i class="fas fa-qrcode"></i> QR Code</button>
+        <button type="button" class="btn-visit" data-a="editar"><i class="fas fa-pen"></i> Editar</button>
+        <button type="button" class="btn-visit" data-a="ativar">${l.ativo ? 'Desativar' : 'Ativar'}</button></div>
+      ${ed ? `<div style="margin-top:10px"><div class="form-row"><label for="ve-nome">Nome da campanha</label><input id="ve-nome" type="text" maxlength="120" value="${esc(l.nome)}"></div><div class="form-row"><label for="ve-obs">Observações internas</label><textarea id="ve-obs" maxlength="500" rows="2">${esc(l.observacoes || '')}</textarea></div><button type="button" class="btn-visit" data-a="salvar">Salvar</button> <button type="button" class="btn-visit" data-a="cancelar">Cancelar</button></div>` : ''}
+    </div>`;
+  }
+  function painelQr() {
+    const l = (lista || []).find(x => x.codigo === qr); if (!l) return '';
+    const link = linkRastreavel(l); let svg = '';
+    try { svg = window.PR_QR.svg(link, { escala: 6, rotulo: 'QR Code do link ' + l.nome }); } catch (e) { return `<p class="vazio" role="alert">${esc(e.message)}</p>`; }
+    return `<div class="card" id="vl-qr" style="padding:14px;margin:12px 0;text-align:center"><strong>QR Code: ${esc(l.nome)}</strong><div style="max-width:260px;margin:10px auto">${svg}</div><div style="font-size:.78rem;word-break:break-all;color:#666">${esc(link)}</div>
+      <p><button type="button" class="btn-visit" data-a="png"><i class="fas fa-download"></i> Baixar PNG</button> <button type="button" class="btn-visit" data-a="svg"><i class="fas fa-download"></i> Baixar SVG</button> <button type="button" class="btn-visit" data-a="fechar-qr">Fechar</button></p></div>`;
+  }
+  function draw() {
+    const corpo = lista == null ? '<p class="vazio">Carregando os links…</p>' : (lista.length ? lista.map(linha).join('') : '<p class="vazio">Nenhum link criado ainda. Use o formulário acima.</p>');
+    box.innerHTML = `<section aria-labelledby="vl-t" style="margin-bottom:34px"><h3 id="vl-t"><i class="fas fa-link"></i> Gerador de links rastreáveis</h3>
+      <p>Crie links com código exclusivo e UTM para cada divulgação (Instagram, e-mail, Wi-Fi, eventos...). Cada link conta as visitas e os cliques dele.</p>
+      ${formulario()}
+      <h4 class="subsection-title" style="margin-top:24px">Histórico de links criados</h4>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end"><div class="form-row" style="max-width:260px"><label for="vl-d">Período dos números</label><select id="vl-d">${[[7, 'Últimos 7 dias'], [30, 'Últimos 30 dias'], [90, 'Últimos 90 dias'], [365, 'Últimos 365 dias'], [3650, 'Todo o período']].map(d => `<option value="${d[0]}"${d[0] === dias ? ' selected' : ''}>${d[1]}</option>`).join('')}</select></div>
+      <button type="button" class="btn-visit" id="vl-csv"><i class="fas fa-file-csv"></i> Exportar CSV (abre no Excel)</button></div>
+      ${erro ? `<p class="vazio" role="alert">${esc(erro)}</p>` : ''}${painelQr()}${corpo}</section>`;
+    const $ = s => box.querySelector(s), cat = $('#vl-cat');
+    cat.onchange = () => { const c = CATEGORIAS.find(x => x[0] === cat.value); if (c) { $('#vl-src').value = c[2]; $('#vl-med').value = c[3]; } };
+    cat.onchange();
+    $('#vl-d').onchange = e => { dias = +e.target.value || 30; carregar(); };
+    $('#vl-csv').onclick = () => { baixar('links-rastreaveis.csv', csvLinks(lista || []), 'text/csv;charset=utf-8'); };
+    $('#vl-f').onsubmit = async ev => {
+      ev.preventDefault(); const m = $('#vl-m'), src = limpaN($('#vl-src').value, 40);
+      if (!$('#vl-nome').value.trim()) { m.textContent = 'Informe o nome da campanha.'; return; }
+      if (!src) { m.textContent = 'Informe a origem (utm_source).'; return; }
+      const corpo = { nome: $('#vl-nome').value.trim(), categoria: cat.value, utm_source: src, utm_medium: limpaN($('#vl-med').value, 40), utm_campaign: limpaN($('#vl-camp').value, 60),
+        utm_content: limpaN($('#vl-cont').value, 60), utm_term: limpaN($('#vl-term').value, 60), destino: $('#vl-dest').value, observacoes: $('#vl-obs').value.trim().slice(0, 500) };
+      m.textContent = 'Criando…';
+      try {
+        const r = await rpc('pr_criar_link', { p: corpo });
+        if (r && r.status === 200 && r.corpo && r.corpo.codigo) { msg = 'Link criado.'; qr = ''; await carregar(); } else m.textContent = falha(r);
+      } catch (e) { m.textContent = 'Não foi possível criar o link agora.'; }
+    };
+    box.querySelectorAll('[data-cod]').forEach(c => {
+      const l = lista.find(x => x.codigo === c.dataset.cod);
+      c.querySelectorAll('[data-a]').forEach(b => b.onclick = async () => {
+        const a = b.dataset.a;
+        if (a === 'copiar') { try { await navigator.clipboard.writeText(linkRastreavel(l)); msg = 'Link copiado.'; } catch (e) { c.querySelector('input').select(); msg = 'Selecione e copie o link (Ctrl+C).'; } b.textContent = 'Copiado'; }
+        else if (a === 'qr') { qr = l.codigo; draw(); const q = box.querySelector('#vl-qr'); if (q && q.scrollIntoView) q.scrollIntoView({ block: 'nearest' }); }
+        else if (a === 'editar') { editando = l.codigo; draw(); }
+        else if (a === 'cancelar') { editando = ''; draw(); }
+        else if (a === 'salvar' || a === 'ativar') {
+          const novo = a === 'ativar' ? !l.ativo : l.ativo, nome = a === 'salvar' ? c.querySelector('#ve-nome').value : l.nome, obs = a === 'salvar' ? c.querySelector('#ve-obs').value : l.observacoes;
+          try { const r = await rpc('pr_atualizar_link', { p_codigo: l.codigo, p_nome: nome, p_observacoes: obs, p_ativo: novo }); if (r && r.status === 200) { editando = ''; await carregar(); } else { erro = falha(r); draw(); } } catch (e) { erro = 'Não foi possível salvar agora.'; draw(); }
+        }
+      });
+    });
+    box.querySelectorAll('#vl-qr [data-a]').forEach(b => b.onclick = () => {
+      const l = lista.find(x => x.codigo === qr), link = linkRastreavel(l), nome = 'qr-' + l.codigo;
+      if (b.dataset.a === 'fechar-qr') { qr = ''; draw(); }
+      else if (b.dataset.a === 'svg') baixar(nome + '.svg', window.PR_QR.svg(link, { escala: 10 }), 'image/svg+xml');
+      else if (b.dataset.a === 'png') baixar(nome + '.png', window.PR_QR.pngUrl(link, 10), 'image/png');
+    });
+  }
+  draw(); carregar();
+}
+window.PR_COM_VISITAS = { linkRastreavel, csvLinks, abrir, montaLink, montaLinkIr, limpa, rotuloOrigem, rotuloDestino };
 })();

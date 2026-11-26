@@ -39,6 +39,11 @@ function destinoDe(busca) {
   var d = limpa(q.get('d') || q.get('destino') || '');
   return DESTINOS[d] ? d : '';
 }
+function codigoDoLink(busca) {
+  var q; try { q = new URLSearchParams(busca || ''); } catch (e) { return ''; }
+  var c = String(q.get('l') || '').toLowerCase();
+  return /^[a-z0-9]{4,12}$/.test(c) ? c : '';
+}
 function conta(destino, origem) {
   try {
     var host = location.hostname.toLowerCase();
@@ -46,10 +51,12 @@ function conta(destino, origem) {
     try { var s = JSON.parse(localStorage.getItem(CHAVE_LOGIN) || 'null'); if (s && s.access_token) return Promise.resolve(); } catch (e) { /* sem login */ }
     var conf = (window.PR_CONFIG_DADOS && window.PR_CONFIG_DADOS.supabase) || {};
     if (!conf.url || !conf.chavePublica) return Promise.resolve();
-    return fetch(String(conf.url).replace(/\/+$/, '') + '/rest/v1/rpc/pr_registrar_clique', {
-      method: 'POST', keepalive: true, body: JSON.stringify({ p_destino: destino, p_origem: origem }),
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json', apikey: conf.chavePublica }
-    }).catch(function () { /* sem internet: segue */ });
+    var base = String(conf.url).replace(/\/+$/, '') + '/rest/v1/rpc/', cab = { 'Content-Type': 'application/json', Accept: 'application/json', apikey: conf.chavePublica };
+    var cod = codigoDoLink(location.search); // link rastreável com código (?l=): conta também por link
+    var extra = cod ? fetch(base + 'pr_registrar_acesso_link', { method: 'POST', keepalive: true, body: JSON.stringify({ p_codigo: cod, p_tipo: 'clique' }), headers: cab }).catch(function () { }) : null;
+    return fetch(base + 'pr_registrar_clique', {
+      method: 'POST', keepalive: true, body: JSON.stringify({ p_destino: destino, p_origem: origem }), headers: cab
+    }).catch(function () { /* sem internet: segue */ }).then(function () { return extra; });
   } catch (e) { return Promise.resolve(); }
 }
 function botao(href, texto, cls) { var a = document.createElement('a'); a.className = 'bt' + (cls ? ' ' + cls : ''); a.href = href; a.textContent = texto; return a; }
@@ -76,6 +83,6 @@ function inicia() {
   if (window.PR_CONFIG_DADOS) vai();
   else { var s = document.createElement('script'); s.src = 'config-dados.js'; s.onload = vai; s.onerror = ir; document.head.appendChild(s); }
 }
-window.PR_IR = { DESTINOS: DESTINOS, limpa: limpa, origemDe: origemDe, destinoDe: destinoDe };
+window.PR_IR = { codigoDoLink: codigoDoLink, DESTINOS: DESTINOS, limpa: limpa, origemDe: origemDe, destinoDe: destinoDe };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', inicia); else inicia();
 })();

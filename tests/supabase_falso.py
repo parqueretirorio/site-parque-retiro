@@ -69,6 +69,7 @@ class SupabaseFalso:
         self.seq = itertools.count(1)
         self.log = []
         self.cliques_log = []
+        self.acessos_link_log = []
         self.visitas_log = []   # chamadas de pr_registrar_visita feitas pelo site aberto
         self.enviados = []      # e-mails "enviados" (confirmação, recuperação)
         self.arquivos = {}      # Storage: 'bucket/caminho' -> {bytes, tipo}
@@ -166,7 +167,7 @@ class SupabaseFalso:
         if caminho == '/auth/v1/logout':
             self.tokens.pop(tok, None)
             return 204, None
-        if caminho in ('/rest/v1/rpc/pr_ler_publico', '/rest/v1/rpc/pr_enviar_publico', '/rest/v1/rpc/pr_rifa_inscrever', '/rest/v1/rpc/pr_consultar_publico', '/rest/v1/rpc/pr_registrar_visita', '/rest/v1/rpc/pr_registrar_clique') and not uid:
+        if caminho in ('/rest/v1/rpc/pr_ler_publico', '/rest/v1/rpc/pr_enviar_publico', '/rest/v1/rpc/pr_rifa_inscrever', '/rest/v1/rpc/pr_consultar_publico', '/rest/v1/rpc/pr_registrar_visita', '/rest/v1/rpc/pr_registrar_clique', '/rest/v1/rpc/pr_registrar_acesso_link') and not uid:
             try:  # site aberto, sem login: papel anon (só a chave pública)
                 if caminho.endswith('pr_rifa_inscrever'):
                     r = psql(f"select pr_rifa_inscrever({lit(corpo['p_dados'])}::jsonb)", self.db, 'anon')
@@ -175,6 +176,9 @@ class SupabaseFalso:
                 elif caminho.endswith('pr_ler_publico'):
                     nomes = '{' + ','.join('"' + n.replace('"', '') + '"' for n in (corpo or {}).get('p_nomes', [])) + '}'
                     r = psql(f"select pr_ler_publico({lit(nomes)}::text[])", self.db, 'anon')
+                elif caminho.endswith('pr_registrar_acesso_link'):
+                    self.acessos_link_log.append(dict(corpo or {}))
+                    r = psql(f"select pr_registrar_acesso_link({lit((corpo or {}).get('p_codigo'))}, {lit((corpo or {}).get('p_tipo', 'visita'))})", self.db, 'anon')
                 elif caminho.endswith('pr_registrar_clique'):
                     self.cliques_log.append(dict(corpo or {}))
                     r = psql(f"select pr_registrar_clique({lit((corpo or {}).get('p_destino'))}, {lit((corpo or {}).get('p_origem'))})", self.db, 'anon')
@@ -227,6 +231,13 @@ class SupabaseFalso:
             elif fn == 'pr_ler_publico':
                 nomes = '{' + ','.join('"' + n.replace('"', '') + '"' for n in (corpo or {}).get('p_nomes', [])) + '}'
                 r = psql(f"select pr_ler_publico({lit(nomes)}::text[])", self.db, 'authenticated', uid)
+            elif fn == 'pr_listar_links':
+                r = psql(f"select pr_listar_links({int((corpo or {}).get('p_dias', 30))})", self.db, 'authenticated', uid)
+            elif fn == 'pr_criar_link':
+                r = psql(f"select pr_criar_link({lit(json.dumps(corpo['p']))}::jsonb)", self.db, 'authenticated', uid)
+            elif fn == 'pr_atualizar_link':
+                ativo = 'null' if corpo.get('p_ativo') is None else ('true' if corpo['p_ativo'] else 'false')
+                r = psql(f"select pr_atualizar_link({lit(corpo.get('p_codigo'))}, {lit(corpo.get('p_nome'))}, {lit(corpo.get('p_observacoes'))}, {ativo})", self.db, 'authenticated', uid)
             elif fn == 'pr_resumo_cliques':
                 r = psql(f"select pr_resumo_cliques({int((corpo or {}).get('p_dias', 30))})", self.db, 'authenticated', uid)
             elif fn == 'pr_resumo_visitas':

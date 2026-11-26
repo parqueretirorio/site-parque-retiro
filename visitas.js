@@ -65,6 +65,13 @@ function decide(ctx) {
   return { origem: origemPorReferrer(ctx.referrer || '', ctx.host) || 'direto', nova: true };
 }
 
+// Código do link rastreável (?l=a1b2c3), criado no Gerador de links da área restrita. Só letras minúsculas e números.
+function codigoDoLink(busca) {
+  var q; try { q = new URLSearchParams(busca || ''); } catch (e) { return ''; }
+  var c = String(q.get('l') || '').toLowerCase();
+  return /^[a-z0-9]{4,12}$/.test(c) ? c : '';
+}
+
 function conta() {
   try {
     var host = location.hostname.toLowerCase();
@@ -77,16 +84,21 @@ function conta() {
     if (!conf.url || !conf.chavePublica) return;
     var sessao = null; try { sessao = JSON.parse(sessionStorage.getItem(CHAVE_SESSAO) || 'null'); } catch (e) { /* sessionStorage bloqueado */ }
     var d = decide({ busca: location.search, referrer: document.referrer, host: host, sessao: sessao });
-    try { sessionStorage.setItem(CHAVE_SESSAO, JSON.stringify({ o: d.origem })); } catch (e) { /* segue sem lembrar */ }
+    var cod = codigoDoLink(location.search), tipoLink = cod ? ((sessao && sessao.l === cod) ? 'pagina' : 'visita') : '';
+    try { sessionStorage.setItem(CHAVE_SESSAO, JSON.stringify({ o: d.origem, l: cod || (sessao && sessao.l) || '' })); } catch (e) { /* segue sem lembrar */ }
     var corpo = JSON.stringify({ p_pagina: pagina, p_origem: d.origem, p_nova_visita: d.nova });
     fetch(String(conf.url).replace(/\/+$/, '') + '/rest/v1/rpc/pr_registrar_visita', {
       method: 'POST', keepalive: true, body: corpo,
       headers: { 'Content-Type': 'application/json', Accept: 'application/json', apikey: conf.chavePublica }
     }).catch(function () { /* sem internet: não faz mal perder uma contagem */ });
+    if (cod) fetch(String(conf.url).replace(/\/+$/, '') + '/rest/v1/rpc/pr_registrar_acesso_link', { // link rastreável com código (?l=)
+      method: 'POST', keepalive: true, body: JSON.stringify({ p_codigo: cod, p_tipo: tipoLink }),
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json', apikey: conf.chavePublica }
+    }).catch(function () { /* idem */ });
   } catch (e) { /* nunca atrapalha a página */ }
 }
 
-window.PR_VISITAS = { limpa: limpa, origemPorReferrer: origemPorReferrer, paginaAtual: paginaAtual, decide: decide, conta: conta };
+window.PR_VISITAS = { codigoDoLink: codigoDoLink, limpa: limpa, origemPorReferrer: origemPorReferrer, paginaAtual: paginaAtual, decide: decide, conta: conta };
 
 // Algumas páginas abertas não carregam config-dados.js: busca só quando falta, depois conta.
 function inicia() {
