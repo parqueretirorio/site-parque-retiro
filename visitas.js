@@ -72,6 +72,19 @@ function codigoDoLink(busca) {
   return /^[a-z0-9]{4,12}$/.test(c) ? c : '';
 }
 
+// Categorias bem gerais do aparelho (celular/computador/tablet, sistema e navegador), lidas do próprio navegador. Nada além disso:
+// sem modelo, sem resolução, sem identificador do aparelho. Função pura (usada nos testes).
+function dispositivo(ua, toque) {
+  ua = String(ua || ''); var u = ua.toLowerCase(), so = 'outro', tipo = 'desktop', nav = 'outro';
+  if (/android/.test(u)) so = 'android'; else if (/iphone|ipad|ipod/.test(u)) so = 'ios'; else if (/windows/.test(u)) so = 'windows';
+  else if (/macintosh|mac os x/.test(u)) so = toque ? 'ios' : 'macos'; else if (/linux|x11|cros/.test(u)) so = 'linux';
+  if (/ipad|tablet/.test(u) || (so === 'ios' && /macintosh/.test(u)) || (/android/.test(u) && !/mobile/.test(u))) tipo = 'tablet';
+  else if (/mobi|iphone|ipod|android/.test(u)) tipo = 'mobile';
+  if (/edg(e|a|ios)?\//.test(u)) nav = 'edge'; else if (/opr\/|opera/.test(u)) nav = 'opera'; else if (/samsungbrowser/.test(u)) nav = 'samsung';
+  else if (/chrome|crios|chromium/.test(u)) nav = 'chrome'; else if (/firefox|fxios/.test(u)) nav = 'firefox'; else if (/safari/.test(u)) nav = 'safari';
+  return { tipo: tipo, so: so, navegador: nav };
+}
+
 function conta() {
   try {
     var host = location.hostname.toLowerCase();
@@ -84,6 +97,9 @@ function conta() {
     if (!conf.url || !conf.chavePublica) return;
     var sessao = null; try { sessao = JSON.parse(sessionStorage.getItem(CHAVE_SESSAO) || 'null'); } catch (e) { /* sessionStorage bloqueado */ }
     var d = decide({ busca: location.search, referrer: document.referrer, host: host, sessao: sessao });
+    if (d.nova) { var dv = dispositivo(navigator.userAgent, (navigator.maxTouchPoints || 0) > 1); // uma vez por visita
+      fetch(String(conf.url).replace(/\/+$/, '') + '/rest/v1/rpc/pr_registrar_dispositivo', { method: 'POST', keepalive: true, body: JSON.stringify({ p_tipo: dv.tipo, p_so: dv.so, p_navegador: dv.navegador }),
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json', apikey: conf.chavePublica } }).catch(function () { /* sem internet */ }); }
     var cod = codigoDoLink(location.search), tipoLink = cod ? ((sessao && sessao.l === cod) ? 'pagina' : 'visita') : '';
     try { sessionStorage.setItem(CHAVE_SESSAO, JSON.stringify({ o: d.origem, l: cod || (sessao && sessao.l) || '' })); } catch (e) { /* segue sem lembrar */ }
     var corpo = JSON.stringify({ p_pagina: pagina, p_origem: d.origem, p_nova_visita: d.nova });
@@ -98,7 +114,7 @@ function conta() {
   } catch (e) { /* nunca atrapalha a página */ }
 }
 
-window.PR_VISITAS = { codigoDoLink: codigoDoLink, limpa: limpa, origemPorReferrer: origemPorReferrer, paginaAtual: paginaAtual, decide: decide, conta: conta };
+window.PR_VISITAS = { dispositivo: dispositivo, codigoDoLink: codigoDoLink, limpa: limpa, origemPorReferrer: origemPorReferrer, paginaAtual: paginaAtual, decide: decide, conta: conta };
 
 // Algumas páginas abertas não carregam config-dados.js: busca só quando falta, depois conta.
 function inicia() {

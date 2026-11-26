@@ -43,7 +43,7 @@ function rotuloOrigem(o) {
   if (/^grupo-/.test(o)) return 'Grupo ' + o.slice(6).replace(/-/g, ' ') + ' (WhatsApp)';
   return o;
 }
-const rotuloPagina = p => PAGINAS_ROTULO[p] || p;
+const rotuloPagina = p => PAGINAS_ROTULO[p] || (PAGINAS_GERADOR.find(x => x[0] === p + '.html') || [0, p])[1];
 const rotuloDestino = d => DESTINOS_ROTULO[d] || d;
 // Link que PASSA pelo site e segue para uma rede do Parque (página ir.html, que conta o clique)
 function montaLinkIr(destino, origem) {
@@ -54,7 +54,7 @@ function montaLinkIr(destino, origem) {
 function abrir(el, H) {
   const esc = (H && H.esc) || (s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])));
   const nf = n => (+n || 0).toLocaleString('pt-BR');
-  el.innerHTML = '<div class="vis-a"></div><div class="vis-b" id="site-links"></div>';
+  el.innerHTML = '<div class="vis-a"></div><div class="vis-p" id="site-painel"></div><div class="vis-b" id="site-links"></div>';
   const raiz = el.querySelector('.vis-a');
   let dias = 30, dados = null, erro = '', carregando = true, cliques = null, erroCliques = '';
 
@@ -165,6 +165,7 @@ function abrir(el, H) {
     };
   }
   buscar();
+  if (window.PR_COM_PAINEL) window.PR_COM_PAINEL.abrir(el.querySelector('.vis-p'), { esc, nf, dataBR });
   abrirLinks(el.querySelector('.vis-b'), { esc, nf, dataBR });
 }
 
@@ -248,7 +249,7 @@ function abrirLinks(box, H) {
   function painelQr() {
     const l = (lista || []).find(x => x.codigo === qr); if (!l) return '';
     const link = linkRastreavel(l); let svg = '';
-    try { svg = window.PR_QR.svg(link, { escala: 6, rotulo: 'QR Code do link ' + l.nome }); } catch (e) { return `<p class="vazio" role="alert">${esc(e.message)}</p>`; }
+    try { svg = window.PR_QR.svg(link, { escala: 6, rotulo: 'QR Code do link ' + l.nome }).replace('<svg ', '<svg style="display:block;width:100%;height:auto;max-width:100%" '); } catch (e) { return `<p class="vazio" role="alert">${esc(e.message)}</p>`; }
     return `<div class="card" id="vl-qr" style="padding:14px;margin:12px 0;text-align:center"><strong>QR Code: ${esc(l.nome)}</strong><div style="max-width:260px;margin:10px auto">${svg}</div><div style="font-size:.78rem;word-break:break-all;color:#666">${esc(link)}</div>
       <p><button type="button" class="btn-visit" data-a="png"><i class="fas fa-download"></i> Baixar PNG</button> <button type="button" class="btn-visit" data-a="svg"><i class="fas fa-download"></i> Baixar SVG</button> <button type="button" class="btn-visit" data-a="fechar-qr">Fechar</button></p></div>`;
   }
@@ -301,5 +302,5 @@ function abrirLinks(box, H) {
   }
   draw(); carregar();
 }
-window.PR_COM_VISITAS = { linkRastreavel, csvLinks, abrir, montaLink, montaLinkIr, limpa, rotuloOrigem, rotuloDestino };
+window.PR_COM_VISITAS = { linkRastreavel, csvLinks, abrir, montaLink, montaLinkIr, limpa, rotuloOrigem, rotuloDestino, rotuloPagina };
 })();

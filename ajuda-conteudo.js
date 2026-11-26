@@ -2292,6 +2292,7 @@ window.PR_AJUDA_CONTEUDO = {
         "Para divulgar com origem, use **Gerar link com origem**: escolha onde vai postar (Canal, Comunidade, grupo...), a página que o link abre e clique em **Copiar link**.",
         "Cole o link gerado na postagem. Ele termina em `?o=nome`; não coloque ponto nem espaço depois dele.",
         "Para medir quem clica e vai para uma rede do Parque (Canal, Comunidade, YouTube, Instagram, Facebook, grupo CONecta), escolha em **Para onde o link leva** uma opção \"Passa pelo site e vai para...\". O link abre uma página rápida do site, conta o clique e leva a pessoa ao destino. Veja os números em **Cliques para as redes do Parque**.",
+        "O **Painel de visitantes** mostra, para o período que você escolher (hoje, ontem, 7, 30 ou 90 dias, este mês, mês anterior ou datas livres), as visitas, páginas vistas, origem em %, redes sociais (Linktree × link direto), páginas mais acessadas e dispositivos. Marque **Comparar com o período anterior** para ver a variação, e use **Relatórios** para exportar em CSV ou imprimir/salvar em PDF.",
         "Para campanhas com histórico, use o **Gerador de links rastreáveis**: informe nome, categoria, origem, meio, campanha, página de destino e observações, e clique em **Criar link rastreável**. Cada link ganha um código exclusivo (ex.: `l=a1b2c3`) e passa a contar as visitas e os cliques dele.",
         "No **Histórico de links criados** você copia o link, gera o **QR Code** (baixe em PNG ou SVG), edita o nome e as observações, **desativa** ou reativa o link, filtra por período e **exporta em CSV** (abre no Excel). Link desativado continua abrindo o site, mas deixa de contar."
       ],
@@ -2304,6 +2305,7 @@ window.PR_AJUDA_CONTEUDO = {
         "O WhatsApp esconde de onde a pessoa veio: sem o link marcado, a visita aparece como \"Acesso direto\".",
         "Instagram, YouTube, Facebook e Google costumam ser reconhecidos sozinhos, mas o link marcado é mais certo.",
         "A contagem começa na data indicada na tela; não há histórico anterior.",
+        "Dispositivos e navegadores são contados em categorias gerais (celular, computador, tablet; Android, iOS...). Visitantes únicos, tempo de permanência e localização ainda não existem: dependem de etapas futuras.",
         "Visita não é pessoa: quem volta em outro dia ou em outra aba conta de novo."
       ]
     },
@@ -4780,6 +4782,38 @@ window.PR_AJUDA_CONTEUDO = {
   "r.comunicacao.vv-a": [
    "Atualizar",
    "Busca de novo as visitas do site no servidor."
+  ],
+  "r.comunicacao.vp-at": [
+   "Atualizar",
+   "Busca de novo os números do painel de visitantes para o período escolhido."
+  ],
+  "r.comunicacao.aba.geral": [
+   "Visão geral",
+   "Visitas, páginas vistas e acessos por dia no período."
+  ],
+  "r.comunicacao.aba.origem": [
+   "Origem dos acessos",
+   "De onde vieram as visitas, com quantidade e percentual. Clique em uma origem para ver os detalhes."
+  ],
+  "r.comunicacao.aba.redes": [
+   "Redes sociais",
+   "Compara cada rede: visitas por link direto e cliques vindos do Linktree."
+  ],
+  "r.comunicacao.aba.linktree": [
+   "Linktree",
+   "Quantos visitaram o site pelo Linktree e quantos cliques cada botão recebeu."
+  ],
+  "r.comunicacao.aba.paginas": [
+   "Páginas mais acessadas",
+   "Ranking das páginas do site, com o percentual de cada uma."
+  ],
+  "r.comunicacao.aba.dispositivos": [
+   "Dispositivos",
+   "Tipo de aparelho, sistema e navegador usados nas visitas, em categorias gerais."
+  ],
+  "r.comunicacao.aba.relatorio": [
+   "Relatórios",
+   "Respostas prontas às perguntas do período, exportação em CSV e impressão em PDF."
   ],
   "r.comunicacao.s.cal": [
    "Calendário de Comunicação",
