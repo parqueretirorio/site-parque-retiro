@@ -2227,9 +2227,10 @@
     "oQueE": "",
     "finalidade": "",
     "passos": [
-     "Clique em **Configurar** na página desejada. Veja a medida exata (ex.: 1600 × 533 px).",
+     "Clique em **Configurar** na página desejada. Veja a medida exata (1920 × 640 px, proporção 3:1).",
      "Escolha **Fixo** (1 imagem) ou **Carrossel** (até 8 imagens, troca de 2 a 30 s).",
      "Envie as imagens (JPG, PNG ou WebP, até 15 MB) com a proporção certa; preencha a descrição (acessibilidade) e o link opcional.",
+     "Opcional: em cada imagem, envie também a **imagem para celular** (1200 × 900 px, proporção 4:3). Ela aparece em telas de até 700 px; sem ela, o celular usa a imagem do computador.",
      "Salve e confira a pré-visualização (aparece só para você, com a etiqueta \"Pré-visualização\").",
      "Clique em **Baixar pacote para publicar (.zip)**, descompacte e copie a pasta **banners** para a pasta do site na hospedagem."
     ],

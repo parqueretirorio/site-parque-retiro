@@ -26,7 +26,7 @@ async def main():
         await pg.click('[data-slug="doacao"] [data-a="abrir"]'); await pg.check('[data-slug="doacao"] input[value="carrossel"]')
         await pg.set_input_files('#up-doacao',[B+'ok1.jpg',B+'ok2.png',B+'ok3.jpg'])
         await pg.wait_for_function("document.querySelectorAll('[data-slug=\"doacao\"] .bn-slide').length==3")
-        dims=await pg.evaluate("(async()=>{const l=PR_DADOS.db.get('site_banners',[]).find(x=>x.id==='doacao');return Promise.all(l.slides.map(s=>new Promise(r=>{const i=new Image();i.onload=()=>r(i.width+'x'+i.height);i.src=s.img})))})()"); print("DIMENSOES gravadas:",dims); assert dims==['1600x533']*3
+        dims=await pg.evaluate("(async()=>{const l=PR_DADOS.db.get('site_banners',[]).find(x=>x.id==='doacao');return Promise.all(l.slides.map(s=>new Promise(r=>{const i=new Image();i.onload=()=>r(i.width+'x'+i.height);i.src=s.img})))})()"); print("DIMENSOES gravadas:",dims); assert dims==['1920x640']*3
         await pg.fill('[data-slug="doacao"] [data-i="0"] [data-f="alt"]','Banner 1'); await pg.fill('[data-slug="doacao"] [data-i="0"] [data-f="link"]','reservas.html')
         await pg.click('[data-slug="doacao"] [data-a="salvar"]')
         await pg.click('[data-slug="doacao"] [data-a="down"] >> nth=0')  # reordena

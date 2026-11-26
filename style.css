@@ -618,7 +618,7 @@ footer p { font-size: 0.85rem; opacity: 0.85; margin: 0; }
 
 /* Banner da página inicial */
 .hero-banner { background: var(--primary-color); line-height: 0; }
-.hero-banner img { display: block; width: 100%; height: auto; max-width: 1600px; margin: 0 auto; }
+.hero-banner img { display: block; width: 100%; height: auto; max-width: 1920px; margin: 0 auto; }
 .sr-only {
     position: absolute;
     width: 1px;

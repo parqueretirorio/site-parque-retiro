@@ -32,7 +32,7 @@ async function preparaImagem(file, slot) {
   if (!/^image\/(jpeg|png|webp)$/i.test(file.type)) throw new Error(`"${file.name}": use JPG, PNG ou WebP.`);
   if (file.size > 15 * 1048576) throw new Error(`"${file.name}": arquivo grande demais (máx. 15 MB).`);
   const im = await carregaImg(file), r = im.width / im.height, alvo = slot.w / slot.h;
-  if (Math.abs(r - alvo) / alvo > TOL) throw new Error(`"${file.name}" tem ${im.width} × ${im.height} px (proporção ${r.toFixed(2)}:1). Este espaço exige ${slot.w} × ${slot.h} px (proporção ${alvo.toFixed(2)}:1). Ajuste a imagem e envie de novo.`);
+  if (Math.abs(r - alvo) / alvo > TOL) throw new Error(`"${file.name}" tem ${im.width} × ${im.height} px (proporção ${r.toFixed(2)}:1). Esta imagem exige ${slot.w} × ${slot.h} px (proporção ${alvo.toFixed(2)}:1). Ajuste a imagem e envie de novo.`);
   const c = document.createElement('canvas'); c.width = slot.w; c.height = slot.h;
   const g = c.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(im, 0, 0, slot.w, slot.h);
   return { img: c.toDataURL('image/jpeg', IMG_Q), aviso: im.width < slot.w ? `"${file.name}" tem só ${im.width} px de largura (o ideal é ${slot.w}); pode ficar com pouca nitidez.` : '' };
@@ -47,7 +47,7 @@ window.PR_BANNERS_ADMIN = { zip, crc32, abrir(el, H) {
   let aberto = '', msg = '', erro = '', aviso = '';
   try { aberto = sessionStorage.getItem('pr_com_banner') || ''; sessionStorage.removeItem('pr_com_banner'); } catch (e) { /* sem atalho vindo do Painel */ }
   const kb = n => n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.round(n / 1024) + ' KB';
-  const tamSlot = c => (c.slides || []).reduce((s, x) => s + (x.img ? x.img.length : 0), 0);
+  const tamSlot = c => (c.slides || []).reduce((s, x) => s + (x.img ? x.img.length : 0) + (x.imgM ? x.imgM.length : 0), 0);
   const grupos = () => { const g = []; B.SLOTS.forEach(s => { let x = g.find(y => y[0] === s.grupo); if (!x) g.push(x = [s.grupo, []]); x[1].push(s); }); return g; };
 
   const cartao = s => {
@@ -61,6 +61,9 @@ window.PR_BANNERS_ADMIN = { zip, crc32, abrir(el, H) {
         <div>
           <div class="form-row"><label>Descrição da imagem (para leitores de tela) ${x.alt ? '' : '<span class="form-erro">— falta preencher</span>'}</label><input data-f="alt" maxlength="300" value="${esc(x.alt || '')}"></div>
           <div class="form-row"><label>Link ao clicar (opcional: https://… ou página do site, ex.: reservas.html)</label><input data-f="link" maxlength="300" value="${esc(x.link || '')}"></div>
+          <div class="form-row bn-cel"><label for="m-${s.slug}-${i}"><i class="fas fa-mobile-alt"></i> Imagem para celular (opcional) — exatamente ${B.MOBILE.w} × ${B.MOBILE.h} px (4:3), usada em telas de até ${B.MOBILE.ate} px. Sem ela, o celular usa a imagem do computador.</label>
+            ${x.imgM ? `<div><img src="${esc(x.imgM)}" alt="Miniatura da imagem para celular do banner ${i + 1}" style="width:140px;height:auto;aspect-ratio:4 / 3;object-fit:contain;border:1px solid #ccd"> <button type="button" class="btn-visit" data-a="delm"><i class="fas fa-trash"></i> Remover imagem do celular</button></div>` : ''}
+            <input id="m-${s.slug}-${i}" type="file" data-a="upm" accept="image/jpeg,image/png,image/webp"></div>
           <label><input type="checkbox" data-f="ativo" ${x.ativo !== false ? 'checked' : ''}> Exibir</label>
           <span class="bn-acoes"><button type="button" class="btn-visit" data-a="up" ${i === 0 ? 'disabled' : ''} aria-label="Mover para cima">↑</button> <button type="button" class="btn-visit" data-a="down" ${i === c.slides.length - 1 ? 'disabled' : ''} aria-label="Mover para baixo">↓</button> <button type="button" class="btn-visit" data-a="del"><i class="fas fa-trash"></i> Remover</button></span>
         </div></div>`).join('') || '<p class="vazio">Nenhuma imagem ainda.</p>'}</div>
@@ -91,6 +94,7 @@ window.PR_BANNERS_ADMIN = { zip, crc32, abrir(el, H) {
       card.querySelectorAll('[data-a]').forEach(b => b.onclick = ev => {
         const a = b.dataset.a, c = cfgDe(slug); msg = ''; aviso = '';
         if (a === 'abrir') { aberto = aberto === slug ? '' : slug; return draw(); }
+        if (a === 'delm' && b.closest('.bn-slide')) { lerCampos(c); delete c.slides[+b.closest('.bn-slide').dataset.i].imgM; grava(c); return draw(); }
         if (b.closest('.bn-slide') && ['up', 'down', 'del'].includes(a)) {
           lerCampos(c); const i = +b.closest('.bn-slide').dataset.i;
           if (a === 'del') { if (!confirm('Remover esta imagem do banner?')) return; c.slides.splice(i, 1); }
@@ -99,9 +103,14 @@ window.PR_BANNERS_ADMIN = { zip, crc32, abrir(el, H) {
         }
         if (a === 'salvar') { lerCampos(c); if (grava(c)) msg = 'Salvo.'; return draw(); }
         if (a === 'limpar') { if (!confirm('Remover todas as imagens deste espaço e voltar ao banner original da página?')) return; c.slides = []; grava(c); return draw(); }
-        if (a === 'prev') { lerCampos(c); const ss = c.slides.filter(x => x.ativo !== false && x.img).map(x => ({ src: x.img, alt: x.alt, link: '' })); const box = card.querySelector('#pv-' + slug); if (!ss.length) { box.innerHTML = '<p class="vazio">Nada para pré-visualizar.</p>'; return; } B.injetaCss(); const d = document.createElement('div'); d.className = 'pr-banner'; box.textContent = ''; box.appendChild(d); B.monta(d, { modo: c.modo, intervalo: c.intervalo, slides: ss }, s, false); }
+        if (a === 'prev') { lerCampos(c); const ss = c.slides.filter(x => x.ativo !== false && x.img).map(x => ({ src: x.img, alt: x.alt, link: '', mobile: x.imgM || '' })); const box = card.querySelector('#pv-' + slug); if (!ss.length) { box.innerHTML = '<p class="vazio">Nada para pré-visualizar.</p>'; return; } B.injetaCss(); const d = document.createElement('div'); d.className = 'pr-banner'; box.textContent = ''; box.appendChild(d); B.monta(d, { modo: c.modo, intervalo: c.intervalo, slides: ss }, s, false); }
       });
       card.querySelectorAll('input[type=radio]').forEach(r => r.onchange = () => { const c = cfgDe(slug); lerCampos(c); c.modo = r.value; if (c.modo === 'fixo' && c.slides.length > 1 && !confirm('No modo Fixo só uma imagem é exibida. As outras ficam guardadas, mas não aparecem. Continuar?')) { draw(); return; } grava(c); draw(); });
+      card.querySelectorAll('input[data-a="upm"]').forEach(inp => inp.onchange = async () => {
+        const c = cfgDe(slug); lerCampos(c); msg = ''; aviso = ''; erro = ''; const f = inp.files[0]; if (!f) return;
+        try { const r = await preparaImagem(f, B.MOBILE); c.slides[+inp.closest('.bn-slide').dataset.i].imgM = r.img; aviso = r.aviso; if (grava(c)) msg = 'Imagem para celular salva.'; } catch (e) { erro = e.message; }
+        draw();
+      });
       const up = card.querySelector('#up-' + slug);
       if (up) up.onchange = async () => {
         const c = cfgDe(slug); lerCampos(c); msg = ''; aviso = ''; erro = ''; let errUp = '';
@@ -116,7 +125,7 @@ window.PR_BANNERS_ADMIN = { zip, crc32, abrir(el, H) {
       todos().forEach(c => {
         const ss = (c.slides || []).filter(x => x.ativo !== false && x.img); if (!ss.length) return;
         const lista = c.modo === 'carrossel' ? ss : ss.slice(0, 1);
-        slots[c.id] = { modo: lista.length > 1 ? 'carrossel' : 'fixo', intervalo: c.intervalo || B.INTERVALO_PADRAO, slides: lista.map((x, i) => { const nome = `banners/${c.id}-${i + 1}.jpg`; arqs.push({ nome, dados: dataUrlBytes(x.img) }); n++; return { src: nome, alt: x.alt || '', link: x.link || '' }; }) };
+        slots[c.id] = { modo: lista.length > 1 ? 'carrossel' : 'fixo', intervalo: c.intervalo || B.INTERVALO_PADRAO, slides: lista.map((x, i) => { const nome = `banners/${c.id}-${i + 1}.jpg`; arqs.push({ nome, dados: dataUrlBytes(x.img) }); n++; const o = { src: nome, alt: x.alt || '', link: x.link || '' }; if (x.imgM) { const nm = `banners/${c.id}-${i + 1}-m.jpg`; arqs.push({ nome: nm, dados: dataUrlBytes(x.imgM) }); o.mobile = nm; } return o; }) };
       });
       if (!n) { erro = 'Não há banners para publicar. Configure ao menos um.'; msg = ''; return draw(); }
       arqs.unshift({ nome: 'banners/banners.json', dados: enc.encode(JSON.stringify({ versao: 1, gerado: new Date().toISOString(), slots }, null, 1)) });

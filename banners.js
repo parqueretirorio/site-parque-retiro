@@ -7,9 +7,12 @@
 //  - Configuração publicada: arquivo banners/banners.json (gerado pela área restrita > Comunicação > Site).
 //  - Pré-visualização: quem está logado vê, neste navegador, o rascunho ainda não publicado.
 (function () {
-// w × h = medida EXATA em pixels. Todos os espaços usam 1600 × 533 (3:1), a largura máxima de exibição do site (max-width: 1600px).
-// (26/11/2026: Início, Quem somos e Sobre o Parque passaram de 2172 × 724 para 1600 × 533, a pedido do administrador.)
-const P = 1600, H3 = 533;
+// w × h = medida EXATA em pixels. Todos os espaços usam 1920 × 640 (3:1), a largura máxima de exibição do site (max-width: 1920px),
+// a resolução de monitor mais comum (Full HD). Banners antigos de 1600 × 533 têm a mesma proporção e continuam válidos (só ficam ampliados).
+// (26/11/2026: padrão passou de 1600 × 533 para 1920 × 640, a pedido do administrador. Antes: 2172 × 724 em Início, Quem somos e Sobre o Parque.)
+// Imagem opcional para CELULAR: 1200 × 900 (4:3), usada em telas de até 700 px de largura; sem ela, o celular usa a imagem do computador.
+const P = 1920, H3 = 640;
+const MOBILE = { w: 1200, h: 900, ate: 700 };
 const SLOTS = [
   // [slug, nome na tela, arquivo, grupo, largura, altura]
   ['index', 'Início', 'index.html', 'Principal', P, H3],
@@ -63,10 +66,11 @@ const slotDe = slug => SLOTS.find(s => s.slug === slug);
 /* ---------- Exibição pública ---------- */
 const CSS = `
 .pr-banner{background:var(--primary-color,#1e3a3a);line-height:0;position:relative}
-.pr-banner .pr-b-box{position:relative;max-width:1600px;margin:0 auto;overflow:hidden}
+.pr-banner .pr-b-box{position:relative;max-width:1920px;margin:0 auto;overflow:hidden}
 .pr-banner .pr-b-slide{display:none;width:100%}
 .pr-banner .pr-b-slide.on{display:block}
-.pr-banner img{display:block;width:100%;height:auto}
+.pr-banner img,.pr-banner picture{display:block;width:100%;height:auto}
+@media (max-width:700px){.pr-banner .pr-b-box.sem-m{aspect-ratio:auto!important}.pr-banner .pr-b-box.tem-m{aspect-ratio:4/3!important}}
 .pr-banner a{display:block}
 .pr-banner .pr-b-btn{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:0;background:rgba(0,0,0,.45);color:#fff;font-size:20px;line-height:42px;cursor:pointer;z-index:2}
 .pr-banner .pr-b-btn:hover,.pr-banner .pr-b-btn:focus-visible{background:rgba(0,0,0,.75)}
@@ -85,11 +89,13 @@ function monta(el, cfg, slot, rascunho) {
   const unico = cfg.modo !== 'carrossel' || slides.length < 2;
   const box = document.createElement('div'); box.className = 'pr-b-box';
   box.style.aspectRatio = slot.w + ' / ' + slot.h;
+  const comM = slides.filter(x => x.mobile).length; if (comM) box.classList.add(comM === slides.length ? 'tem-m' : 'sem-m'); // celular: 4:3 só se TODOS os slides têm imagem de celular
   slides.forEach((s, i) => {
     const f = document.createElement('div'); f.className = 'pr-b-slide' + (i === 0 ? ' on' : '');
     if (!unico) { f.setAttribute('role', 'group'); f.setAttribute('aria-roledescription', 'slide'); f.setAttribute('aria-label', (i + 1) + ' de ' + slides.length); }
     const im = document.createElement('img'); im.src = s.src; im.alt = s.alt || ''; im.width = slot.w; im.height = slot.h; if (i > 0) im.loading = 'lazy'; im.draggable = false;
-    if (s.link && /^https?:\/\/|^[a-z0-9-]+\.html([?#].*)?$/i.test(s.link)) { const a = document.createElement('a'); a.href = s.link; if (/^https?:/i.test(s.link)) { a.target = '_blank'; a.rel = 'noopener'; } a.appendChild(im); f.appendChild(a); } else f.appendChild(im);
+    let conteudo = im; if (s.mobile) { const pic = document.createElement('picture'), so = document.createElement('source'); so.media = '(max-width:' + MOBILE.ate + 'px)'; so.srcset = s.mobile; so.width = MOBILE.w; so.height = MOBILE.h; pic.append(so, im); conteudo = pic; }
+    if (s.link && /^https?:\/\/|^[a-z0-9-]+\.html([?#].*)?$/i.test(s.link)) { const a = document.createElement('a'); a.href = s.link; if (/^https?:/i.test(s.link)) { a.target = '_blank'; a.rel = 'noopener'; } a.appendChild(conteudo); f.appendChild(a); } else f.appendChild(conteudo);
     box.appendChild(f);
   });
   el.textContent = ''; el.appendChild(box);
@@ -130,7 +136,7 @@ async function iniciaPagina() {
   const slug = slugAtual(), slot = slotDe(slug); if (!slot) return;
   let cfg = null, rasc = false;
   const rl = rascunhoLocal();
-  if (rl) { const r = rl.find(x => x.id === slug); if (r) { const c = { modo: r.modo, intervalo: r.intervalo, slides: (r.slides || []).filter(s => s.ativo !== false && s.img).map(s => ({ src: s.img, alt: s.alt, link: s.link })) }; if (cfgOk(c)) { cfg = c; rasc = true; } } }
+  if (rl) { const r = rl.find(x => x.id === slug); if (r) { const c = { modo: r.modo, intervalo: r.intervalo, slides: (r.slides || []).filter(s => s.ativo !== false && s.img).map(s => ({ src: s.img, alt: s.alt, link: s.link, mobile: s.imgM || '' })) }; if (cfgOk(c)) { cfg = c; rasc = true; } } }
   if (!cfg) {
     try { const r = await fetch('banners/banners.json', { cache: 'no-cache' }); if (r.ok) { const j = await r.json(); const c = j && j.slots && j.slots[slug]; if (cfgOk(c)) cfg = c; } } catch (e) { /* sem banners publicados */ }
   }
@@ -149,7 +155,7 @@ async function iniciaPagina() {
   const titulo = a.el.querySelector('h1.sr-only'); const h1 = titulo ? titulo.cloneNode(true) : null;
   monta(a.el, cfg, slot, rasc); if (h1) a.el.prepend(h1);
 }
-window.PR_BANNERS = { SLOTS, MAX_SLIDES, INTERVALO_PADRAO, slotDe, monta, injetaCss };
+window.PR_BANNERS = { SLOTS, MOBILE, MAX_SLIDES, INTERVALO_PADRAO, slotDe, monta, injetaCss };
 if (document.querySelector('header')) {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciaPagina); else iniciaPagina();
 }
