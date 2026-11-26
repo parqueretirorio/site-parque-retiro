@@ -27,7 +27,8 @@
   async function buscarMetricas() {
     if (!window.PR_SUPABASE) return null;
     try {
-      return await window.PR_SUPABASE.rpc('pr_metricas_comunicacao', {});
+      var r = await window.PR_SUPABASE.rpc('pr_metricas_comunicacao', {});
+      return r && r.status === 200 && r.corpo ? r.corpo : null;
     } catch (e) {
       console.warn('[PR_ANALYTICS] buscarMetricas:', e);
       return null;

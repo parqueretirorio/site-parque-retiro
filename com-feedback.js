@@ -40,7 +40,8 @@
     if (!window.PR_SUPABASE) return null;
     try {
       const corpo = atividadeId ? { p_atividade_id: atividadeId } : {};
-      return await window.PR_SUPABASE.rpc('pr_contagem_feedback', corpo);
+      const r = await window.PR_SUPABASE.rpc('pr_contagem_feedback', corpo);
+      return r && r.status === 200 && r.corpo ? r.corpo : null;
     } catch (e) {
       console.warn('[PR_FEEDBACK] buscarResumo:', e);
       return null;
