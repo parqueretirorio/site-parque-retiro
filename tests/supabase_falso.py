@@ -168,7 +168,7 @@ class SupabaseFalso:
         if caminho == '/auth/v1/logout':
             self.tokens.pop(tok, None)
             return 204, None
-        if caminho in ('/rest/v1/rpc/pr_ler_publico', '/rest/v1/rpc/pr_enviar_publico', '/rest/v1/rpc/pr_rifa_inscrever', '/rest/v1/rpc/pr_consultar_publico', '/rest/v1/rpc/pr_registrar_visita', '/rest/v1/rpc/pr_registrar_clique', '/rest/v1/rpc/pr_registrar_acesso_link', '/rest/v1/rpc/pr_registrar_dispositivo') and not uid:
+        if caminho in ('/rest/v1/rpc/pr_ler_publico', '/rest/v1/rpc/pr_enviar_publico', '/rest/v1/rpc/pr_rifa_inscrever', '/rest/v1/rpc/pr_consultar_publico', '/rest/v1/rpc/pr_registrar_visita', '/rest/v1/rpc/pr_registrar_clique', '/rest/v1/rpc/pr_registrar_acesso_link', '/rest/v1/rpc/pr_participacao_evento', '/rest/v1/rpc/pr_participacao_inscrever', '/rest/v1/rpc/pr_participacao_informar_pago', '/rest/v1/rpc/pr_registrar_dispositivo') and not uid:
             try:  # site aberto, sem login: papel anon (só a chave pública)
                 if caminho.endswith('pr_rifa_inscrever'):
                     r = psql(f"select pr_rifa_inscrever({lit(corpo['p_dados'])}::jsonb)", self.db, 'anon')
@@ -180,6 +180,13 @@ class SupabaseFalso:
                 elif caminho.endswith('pr_registrar_dispositivo'):
                     self.dispositivos_log.append(dict(corpo or {}))
                     r = psql(f"select pr_registrar_dispositivo({lit((corpo or {}).get('p_tipo'))}, {lit((corpo or {}).get('p_so'))}, {lit((corpo or {}).get('p_navegador'))})", self.db, 'anon')
+                elif caminho.endswith('pr_participacao_evento'):
+                    r = psql(f"select pr_participacao_evento({lit((corpo or {}).get('p_id'))})", self.db, 'anon')
+                elif caminho.endswith('pr_participacao_inscrever'):
+                    c = corpo or {}
+                    r = psql(f"select pr_participacao_inscrever({lit(c.get('p_evento'))}, {lit(c.get('p_nome'))}, {lit(c.get('p_email'))}, {lit(c.get('p_telefone'))}, {lit(c.get('p_cep'))}, {lit(c.get('p_restricao'))}, {lit(c.get('p_outra'))}, {lit(c.get('p_opcao'))}, {lit(c.get('p_forma'))}, {'true' if c.get('p_consent') else 'false'})", self.db, 'anon')
+                elif caminho.endswith('pr_participacao_informar_pago'):
+                    r = psql(f"select pr_participacao_informar_pago({lit((corpo or {}).get('p_codigo'))}, {lit((corpo or {}).get('p_token'))})", self.db, 'anon')
                 elif caminho.endswith('pr_registrar_acesso_link'):
                     self.acessos_link_log.append(dict(corpo or {}))
                     r = psql(f"select pr_registrar_acesso_link({lit((corpo or {}).get('p_codigo'))}, {lit((corpo or {}).get('p_tipo', 'visita'))})", self.db, 'anon')
@@ -245,6 +252,12 @@ class SupabaseFalso:
             elif fn == 'pr_relatorio_visitas':
                 dd = lambda v: 'null' if not v else lit(v) + '::date'
                 r = psql(f"select pr_relatorio_visitas({dd((corpo or {}).get('p_ini'))}, {dd((corpo or {}).get('p_fim'))})", self.db, 'authenticated', uid)
+            elif fn == 'pr_participacao_config_salvar':
+                r = psql(f"select pr_participacao_config_salvar({lit(corpo.get('p_id'))}, {lit(json.dumps(corpo.get('p_cfg') or {}))}::jsonb)", self.db, 'authenticated', uid)
+            elif fn == 'pr_participacao_listar':
+                r = psql(f"select pr_participacao_listar({lit(corpo.get('p_id'))})", self.db, 'authenticated', uid)
+            elif fn == 'pr_participacao_atualizar':
+                r = psql(f"select pr_participacao_atualizar({lit(corpo.get('p_evento'))}, {lit(corpo.get('p_codigo'))}, {lit(corpo.get('p_acao'))})", self.db, 'authenticated', uid)
             elif fn == 'pr_exportar_numeros_visitas':
                 r = psql("select pr_exportar_numeros_visitas()", self.db, 'authenticated', uid)
             elif fn == 'pr_resumo_cliques':

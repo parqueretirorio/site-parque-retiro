@@ -1388,3 +1388,28 @@ body.modo-app #tab pre, body.modo-app #tab code { white-space: pre-wrap; word-br
 .nc-lateral li:last-child { border-bottom: 0; }
 .nc-lateral .vazio { font-size: 0.88rem; margin: 0; }
 @media (max-width: 800px) { .nc-grade { grid-template-columns: 1fr; } .nc-lateral { position: static; } .nc-artigo { padding: 18px; } .nc-titulo { font-size: 1.3rem; } }
+
+/* Inscrição em evento com contribuição (participar.html e painel em Atividades) — 26/11/2026 */
+.pa-info p { margin: 4px 0; }
+.pa-app { max-width: 640px; margin: 0 auto; }
+.pa-passos { display: flex; gap: 8px; list-style: none; padding: 0; margin: 0 0 18px; flex-wrap: wrap; }
+.pa-passos li { flex: 1 1 140px; padding: 8px 10px; border-radius: 6px; background: #eef2f2; color: #456; font-size: .9rem; }
+.pa-passos li span { display: inline-block; min-width: 22px; height: 22px; line-height: 22px; border-radius: 50%; background: #9ab; color: #fff; text-align: center; margin-right: 4px; }
+.pa-passos li.on { background: var(--primary-color); color: #fff; font-weight: 600; }
+.pa-passos li.on span { background: #fff; color: var(--primary-color); }
+.pa-passos li.feito span { background: #2e7d32; }
+.pa-conf { display: flex; gap: 8px; align-items: flex-start; font-weight: 600; margin: 12px 0; }
+.pa-conf input { margin-top: 4px; }
+.pa-peq { font-size: .85rem; color: #566; }
+.pa-botoes { display: flex; gap: 10px; flex-wrap: wrap; }
+.pa-qr { text-align: center; margin: 10px 0; }
+.pa-qr svg { max-width: 220px; height: auto; background: #fff; padding: 8px; border: 1px solid #ccd; }
+.pa-valor { font-size: 1.4rem; }
+.pa-res textarea { width: 100%; font-family: monospace; font-size: .8rem; }
+.pa-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 12px 0; }
+.pa-cards div { background: #f2f6f6; border-radius: 8px; padding: 10px; text-align: center; }
+.pa-cards strong { display: block; font-size: 1.3rem; color: var(--primary-color); }
+.pa-cards span { font-size: .8rem; color: #566; }
+.pa-op { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+.pa-op .pa-on { flex: 1 1 200px; }
+.atv-participar { margin: 14px 0; }
