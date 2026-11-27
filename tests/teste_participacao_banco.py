@@ -39,7 +39,7 @@ ok(not J("select pr_participacao_evento('nao-existe')::text", papel='anon')['ok'
 def insc(nome='Ana Souza', email='ana@t.com', tel='(21) 99999-1111', cep='24900-000', rest='nao_vegetariano', opcao='dom', forma='pix', consent='true', evento='atv1'):
     return J(f"select pr_participacao_inscrever('{evento}','{nome}','{email}','{tel}','{cep}','{rest}','','{opcao}','{forma}',{consent})::text", papel='anon')
 r = insc(); ok(r['ok'] and len(r['codigo']) == 6 and r['txid'] == 'PR' + r['codigo'] and 1 <= r['extra_centavos'] <= 99 and r['total_centavos'] == 3500 + r['extra_centavos'], f"inscrição por Pix: total = valor + centavos de identificação ({r['total_centavos']})")
-ok(len(r['token']) == 24, "a pessoa recebe um segredo para o 'Já paguei'")
+ok(len(r['token']) == 32, "a pessoa recebe um segredo para o 'Já paguei'")
 for k, v in dict(nome='Ana', email='ana', tel='123', cep='123', rest='x', opcao='zzz', forma='boleto', consent='false').items():
     ok(not insc(**{k: v, 'email': 'novo@t.com'} if k != 'email' else {'email': v})['ok'], f"recusa {k} inválido")
 ok(not insc()['ok'], "recusa o mesmo e-mail duas vezes no mesmo evento")
