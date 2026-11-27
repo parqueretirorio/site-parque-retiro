@@ -113,7 +113,7 @@ async def main():
             for _ in range(n): reg(d, o)
         await e.goto(B + '/area-restrita.html#t=comunicacao&s=site'); await e.wait_for_timeout(2500)
         if not await e.locator('#site-visitas').count():
-            await e.evaluate("""()=>{const b=[...document.querySelectorAll('button,a')].find(x=>/Comunica[cç]ão/.test(x.textContent)&&/tab|menu|btn/i.test(x.className+x.id)); if(b) b.click();}""")
+            await e.evaluate("""()=>{const b=[...document.querySelectorAll('button,a')].find(x=>/Comunica[cç]ão|CONecta Retiro/.test(x.textContent)&&/tab|menu|btn/i.test(x.className+x.id)); if(b) b.click();}""")
             await e.wait_for_timeout(800)
             await e.evaluate("""()=>{const b=[...document.querySelectorAll('button')].find(x=>x.textContent.trim()==='Site'); if(b) b.click();}"""); await e.wait_for_timeout(2000)
         t = await e.inner_text('#site-visitas')

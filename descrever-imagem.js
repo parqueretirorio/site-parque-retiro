@@ -13,6 +13,7 @@ const MODOS = {
 };
 const limpa = s => String(s || '').trim().replace(/\s+/g, ' ').replace(/[.\s]+$/, '');
 const semPrefixo = s => limpa(s).replace(/^(uma?\s+)?(imagem|foto|fotografia|banner)\s+(de|do|da|dos|das)\s+/i, '');
+const T = s => { try { const d = (window.PR_I18N_DATA || {})[window.PR_IDIOMA && window.PR_IDIOMA.atual()]; return (d && d[s]) || s; } catch (e) { return s; } };
 const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
 // d: { oque, texto, detalhes, clima }
 function compor(modo, d) {
@@ -57,24 +58,24 @@ function abrir(o) {
   const q = s => ov.querySelector(s), $r = q('#dsc-r'), lista = q('#dsc-lista'), bm = q('#dsc-m');
   const dados = () => ({ oque: q('#dsc-o').value, texto: q('#dsc-tx').value, detalhes: q('#dsc-d').value, clima: q('#dsc-c').value });
   const cont = () => {
-    const n = $r.value.length; let t = n + ' caracteres';
-    if (modo === 1) t += n <= 125 ? ' · tamanho bom' : n <= 200 ? ' · um pouco longo; prefira até 125' : ' · longo para um texto alternativo';
-    if (limite && n > limite) t += ` · o campo aceita até ${limite}; encurte`;
+    const n = $r.value.length; let t = n + ' ' + T('caracteres');
+    if (modo === 1) t += n <= 125 ? ' · ' + T('tamanho bom') : n <= 200 ? ' · ' + T('um pouco longo; prefira até 125') : ' · ' + T('longo para um texto alternativo');
+    if (limite && n > limite) t += ' · ' + T('o campo aceita até') + ' ' + limite + '; ' + T('encurte');
     q('#dsc-cont').textContent = t;
   };
-  const setModo = m => { modo = m; q('#dsc-mt').textContent = m + ' · ' + MODOS[m].nome; q('#dsc-clw').hidden = m !== 4; lista.querySelectorAll('.dsc-op').forEach(b => { b.classList.toggle('sel', +b.dataset.m === m); b.setAttribute('aria-selected', +b.dataset.m === m ? 'true' : 'false'); }); try { localStorage.setItem('pr-desc-modo', String(m)); } catch (e) { /* sem armazenamento */ } cont(); };
+  const setModo = m => { modo = m; q('#dsc-mt').textContent = m + ' · ' + T(MODOS[m].nome); q('#dsc-clw').hidden = m !== 4; lista.querySelectorAll('.dsc-op').forEach(b => { b.classList.toggle('sel', +b.dataset.m === m); b.setAttribute('aria-selected', +b.dataset.m === m ? 'true' : 'false'); }); try { localStorage.setItem('pr-desc-modo', String(m)); } catch (e) { /* sem armazenamento */ } cont(); };
   const fechaLista = () => { lista.hidden = true; bm.setAttribute('aria-expanded', 'false'); };
   bm.onclick = e => { e.stopPropagation(); lista.hidden = !lista.hidden; bm.setAttribute('aria-expanded', lista.hidden ? 'false' : 'true'); if (!lista.hidden) { const s = lista.querySelector('.sel') || lista.querySelector('.dsc-op'); s.focus(); } };
   lista.querySelectorAll('.dsc-op').forEach(b => { b.onclick = () => { setModo(+b.dataset.m); fechaLista(); bm.focus(); if ($r.value && q('#dsc-o').value) $r.value = compor(modo, dados()); cont(); }; });
-  q('#dsc-g').onclick = () => { const t = compor(modo, dados()); if (!t) { q('#dsc-cont').textContent = 'Diga primeiro o que é a imagem.'; q('#dsc-o').focus(); return; } $r.value = t; cont(); $r.focus(); };
-  q('#dsc-p').onclick = async () => { q('#dsc-cont').textContent = (await copiar(pedido(modo, dados(), titulo))) ? 'Pedido copiado. Cole no Claude e anexe a imagem; depois traga o texto para o campo “Texto”.' : 'Não consegui copiar.'; };
-  q('#dsc-c2').onclick = async () => { q('#dsc-cont').textContent = (await copiar($r.value)) ? 'Texto copiado.' : 'Não consegui copiar.'; };
+  q('#dsc-g').onclick = () => { const t = compor(modo, dados()); if (!t) { q('#dsc-cont').textContent = T('Diga primeiro o que é a imagem.'); q('#dsc-o').focus(); return; } $r.value = t; cont(); $r.focus(); };
+  q('#dsc-p').onclick = async () => { q('#dsc-cont').textContent = (await copiar(pedido(modo, dados(), titulo))) ? T('Pedido copiado. Cole no Claude e anexe a imagem; depois traga o texto para o campo “Texto”.') : T('Não consegui copiar.'); };
+  q('#dsc-c2').onclick = async () => { q('#dsc-cont').textContent = (await copiar($r.value)) ? T('Texto copiado.') : T('Não consegui copiar.'); };
   $r.oninput = cont;
   const fecha = () => { if (!ov.isConnected) return; ov.remove(); document.removeEventListener('keydown', tecla, true); aberto = null; if (antes && antes.focus) antes.focus(); };
   q('#dsc-u').onclick = () => {
     if (!campo) return fecha();
-    const t = $r.value.trim(); if (!t) { q('#dsc-cont').textContent = 'Monte ou escreva o texto antes.'; return; }
-    if (limite && t.length > limite) { q('#dsc-cont').textContent = `O campo aceita até ${limite} caracteres e o texto tem ${t.length}. Encurte, ou use o modo 1.`; return; }
+    const t = $r.value.trim(); if (!t) { q('#dsc-cont').textContent = T('Monte ou escreva o texto antes.'); return; }
+    if (limite && t.length > limite) { q('#dsc-cont').textContent = T('O campo aceita até') + ' ' + limite + ' ' + T('caracteres e o texto tem') + ' ' + t.length + '. ' + T('Encurte, ou use o modo 1.'); return; }
     campo.value = t; campo.dispatchEvent(new Event('input', { bubbles: true })); campo.dispatchEvent(new Event('change', { bubbles: true })); fecha();
   };
   q('#dsc-fecha').onclick = fecha;

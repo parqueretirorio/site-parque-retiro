@@ -34,7 +34,7 @@ async def main():
         await pg.wait_for_url("**/area-restrita.html")
         ok(await pg.evaluate("!!document.querySelector('.area-col[data-area=com] [data-tab=jardinagem]')"),"Jardinagem / Área Externa está dentro de Comissões Parque Retiro")
         ok(await pg.evaluate("!document.querySelector('[data-tab=jardinagem]').closest('.area-grupo')"),"e direto em Comissões (não dentro de um grupo, nem de Voluntário)")
-        ok(await pg.evaluate("!!document.querySelector('.area-col[data-area=com] [data-tab=comunicacao]')") and 'Site' in await pg.inner_text('[data-tab=comunicacao]'),"Comunicação, Redes Sociais e Site está direto em Comissões")
+        ok(await pg.evaluate("!!document.querySelector('.area-col[data-area=com] [data-tab=comunicacao]')") and 'CONecta Retiro' in await pg.inner_text('[data-tab=comunicacao]'),"Comunicação, Redes Sociais e Site está direto em Comissões")
         ok(await pg.evaluate("!!document.querySelector('.area-grupo [data-tab=el_sala]')"),"grupo Elementos continua funcionando")
         # inscrições
         await aba(pg,'voluntarios'); t=await pg.inner_text('#tab'); ok('Ana Souza' in t and 'Jardinagem e área externa' in t,"inscrição aparece para o responsável")

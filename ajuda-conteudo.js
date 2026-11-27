@@ -2082,7 +2082,7 @@ window.PR_AJUDA_CONTEUDO = {
    "id": "comunicacao-visao-geral",
    "categoria": "comunicacao",
    "ordem": 1,
-   "titulo": "Comunicação, Redes Sociais e Site: visão geral",
+   "titulo": "CONecta Retiro: visão geral",
    "resumo": "Do encaminhamento da ata à publicação: planeje, produza, publique e meça a comunicação do Parque num só lugar.",
    "publico": "equipe",
    "status": "publicado",
@@ -2095,7 +2095,7 @@ window.PR_AJUDA_CONTEUDO = {
     "publicação",
     "campanha"
    ],
-   "onde": "**Comissões Parque Retiro › Comunicação, Redes Sociais e Site** (administrador, Responsável pela Comunicação e convidados).",
+   "onde": "**Comissões Parque Retiro › CONecta Retiro** (administrador, Responsável pela Comunicação e convidados).",
    "secoes": {
     "oQueE": "A ferramenta tem 12 sub-abas: Calendário de Comunicação, Publicações, Criar a partir do calendário, Redes sociais, Projetos e campanhas, Tipos de publicação, Datas fixas anuais, Site, Equipe e convidados, Arquivos, Indicadores e Conectores.",
     "finalidade": "Ata → atividade no calendário → ação de comunicação (canais e formatos) → materiais → fila de publicação → publicada → relatório.",
@@ -2140,7 +2140,7 @@ window.PR_AJUDA_CONTEUDO = {
     "planejar",
     "data"
    ],
-   "onde": "**Comunicação › Calendário de Comunicação** e **Criar a partir do calendário**.",
+   "onde": "**CONecta Retiro › Calendário de Comunicação** e **Criar a partir do calendário**.",
    "secoes": {
     "oQueE": "",
     "finalidade": "",
@@ -2178,7 +2178,7 @@ window.PR_AJUDA_CONTEUDO = {
     "ics",
     "agenda"
    ],
-   "onde": "**Comunicação › Publicações** (botões Painel por canal e formato, Fila de publicação e Lista de publicações).",
+   "onde": "**CONecta Retiro › Publicações** (botões Painel por canal e formato, Fila de publicação e Lista de publicações).",
    "secoes": {
     "oQueE": "",
     "finalidade": "",
@@ -2227,14 +2227,14 @@ window.PR_AJUDA_CONTEUDO = {
     "zip",
     "medida"
    ],
-   "onde": "**Comunicação › Site**.",
+   "onde": "**CONecta Retiro › Site**.",
    "secoes": {
     "oQueE": "",
     "finalidade": "",
     "passos": [
      "Clique em **Configurar** na página desejada. Veja a medida exata (1920 × 640 px, proporção 3:1).",
      "Escolha **Fixo** (1 imagem) ou **Carrossel** (até 8 imagens, troca de 2 a 30 s).",
-     "Envie as imagens (JPG, PNG ou WebP, até 15 MB) com a proporção certa; preencha a descrição (acessibilidade) e o link opcional.",
+     "Envie as imagens (JPG, PNG ou WebP, até 15 MB) com a proporção certa; preencha a descrição (acessibilidade) e o link opcional. Se tiver dúvida sobre o que escrever, clique em **Ajudar a descrever**: responda 3 perguntas rápidas, escolha o modo (texto alternativo, audiodescrição, legenda ou leitura reflexiva) e clique em **Usar no campo**.",
      "Opcional: em cada imagem, envie também a **imagem para celular** (1200 × 900 px, proporção 4:3). Ela aparece em telas de até 700 px; sem ela, o celular usa a imagem do computador.",
      "Salve e confira a pré-visualização (aparece só para você, com a etiqueta \"Pré-visualização\").",
      "Clique em **Baixar pacote para publicar (.zip)**, descompacte e copie a pasta **banners** para a pasta do site na hospedagem."
@@ -2283,12 +2283,12 @@ window.PR_AJUDA_CONTEUDO = {
       "acessos",
       "estatística"
     ],
-    "onde": "**Comunicação, Redes Sociais e Site › Site** (a seção \"Visitas do site\" fica no alto da tela).",
+    "onde": "**CONecta Retiro › Site** (a seção \"Visitas do site\" fica no alto da tela).",
     "secoes": {
       "oQueE": "Um contador interno que conta uma **visita** por sessão do navegador e as páginas abertas nela. Não guarda nome, e-mail, IP nem cookies: só números por dia, página e origem. Quem está logado na área restrita não é contado.",
       "finalidade": "Saber se o site está sendo visitado e de onde as pessoas chegam, para decidir onde vale a pena divulgar.",
       "passos": [
-        "Abra **Comunicação, Redes Sociais e Site › Site**. No alto aparecem as visitas de hoje, ontem, 7 e 30 dias.",
+        "Abra **CONecta Retiro › Site**. No alto aparecem as visitas de hoje, ontem, 7 e 30 dias.",
         "Veja **De onde vieram as visitas** e escolha o período (7, 30, 90 ou 365 dias).",
         "Para divulgar com origem, use **Gerar link com origem**: escolha onde vai postar (Canal, Comunidade, grupo...), a página que o link abre e clique em **Copiar link**.",
         "Cole o link gerado na postagem. Ele termina em `?o=nome`; não coloque ponto nem espaço depois dele.",
@@ -2334,7 +2334,7 @@ window.PR_AJUDA_CONTEUDO = {
     "publicador",
     "permissão"
    ],
-   "onde": "**Comunicação › Equipe e convidados**.",
+   "onde": "**CONecta Retiro › Equipe e convidados**.",
    "secoes": {
     "oQueE": "",
     "finalidade": "",
@@ -2500,7 +2500,7 @@ window.PR_AJUDA_CONTEUDO = {
     "lembrete",
     "gmail"
    ],
-   "onde": "**Comissões Parque Retiro › Comunicação, Redes Sociais e Site › Comunicados por e-mail**, botão **Convite para a área restrita**.",
+   "onde": "**Comissões Parque Retiro › CONecta Retiro › Comunicados por e-mail**, botão **Convite para a área restrita**.",
    "secoes": {
     "oQueE": "Um e-mail pronto, em português ou espanhol, com o botão **Criar minha conta**, que abre direto o cadastro da área restrita. Quem já tem conta não recebe. Depois do envio, a tela mostra quem já tem acesso, quem está esperando aprovação e quem ainda não se cadastrou.",
     "finalidade": "Trazer para o CONecta Retiro os Mestres e as pessoas das comissões e da administração, sem precisar mandar o link uma a uma pelo WhatsApp.",
@@ -3044,7 +3044,7 @@ window.PR_AJUDA_CONTEUDO = {
     "oQueE": "O que é cadastrado na área restrita fica no servidor; para o público ver no site aberto, cada conteúdo tem o seu caminho.",
     "finalidade": "",
     "passos": [
-     "**Banners do site:** Comunicação › Site › **Baixar pacote para publicar (.zip)** e copiar a pasta banners para a hospedagem.",
+     "**Banners do site:** CONecta Retiro › Site › **Baixar pacote para publicar (.zip)** e copiar a pasta banners para a hospedagem.",
      "**Central de Ajuda:** Administração › Central de Ajuda › Publicar › **Baixar ajuda-conteudo.js** e substituir o arquivo na hospedagem.",
      "**Calendário de uso (público):** as datas ocupadas ficam na lista RESERVAS dentro do arquivo calendario.html; peça a quem cuida do site para atualizar.",
      "**Atividades, Lojinha, Rifa, Vaquinha, Álbum e Biblioteca:** o que a equipe cadastra fica no servidor; a ligação das páginas abertas do site ao servidor é a próxima etapa (até lá, o público vê o que foi publicado no site)."
@@ -3807,7 +3807,7 @@ window.PR_AJUDA_CONTEUDO = {
    "multiuso-gestao"
   ],
   "aba.comunicacao": [
-   "Comunicação, Redes Sociais e Site",
+   "CONecta Retiro",
    "Calendário de comunicação, publicações por canal, banners do site, equipe, arquivos e indicadores.",
    "comunicacao-visao-geral"
   ],

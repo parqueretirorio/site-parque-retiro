@@ -43,7 +43,7 @@ async def main():
         await pg.wait_for_url("**/area-restrita.html")
         ok(await pg.evaluate("!!document.querySelector('.area-col[data-area=com] [data-tab=atividades]')"),"Atividades está em Comissões Parque Retiro")
         ok(await pg.evaluate("!!document.querySelector('.area-col[data-area=com] [data-tab=jardinagem]') && !document.querySelector('[data-tab=jardinagem]').closest('.area-grupo')"),"Jardinagem / Área Externa direto em Comissões Parque Retiro")
-        ok(await pg.evaluate("!!document.querySelector('.area-col[data-area=com] [data-tab=comunicacao]')"),"Comunicação, Redes Sociais e Site direto em Comissões")
+        ok(await pg.evaluate("!!document.querySelector('.area-col[data-area=com] [data-tab=comunicacao]')"),"Aba CONecta Retiro direto em Comissões")
         ok(not await pg.evaluate("!!document.querySelector('[data-tab=voluntarios]').closest('.area-grupo') === false"),"Voluntários continua no grupo Ajude o Parque")
         await aba(pg,'album'); ok('Fotos por atividade' in await pg.inner_text('#tab') and 'Fotos por evento' not in await pg.inner_text('#tab'),"Álbum: 'Fotos por atividade'")
         await aba(pg,'atividades'); await pg.click('#at-novo')

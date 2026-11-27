@@ -1,4 +1,4 @@
-// Painel de visitantes (área restrita › Comunicação › Site). 25/11/2026. Usa pr_relatorio_visitas (migração 0024), pr_listar_links (0023).
+// Painel de visitantes (área restrita › CONecta Retiro › Site). 25/11/2026. Usa pr_relatorio_visitas (migração 0024), pr_listar_links (0023).
 // Períodos livres, comparação com o período anterior, origem em %, redes sociais (Linktree × link direto), dispositivos, relatório.
 // Só números agregados: não identifica pessoas. Visitante único, tempo de permanência e localização ficam para as etapas F3 e F4.
 (function () {

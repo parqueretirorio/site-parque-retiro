@@ -1,4 +1,4 @@
-// Briefing para o Claude (área restrita > Comunicação, Redes Sociais e Site > "Briefing para o Claude").
+// Briefing para o Claude (área restrita > CONecta Retiro > "Briefing para o Claude").
 // A pessoa responde perguntas simples sobre a campanha; o app monta um texto pronto para colar no claude.ai,
 // que devolve as peças (textos por canal, artes, calendário) e o "pacote da campanha".
 // Dados no navegador: pr_com_briefings  [{id, titulo, tipo, projeto, r:{campo:valor}, autor, criadoEm, atualizadoEm, enviadoEm}]

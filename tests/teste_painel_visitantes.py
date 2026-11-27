@@ -112,7 +112,7 @@ async def main():
         psql(f"insert into visitas_dispositivo_dia(dia, tipo, so, navegador, visitas) values ({HJ}, 'mobile', 'android', 'chrome', 6), ({HJ}, 'desktop', 'windows', 'edge', 2), ({HJ}, 'tablet', 'ios', 'safari', 2)")
         await e.goto(B + '/area-restrita.html#t=comunicacao&s=site'); await e.wait_for_timeout(2500)
         if not await e.locator('#vp-per').count():
-            await e.evaluate("""()=>{const b=[...document.querySelectorAll('button,a')].find(x=>/Comunica[cç]ão/.test(x.textContent)&&/tab|menu|btn/i.test(x.className+x.id)); if(b) b.click();}""")
+            await e.evaluate("""()=>{const b=[...document.querySelectorAll('button,a')].find(x=>/Comunica[cç]ão|CONecta Retiro/.test(x.textContent)&&/tab|menu|btn/i.test(x.className+x.id)); if(b) b.click();}""")
             await e.wait_for_timeout(800)
             await e.evaluate("""()=>{const b=[...document.querySelectorAll('button')].find(x=>x.textContent.trim()==='Site'); if(b) b.click();}"""); await e.wait_for_timeout(2000)
         ok(await e.locator('#vp-per').count() == 1, "Comunicação › Site tem o Painel de visitantes")

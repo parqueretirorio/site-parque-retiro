@@ -46,6 +46,12 @@ async def main():
         ok(await pg.evaluate("document.activeElement.id") == 'at-desc', "foco volta ao botão")
         await pg.evaluate("(u)=>PR_DESCREVER.abrir({imagem:u,campo:document.querySelector('#at-ba')})", PNG); await pg.wait_for_selector('.dsc-box')
         await pg.keyboard.press('Escape'); ok(await pg.locator('.dsc-box').count() == 0, "Esc fecha o painel")
+        # espanhol
+        await pg.evaluate("PR_IDIOMA.aplica('es', false)"); await pg.wait_for_timeout(500)
+        await pg.evaluate("(u)=>PR_DESCREVER.abrir({imagem:u,campo:document.querySelector('#at-ba')})", PNG); await pg.wait_for_selector('.dsc-box'); await pg.wait_for_timeout(500)
+        tx = await pg.inner_text('.dsc-box'); ok('Describir la imagen' in tx and 'Armar texto' in tx and 'Usar en el campo' in tx, "painel traduzido para espanhol")
+        await pg.fill('#dsc-o', 'ilustração do Parque'); await pg.click('#dsc-g'); ok('buen tamaño' in await pg.inner_text('#dsc-cont'), "contador traduzido")
+        await pg.keyboard.press('Escape'); await pg.evaluate("PR_IDIOMA.aplica('pt', false)"); await pg.wait_for_timeout(300)
         # celular
         await pg.set_viewport_size({'width': 390, 'height': 800}); await pg.evaluate("(u)=>PR_DESCREVER.abrir({imagem:u,campo:document.querySelector('#at-ba')})", PNG); await pg.wait_for_selector('.dsc-box')
         bx = await pg.locator('.dsc-box').bounding_box(); ok(bx['width'] >= 385 and bx['y'] > 50, "no celular vira painel no rodapé")
