@@ -1422,3 +1422,34 @@ body.modo-app #tab pre, body.modo-app #tab code { white-space: pre-wrap; word-br
 .at-conv { margin: 8px 0; }
 .at-conv > summary { cursor: pointer; color: var(--primary-color); font-weight: 600; }
 .at-conv-corpo { border: 1px solid #ccd; border-radius: 6px; padding: 10px 12px; margin-top: 6px; max-width: 520px; }
+
+/* Ajuda para descrever imagens (painel flutuante; no celular sobe do rodapé) — 27/11/2026 */
+.dsc-ov { position: fixed; inset: 0; z-index: 3000; background: rgba(0,0,0,.4); display: flex; align-items: center; justify-content: center; padding: 12px; animation: dsc-in .15s ease-out; }
+.dsc-box { background: #fff; border-radius: 12px; width: min(760px, 100%); max-height: calc(100vh - 24px); overflow: auto; box-shadow: 0 12px 36px rgba(0,0,0,.3); }
+.dsc-cab { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-bottom: 1px solid #dde; position: sticky; top: 0; background: #fff; z-index: 2; }
+.dsc-cab h3 { margin: 0; font-size: 1.05rem; }
+.dsc-x { border: 0; background: transparent; font-size: 1.2rem; cursor: pointer; padding: 6px 10px; }
+.dsc-corpo { display: grid; grid-template-columns: minmax(0, 230px) minmax(0, 1fr); gap: 14px; padding: 14px; }
+.dsc-img img { width: 100%; height: auto; border: 1px solid #ccd; border-radius: 6px; }
+.dsc-form label { display: block; margin: 8px 0 3px; font-weight: 600; font-size: .9rem; }
+.dsc-form label small { font-weight: 400; color: #566; }
+.dsc-form input, .dsc-form textarea { width: 100%; box-sizing: border-box; }
+.dsc-modo { position: relative; }
+.dsc-chip { display: inline-flex; gap: 6px; align-items: center; padding: 6px 12px; border: 1px solid #99a; border-radius: 8px; background: #fff; cursor: pointer; font-size: .95rem; }
+.dsc-pop { position: absolute; z-index: 5; top: calc(100% + 4px); left: 0; width: min(340px, 100%); background: #fff; border: 1px solid #99a; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.18); padding: 6px; }
+.dsc-op { display: flex; gap: 10px; align-items: flex-start; width: 100%; text-align: left; border: 0; background: transparent; padding: 8px; border-radius: 8px; cursor: pointer; font: inherit; }
+.dsc-op:hover, .dsc-op:focus { background: #eef2f6; outline: 2px solid transparent; }
+.dsc-op b { display: block; font-weight: 600; } .dsc-op small { color: #566; }
+.dsc-n { min-width: 22px; height: 22px; border-radius: 50%; background: #e4e8ee; display: inline-flex; align-items: center; justify-content: center; font-size: .8rem; }
+.dsc-op.sel .dsc-n { background: var(--primary-color); color: #fff; }
+.dsc-cont { font-size: .85rem; color: #566; margin: 4px 0; min-height: 1.2em; }
+.dsc-bot { display: flex; gap: 8px; flex-wrap: wrap; }
+@keyframes dsc-in { from { opacity: 0; } to { opacity: 1; } }
+@media (max-width: 600px) {
+  .dsc-ov { align-items: flex-end; padding: 0; }
+  .dsc-box { border-radius: 16px 16px 0 0; max-height: 92vh; width: 100%; animation: dsc-up .2s ease-out; }
+  .dsc-corpo { grid-template-columns: minmax(0, 1fr); }
+  .dsc-img img { max-height: 140px; width: auto; max-width: 100%; }
+}
+@keyframes dsc-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .dsc-ov, .dsc-box { animation: none; } }

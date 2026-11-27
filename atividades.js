@@ -170,7 +170,7 @@ function abrir(me, root, H) {
         <label><input type="checkbox" id="at-bpart"${v.bannerParticipar ? ' checked' : ''}> Ao clicar no banner, abrir direto o formulário de participação (configure em “Participação”)</label>
         <div class="form-row"><label for="at-b">Imagem do banner <small>(ideal: ${BANNER_W} × ${BANNER_H} px; imagens de outra proporção são recortadas no centro)</small></label><input id="at-b" type="file" accept="image/jpeg,image/png,image/webp">
           <div id="at-bp">${S.banner ? `<img src="${esc(S.banner)}" alt="Banner atual" style="max-width:360px;width:100%;height:auto;margin-top:6px;border:1px solid #ccd"> <button type="button" class="btn-visit" id="at-bx">Remover banner</button>` : ''}</div></div>
-        <div class="form-row"><label for="at-ba">Descrição do banner e da foto (para quem não enxerga a imagem)</label><input id="at-ba" maxlength="200" value="${esc(v.bannerAlt)}"></div>
+        <div class="form-row"><label for="at-ba">Descrição do banner e da foto (para quem não enxerga a imagem)</label><input id="at-ba" maxlength="200" value="${esc(v.bannerAlt)}"> <button type="button" class="btn-visit" id="at-desc"><i class="fas fa-universal-access" aria-hidden="true"></i> Ajudar a descrever</button><small>O leitor de tela lê este texto em voz alta. Diga o que a imagem mostra e o que está escrito nela.</small></div>
       </fieldset>` : ''}
       <div class="form-row"><label for="at-s">Situação</label><select id="at-s"><option value="rascunho"${v.status !== 'publicada' ? ' selected' : ''}>Rascunho (só aparece aqui)</option><option value="publicada"${v.status === 'publicada' ? ' selected' : ''}>Publicada (aparece no site)</option></select></div>
       <p class="form-erro" id="at-er" role="alert"${S.erro ? '' : ' hidden'}>${esc(S.erro)}</p>
@@ -186,6 +186,7 @@ function abrir(me, root, H) {
       try { const r = await window.PR_SUPABASE.rpc('pr_participacao_config_salvar', { p_id: ALMOCO_ID, p_cfg: almocoConfig(me) }); if (r && r.status >= 400) extra = ' Atenção: a configuração da inscrição não foi salva (a migração 0027 já foi aplicada?). Abra “Participação” depois de aplicá-la.'; } catch (e) { extra = ' Atenção: a configuração da inscrição não foi salva. Abra “Participação” e salve de novo.'; }
       S.msg = 'Atividade do almoço cadastrada e publicada.' + extra; draw();
     };
+    const dsc = $('#at-desc', root); if (dsc) dsc.onclick = () => { const img = S.banner || S.foto; if (!img) { erro('Escolha antes a foto ou o banner para descrever.'); return; } if (window.PR_DESCREVER) window.PR_DESCREVER.abrir({ imagem: img, campo: $('#at-ba', root), titulo: ($('#at-t', root) || {}).value }); };
     const nv = $('#at-novo', root); if (nv) nv.onclick = () => { S.edit = 'novo'; S.foto = null; S.banner = null; S.msg = ''; S.erro = ''; draw(); };
     $('#at-fil', root).onchange = e => { S.cat = e.target.value; draw(); };
     root.querySelectorAll('[data-ed]').forEach(b => b.onclick = () => { S.edit = b.dataset.ed; S.foto = null; S.banner = null; S.msg = ''; S.erro = ''; draw(); window.scrollTo({ top: root.getBoundingClientRect().top + scrollY - 20 }); });

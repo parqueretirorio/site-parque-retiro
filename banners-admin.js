@@ -59,7 +59,7 @@ window.PR_BANNERS_ADMIN = { zip, crc32, abrir(el, H) {
       <div class="bn-slides">${c.slides.map((x, i) => `<div class="bn-slide" data-i="${i}">
         <img src="${esc(x.img)}" alt="Miniatura do banner ${i + 1}" style="width:100%;max-width:360px;flex:0 0 auto;align-self:flex-start;height:auto;aspect-ratio:${s.w} / ${s.h};object-fit:contain;border:1px solid #ccd">
         <div>
-          <div class="form-row"><label>Descrição da imagem (para leitores de tela) ${x.alt ? '' : '<span class="form-erro">— falta preencher</span>'}</label><input data-f="alt" maxlength="300" value="${esc(x.alt || '')}"></div>
+          <div class="form-row"><label>Descrição da imagem (para leitores de tela) ${x.alt ? '' : '<span class="form-erro">— falta preencher</span>'}</label><input data-f="alt" maxlength="300" value="${esc(x.alt || '')}"> <button type="button" class="btn-visit" data-a="desc"><i class="fas fa-universal-access" aria-hidden="true"></i> Ajudar a descrever</button></div>
           <div class="form-row"><label>Link ao clicar (opcional: https://… ou página do site, ex.: reservas.html)</label><input data-f="link" maxlength="300" value="${esc(x.link || '')}"></div>
           <div class="form-row bn-cel"><label for="m-${s.slug}-${i}"><i class="fas fa-mobile-alt"></i> Imagem para celular (opcional) — exatamente ${B.MOBILE.w} × ${B.MOBILE.h} px (4:3), usada em telas de até ${B.MOBILE.ate} px. Sem ela, o celular usa a imagem do computador.</label>
             ${x.imgM ? `<div><img src="${esc(x.imgM)}" alt="Miniatura da imagem para celular do banner ${i + 1}" style="width:140px;height:auto;aspect-ratio:4 / 3;object-fit:contain;border:1px solid #ccd"> <button type="button" class="btn-visit" data-a="delm"><i class="fas fa-trash"></i> Remover imagem do celular</button></div>` : ''}
@@ -94,6 +94,7 @@ window.PR_BANNERS_ADMIN = { zip, crc32, abrir(el, H) {
       card.querySelectorAll('[data-a]').forEach(b => b.onclick = ev => {
         const a = b.dataset.a, c = cfgDe(slug); msg = ''; aviso = '';
         if (a === 'abrir') { aberto = aberto === slug ? '' : slug; return draw(); }
+        if (a === 'desc') { const d = b.closest('.bn-slide'), x = c.slides[+d.dataset.i]; if (window.PR_DESCREVER) window.PR_DESCREVER.abrir({ imagem: x.img, campo: d.querySelector('[data-f="alt"]'), titulo: s.nome }); return; }
         if (a === 'delm' && b.closest('.bn-slide')) { lerCampos(c); delete c.slides[+b.closest('.bn-slide').dataset.i].imgM; grava(c); return draw(); }
         if (b.closest('.bn-slide') && ['up', 'down', 'del'].includes(a)) {
           lerCampos(c); const i = +b.closest('.bn-slide').dataset.i;
