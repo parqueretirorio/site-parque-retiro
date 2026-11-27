@@ -1,4 +1,4 @@
-// Visitas do site, por origem (área restrita › CONecta Retiro › Site). 25/11/2026.
+// Visitas do site, por origem (área restrita › CONecta Comunicação › Site). 25/11/2026.
 // Lê o resumo do servidor (pr_resumo_visitas, migração 0021) e oferece o GERADOR DE LINKS com origem (?o=NOME).
 // Quem conta as visitas é o visitas.js, em cada página pública. Aqui só se mostra o resultado.
 (function () {

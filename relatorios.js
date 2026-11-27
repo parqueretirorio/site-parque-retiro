@@ -224,7 +224,7 @@ R.registrar({
 });
 
 R.registrar({
-  id: 'comunicacao', nome: 'CONecta Retiro', icone: 'fa-bullhorn', acesso: (me, H) => H.tem(me, 'comunicacao'),
+  id: 'comunicacao', nome: 'CONecta Comunicação', icone: 'fa-bullhorn', acesso: (me, H) => H.tem(me, 'comunicacao'),
   relatorios: [
     // Planejado × publicado. Use "Agrupar por" Canal, Formato, Projeto ou Situação: as colunas numéricas viram totais por grupo.
     { id: 'publicacoes', nome: 'Publicações: planejado × publicado', periodo: { k: 'data', rot: 'Data prevista' },

@@ -2082,7 +2082,7 @@ window.PR_AJUDA_CONTEUDO = {
    "id": "comunicacao-visao-geral",
    "categoria": "comunicacao",
    "ordem": 1,
-   "titulo": "CONecta Retiro: visão geral",
+   "titulo": "CONecta Comunicação: visão geral",
    "resumo": "Do encaminhamento da ata à publicação: planeje, produza, publique e meça a comunicação do Parque num só lugar.",
    "publico": "equipe",
    "status": "publicado",
@@ -2095,7 +2095,7 @@ window.PR_AJUDA_CONTEUDO = {
     "publicação",
     "campanha"
    ],
-   "onde": "**Comissões Parque Retiro › CONecta Retiro** (administrador, Responsável pela Comunicação e convidados).",
+   "onde": "**Comissões Parque Retiro › CONecta Comunicação** (administrador, Responsável pela Comunicação e convidados).",
    "secoes": {
     "oQueE": "A ferramenta tem 12 sub-abas: Calendário de Comunicação, Publicações, Criar a partir do calendário, Redes sociais, Projetos e campanhas, Tipos de publicação, Datas fixas anuais, Site, Equipe e convidados, Arquivos, Indicadores e Conectores.",
     "finalidade": "Ata → atividade no calendário → ação de comunicação (canais e formatos) → materiais → fila de publicação → publicada → relatório.",
@@ -2140,7 +2140,7 @@ window.PR_AJUDA_CONTEUDO = {
     "planejar",
     "data"
    ],
-   "onde": "**CONecta Retiro › Calendário de Comunicação** e **Criar a partir do calendário**.",
+   "onde": "**CONecta Comunicação › Calendário de Comunicação** e **Criar a partir do calendário**.",
    "secoes": {
     "oQueE": "",
     "finalidade": "",
@@ -2178,7 +2178,7 @@ window.PR_AJUDA_CONTEUDO = {
     "ics",
     "agenda"
    ],
-   "onde": "**CONecta Retiro › Publicações** (botões Painel por canal e formato, Fila de publicação e Lista de publicações).",
+   "onde": "**CONecta Comunicação › Publicações** (botões Painel por canal e formato, Fila de publicação e Lista de publicações).",
    "secoes": {
     "oQueE": "",
     "finalidade": "",
@@ -2227,7 +2227,7 @@ window.PR_AJUDA_CONTEUDO = {
     "zip",
     "medida"
    ],
-   "onde": "**CONecta Retiro › Site**.",
+   "onde": "**CONecta Comunicação › Site**.",
    "secoes": {
     "oQueE": "",
     "finalidade": "",
@@ -2283,12 +2283,12 @@ window.PR_AJUDA_CONTEUDO = {
       "acessos",
       "estatística"
     ],
-    "onde": "**CONecta Retiro › Site** (a seção \"Visitas do site\" fica no alto da tela).",
+    "onde": "**CONecta Comunicação › Site** (a seção \"Visitas do site\" fica no alto da tela).",
     "secoes": {
       "oQueE": "Um contador interno que conta uma **visita** por sessão do navegador e as páginas abertas nela. Não guarda nome, e-mail, IP nem cookies: só números por dia, página e origem. Quem está logado na área restrita não é contado.",
       "finalidade": "Saber se o site está sendo visitado e de onde as pessoas chegam, para decidir onde vale a pena divulgar.",
       "passos": [
-        "Abra **CONecta Retiro › Site**. No alto aparecem as visitas de hoje, ontem, 7 e 30 dias.",
+        "Abra **CONecta Comunicação › Site**. No alto aparecem as visitas de hoje, ontem, 7 e 30 dias.",
         "Veja **De onde vieram as visitas** e escolha o período (7, 30, 90 ou 365 dias).",
         "Para divulgar com origem, use **Gerar link com origem**: escolha onde vai postar (Canal, Comunidade, grupo...), a página que o link abre e clique em **Copiar link**.",
         "Cole o link gerado na postagem. Ele termina em `?o=nome`; não coloque ponto nem espaço depois dele.",
@@ -2334,7 +2334,7 @@ window.PR_AJUDA_CONTEUDO = {
     "publicador",
     "permissão"
    ],
-   "onde": "**CONecta Retiro › Equipe e convidados**.",
+   "onde": "**CONecta Comunicação › Equipe e convidados**.",
    "secoes": {
     "oQueE": "",
     "finalidade": "",
@@ -2500,7 +2500,7 @@ window.PR_AJUDA_CONTEUDO = {
     "lembrete",
     "gmail"
    ],
-   "onde": "**Comissões Parque Retiro › CONecta Retiro › Comunicados por e-mail**, botão **Convite para a área restrita**.",
+   "onde": "**Comissões Parque Retiro › CONecta Comunicação › Comunicados por e-mail**, botão **Convite para a área restrita**.",
    "secoes": {
     "oQueE": "Um e-mail pronto, em português ou espanhol, com o botão **Criar minha conta**, que abre direto o cadastro da área restrita. Quem já tem conta não recebe. Depois do envio, a tela mostra quem já tem acesso, quem está esperando aprovação e quem ainda não se cadastrou.",
     "finalidade": "Trazer para o CONecta Retiro os Mestres e as pessoas das comissões e da administração, sem precisar mandar o link uma a uma pelo WhatsApp.",
@@ -3044,7 +3044,7 @@ window.PR_AJUDA_CONTEUDO = {
     "oQueE": "O que é cadastrado na área restrita fica no servidor; para o público ver no site aberto, cada conteúdo tem o seu caminho.",
     "finalidade": "",
     "passos": [
-     "**Banners do site:** CONecta Retiro › Site › **Baixar pacote para publicar (.zip)** e copiar a pasta banners para a hospedagem.",
+     "**Banners do site:** CONecta Comunicação › Site › **Baixar pacote para publicar (.zip)** e copiar a pasta banners para a hospedagem.",
      "**Central de Ajuda:** Administração › Central de Ajuda › Publicar › **Baixar ajuda-conteudo.js** e substituir o arquivo na hospedagem.",
      "**Calendário de uso (público):** as datas ocupadas ficam na lista RESERVAS dentro do arquivo calendario.html; peça a quem cuida do site para atualizar.",
      "**Atividades, Lojinha, Rifa, Vaquinha, Álbum e Biblioteca:** o que a equipe cadastra fica no servidor; a ligação das páginas abertas do site ao servidor é a próxima etapa (até lá, o público vê o que foi publicado no site)."
@@ -3592,7 +3592,7 @@ window.PR_AJUDA_CONTEUDO = {
    "ser-voluntario"
   ],
   "menu.comissao-comunicacao": [
-   "Comunicação, Redes Sociais e Site",
+   "Comunicação",
    "Comissão que divulga as atividades e cuida do site.",
    "ser-voluntario"
   ],
@@ -3614,7 +3614,7 @@ window.PR_AJUDA_CONTEUDO = {
    "Novidades do Parque: o Blog e o CONecta Retiro, com o que muda na plataforma a cada semana."
   ],
   "menu.noticias-conecta": [
-   "CONecta Retiro",
+   "CONecta Comunicação",
    "O que mudou na plataforma do Parque nesta semana; as semanas anteriores ficam na lista ao lado, pela data."
   ],
   "menu.movimento-humanista": [

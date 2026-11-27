@@ -51,7 +51,7 @@ const SLOTS = [
   ['vaquinha-coletiva', 'Ajude — Vaquinha Coletiva', 'vaquinha-coletiva.html', 'Ajude o Parque', P, H3],
   ['comissoes', 'Ajude — Comissões', 'comissoes.html', 'Ajude o Parque', P, H3],
   ['comissao-jardinagem', 'Comissão — Jardinagem / Área Externa', 'comissao-jardinagem.html', 'Ajude o Parque', P, H3],
-  ['comissao-comunicacao', 'Comissão — Comunicação, Redes Sociais e Site', 'comissao-comunicacao.html', 'Ajude o Parque', P, H3],
+  ['comissao-comunicacao', 'Comissão — Comunicação', 'comissao-comunicacao.html', 'Ajude o Parque', P, H3],
   ['comissao-multiuso', 'Comissão — Multiuso', 'comissao-multiuso.html', 'Ajude o Parque', P, H3],
   ['voluntario', 'Ajude — Voluntário', 'voluntario.html', 'Ajude o Parque', P, H3],
   ['parques-mundo', 'Parques no Mundo', 'parques-mundo.html', 'Outras páginas', P, H3],

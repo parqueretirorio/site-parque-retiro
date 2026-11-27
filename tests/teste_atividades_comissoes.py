@@ -26,7 +26,7 @@ async def main():
         ok('Nivelação' in nav and 'Nivelamento' not in nav,"menu Centro de Estudo > Escola: Nivelação")
         ok('Atividades' in nav and 'Eventos' in nav and 'Encontros' in nav and 'Retiros' in nav and 'Reuniões' in nav,"menu Atividades com Eventos / Encontros / Retiros / Reuniões")
         ok(await pg.evaluate("[...document.querySelectorAll('header nav a')].filter(a=>/^Eventos$/.test(a.textContent.trim())).every(a=>a.getAttribute('href')==='atividades.html?cat=evento')"),"'Eventos' só existe como tipo dentro de Atividades")
-        ok('Comissões' in nav and 'Jardinagem / Área Externa' in nav and 'Comunicação, Redes Sociais e Site' in nav,"Ajude o Parque tem Comissões com as duas páginas")
+        ok('Comissões' in nav and 'Jardinagem / Área Externa' in nav and 'Comunicação' in nav,"Ajude o Parque tem Comissões com as duas páginas")
         # ---------- lista vazia / voluntário preselecionado ----------
         await pg.goto(U+"atividades.html"); ok('Volte em breve' in await pg.inner_text('#atv-lista'),"lista vazia mostra aviso")
         await pg.goto(U+"eventos.html"); await pg.wait_for_url("**/atividades.html"); ok(True,"eventos.html redireciona para atividades.html")
@@ -43,7 +43,7 @@ async def main():
         await pg.wait_for_url("**/area-restrita.html")
         ok(await pg.evaluate("!!document.querySelector('.area-col[data-area=com] [data-tab=atividades]')"),"Atividades está em Comissões Parque Retiro")
         ok(await pg.evaluate("!!document.querySelector('.area-col[data-area=com] [data-tab=jardinagem]') && !document.querySelector('[data-tab=jardinagem]').closest('.area-grupo')"),"Jardinagem / Área Externa direto em Comissões Parque Retiro")
-        ok(await pg.evaluate("!!document.querySelector('.area-col[data-area=com] [data-tab=comunicacao]')"),"Aba CONecta Retiro direto em Comissões")
+        ok(await pg.evaluate("!!document.querySelector('.area-col[data-area=com] [data-tab=comunicacao]')"),"CONecta Comunicação direto em Comissões")
         ok(not await pg.evaluate("!!document.querySelector('[data-tab=voluntarios]').closest('.area-grupo') === false"),"Voluntários continua no grupo Ajude o Parque")
         await aba(pg,'album'); ok('Fotos por atividade' in await pg.inner_text('#tab') and 'Fotos por evento' not in await pg.inner_text('#tab'),"Álbum: 'Fotos por atividade'")
         await aba(pg,'atividades'); await pg.click('#at-novo')
