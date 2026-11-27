@@ -144,8 +144,9 @@ async function iniciaPagina() {
   if (slug === 'index' && window.PR_ATIVIDADES) {
     const atv = window.PR_ATIVIDADES.slidesBanner();
     if (atv.length) {
-      let base = cfgOk(cfg) ? cfg.slides.filter(x => x.src) : null;
-      if (!base) { const im = document.querySelector('.hero-banner img'); base = im ? [{ src: im.getAttribute('src'), alt: im.getAttribute('alt') || '', link: '' }] : []; }
+      // Com atividades em destaque, só elas aparecem (o banner fixo da página volta a ser exibido quando não houver nenhuma);
+      // slides configurados em Banners (área restrita) continuam antes delas.
+      const base = cfgOk(cfg) ? cfg.slides.filter(x => x.src) : [];
       cfg = { modo: 'carrossel', intervalo: cfg && cfg.intervalo, slides: base.concat(atv) };
     }
   }

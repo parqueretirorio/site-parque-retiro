@@ -79,9 +79,9 @@ async def main():
         await pg.goto(U+"atividade.html?id=nao-existe"); ok('não foi encontrada' in await pg.inner_text('#atv-artigo'),"id inexistente mostra aviso")
         # ---------- banner do Início ----------
         await pg.goto(U+"index.html"); await pg.wait_for_selector('.pr-banner .pr-b-slide')
-        n=await pg.evaluate("document.querySelectorAll('.pr-banner .pr-b-slide').length"); ok(n==2,"Início: carrossel com a imagem atual + 1 atividade em destaque (%d)"%n)
+        n=await pg.evaluate("document.querySelectorAll('.pr-banner .pr-b-slide').length"); ok(n==1,"Início: com atividade em destaque, só ela aparece no banner (%d)"%n)
         href=await pg.evaluate("document.querySelectorAll('.pr-banner .pr-b-slide a')[0].getAttribute('href')"); ok(href.startswith('atividade.html?id='),"slide da atividade leva ao artigo")
-        await pg.evaluate("document.querySelector('.pr-b-next').click()"); await pg.click('.pr-banner .pr-b-slide.on a'); await pg.wait_for_url("**/atividade.html?id=*"); ok('Retiro de Primavera' in await pg.inner_text('.atv-titulo'),"clicar no banner abre a atividade")
+        await pg.click('.pr-banner .pr-b-slide.on a'); await pg.wait_for_url("**/atividade.html?id=*"); ok('Retiro de Primavera' in await pg.inner_text('.atv-titulo'),"clicar no banner abre a atividade")
         ok(not errs,"sem erros de JavaScript "+str(errs))
         await b.close()
 try: asyncio.run(main()); print("TUDO OK")
