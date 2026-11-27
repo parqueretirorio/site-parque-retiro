@@ -1323,7 +1323,7 @@ V.patrimonio = (me, root) => {
 // Links diretos (ex.: area-restrita.html#t=documentos&s=dar): o destino sobrevive ao login e cada ferramenta lê a sub-aba pedida.
 const hashParam = k => new URLSearchParams(location.hash.slice(1)).get(k) || '';
 const guardaDestino = () => { try { if (/(^|&)t=/.test(location.hash.slice(1))) sessionStorage.setItem('pr_destino', location.hash); } catch (e) {} };
-const destinoArea = () => { let d = ''; try { d = sessionStorage.getItem('pr_destino') || ''; sessionStorage.removeItem('pr_destino'); } catch (e) {} return 'area-restrita.html' + (/^#[\w=&%.-]+$/.test(d) ? d : ''); };
+const destinoArea = () => { try { const v = sessionStorage.getItem('pr_volta'); sessionStorage.removeItem('pr_volta'); if (v && /^participar\.html\?id=[\w.%-]+$/.test(v)) return v; } catch (e) {} let d = ''; try { d = sessionStorage.getItem('pr_destino') || ''; sessionStorage.removeItem('pr_destino'); } catch (e) {} return 'area-restrita.html' + (/^#[\w=&%.-]+$/.test(d) ? d : ''); };
 window.PR_LINK = { param: hashParam };
 let irPara = null; // definido em painel(): abre outra aba do painel (usado pelos botões "Planejar publicações" dos calendários)
 const ajudaModulos = () => ({ irPara, db, esc, $, uid, hoje, fmtData, csv, reduz, norm, tem, safeUrl, NIV, livros, emprest, exm, ativos, livre, pedidos, quartoDe, camaTxt, CC, MOEDA, money, normConta });

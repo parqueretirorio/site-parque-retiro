@@ -44,11 +44,23 @@ const copiar = async t => { try { await navigator.clipboard.writeText(t); return
 const linkForm = id => location.origin.replace(/\/$/, '') + location.pathname.replace(/[^/]*$/, '') + 'participar.html?id=' + encodeURIComponent(id);
 
 /* ---------- Página pública ---------- */
+// Quem já tem cadastro aprovado e entrou no CONecta Retiro (mesma sessão do navegador) tem os dados preenchidos.
+// Só lê o próprio perfil, com o login da pessoa; não revela a ninguém se um e-mail está cadastrado.
+async function perfilLogado() {
+  try {
+    const s = JSON.parse(localStorage.getItem('pr-sb-sessao') || 'null'), c = (window.PR_CONFIG_DADOS && window.PR_CONFIG_DADOS.supabase) || {};
+    if (!s || !s.access_token || !s.user || !s.user.id || !c.url || !c.chavePublica) return null;
+    if (s.expires_at && s.expires_at * 1000 < Date.now()) return null;
+    const r = await fetch(c.url.replace(/\/$/, '') + '/rest/v1/perfis?select=nome,email,whatsapp,status&id=eq.' + encodeURIComponent(s.user.id), { headers: { apikey: c.chavePublica, Authorization: 'Bearer ' + s.access_token } });
+    if (!r.ok) return null; const p = (await r.json())[0];
+    return p && p.status === 'aprovado' && p.email ? p : null;
+  } catch (e) { return null; }
+}
 function paginaPublica() {
   const raiz = document.getElementById('pa-app'); if (!raiz) return;
   const id = new URLSearchParams(location.search).get('id') || '';
   const chaveLocal = 'pr-part-' + id;
-  const S = { ev: null, etapa: 1, d: { nome: '', email: '', tel: '', cep: '', rest: '', outra: '', opcao: '', forma: 'pix', ok: false }, erro: '', env: false, res: null };
+  const S = { ev: null, etapa: 1, d: { nome: '', email: '', tel: '', cep: '', rest: '', outra: '', opcao: '', forma: 'pix', ok: false }, erro: '', env: false, res: null, perfil: null };
   try { S.res = JSON.parse(localStorage.getItem(chaveLocal) || 'null'); } catch (e) { S.res = null; }
   const msg = (t, cls) => { raiz.innerHTML = `<p class="${cls || 'vazio'}" role="status">${esc(t)}</p><p><a class="btn-visit" href="atividades.html">Ver as atividades do Parque</a></p>`; };
 
@@ -110,11 +122,12 @@ function paginaPublica() {
   function draw() {
     const ev = S.ev, d = S.d, e = S.etapa;
     const passos = ['Seus dados', 'Informações importantes', 'Contribuição'];
-    raiz.innerHTML = `<ol class="pa-passos" aria-label="Etapas">${passos.map((p, i) => `<li${i + 1 === e ? ' aria-current="step" class="on"' : i + 1 < e ? ' class="feito"' : ''}><span>${i + 1}</span> ${p}</li>`).join('')}</ol>
+    raiz.innerHTML = `<ol class="pa-passos" aria-label="Etapas">${passos.map((p, i) => `<li${i + 1 === e ? ' aria-current="step" class="on"' : i + 1 < e ? ' class="feito"' : ''}><span>${i + 1}</span> <span>${p}</span></li>`).join('')}</ol>
     <form id="pa-form" class="form-reserva" novalidate>
     ${e === 1 ? `<h3>Seus dados</h3>
+      ${S.perfil ? `<p class="tip-box" role="status"><i class="fas fa-user-check"></i> <span>Você entrou no CONecta Retiro como</span> <strong>${esc(S.perfil.nome || S.perfil.email)}</strong>. <span>Preenchemos seus dados; confira e complete o CEP.</span></p>` : `<p class="tip-box" role="note"><i class="fas fa-user-lock"></i> <span>Já tem cadastro no CONecta Retiro?</span> <button type="button" class="btn-visit" id="pa-entrar">Entrar para preencher meus dados</button><br><small>Não tem cadastro? Siga normalmente: não é preciso criar conta para se inscrever.</small></p>`}
       <div class="form-row"><label for="pa-nome">Nome completo *</label><input id="pa-nome" maxlength="120" autocomplete="name" value="${esc(d.nome)}"></div>
-      <div class="form-row"><label for="pa-email">E-mail *</label><input id="pa-email" type="email" maxlength="160" autocomplete="email" value="${esc(d.email)}"></div>
+      <div class="form-row"><label for="pa-email">E-mail *</label><input id="pa-email" type="email" maxlength="160" autocomplete="email" value="${esc(d.email)}"${S.perfil ? ' readonly aria-describedby="pa-email-n"' : ''}>${S.perfil ? '<small id="pa-email-n">O e-mail do seu cadastro identifica a sua inscrição.</small>' : ''}</div>
       <div class="form-row"><label for="pa-tel">Telefone / WhatsApp *</label><input id="pa-tel" type="tel" maxlength="30" autocomplete="tel" placeholder="(21) 99999-9999" value="${esc(d.tel)}"></div>
       <div class="form-row"><label for="pa-cep">CEP *</label><input id="pa-cep" inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="00000-000" value="${esc(d.cep)}"></div>` : ''}
     ${e === 2 ? `<h3>Informações importantes</h3>
@@ -133,6 +146,7 @@ function paginaPublica() {
     <p class="pa-botoes">${e > 1 ? '<button type="button" class="btn-visit" id="pa-volta"><i class="fas fa-arrow-left"></i> Voltar</button> ' : ''}<button class="btn-visit btn-large" id="pa-segue"${S.env ? ' disabled' : ''}>${e < 3 ? 'Continuar <i class="fas fa-arrow-right"></i>' : (S.env ? 'Enviando…' : '<i class="fas fa-check"></i> Concluir inscrição')}</button></p></form>`;
     const f = raiz.querySelector('#pa-form');
     f.onsubmit = ev2 => { ev2.preventDefault(); lerCampos(); const er = valida(); if (er) { S.erro = er; draw(); return; } S.erro = ''; if (S.etapa < 3) { S.etapa++; draw(); window.scrollTo(0, 0); } else enviar(); };
+    const en = raiz.querySelector('#pa-entrar'); if (en) en.onclick = () => { try { sessionStorage.setItem('pr_volta', 'participar.html?id=' + encodeURIComponent(id)); } catch (x) { /* sem armazenamento */ } location.href = 'login.html'; };
     const v = raiz.querySelector('#pa-volta'); if (v) v.onclick = () => { lerCampos(); S.erro = ''; S.etapa--; draw(); };
   }
   function cabecalho() {
@@ -143,11 +157,13 @@ function paginaPublica() {
   }
   if (!id) { msg('Evento não identificado. Use o link que o Parque divulgou.'); return; }
   raiz.innerHTML = '<p class="vazio">Carregando…</p>';
-  publicoRpc('pr_participacao_evento', { p_id: id }).then(ev => {
+  publicoRpc('pr_participacao_evento', { p_id: id }).then(async ev => {
     if (!ev || !ev.ok) { msg(S.res ? 'Este evento já não recebe novas inscrições.' : 'Este evento não está recebendo inscrições agora.'); return; }
     S.ev = ev; cabecalho();
     if (S.res) { telaResultado(); return; }
     if (ev.encerrado) { msg('As inscrições deste evento estão encerradas.'); return; }
+    S.perfil = await perfilLogado();
+    if (S.perfil) { const d = S.d; if (!d.nome) d.nome = S.perfil.nome || ''; if (!d.email) d.email = S.perfil.email; if (!d.tel) d.tel = S.perfil.whatsapp || ''; }
     draw();
   }).catch(e => msg(e.message, 'form-erro'));
 }
