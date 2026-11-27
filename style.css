@@ -1453,3 +1453,10 @@ body.modo-app #tab pre, body.modo-app #tab code { white-space: pre-wrap; word-br
 }
 @keyframes dsc-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .dsc-ov, .dsc-box { animation: none; } }
+
+/* Responsabilidades em caixa flutuante (tabela de responsáveis) — 27/11/2026 */
+.fn-pop { display: inline-block; }
+.fn-box { position: fixed; z-index: 2500; background: #fff; border: 1px solid #99a; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.22); padding: 8px; overflow: auto; }
+.fn-box[hidden] { display: none; }
+.fn-box .fn { display: flex; gap: 8px; align-items: flex-start; padding: 6px 4px; font-size: .9rem; }
+.fn-box .fn input { margin-top: 3px; }

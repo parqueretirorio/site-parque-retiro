@@ -407,7 +407,8 @@ V.users = (me, root) => {
   const salva = (email, fn) => { const l = db.get('users', []), u = l.find(x => x.email === email); if (u) fn(u); db.set('users', l); draw(); const b = document.querySelector('[data-tab="users"] .badge'); const n = l.filter(x => statusDe(x) === 'pendente').length; if (b) { n ? b.textContent = n : b.remove(); } };
   const draw = () => {
     const us = db.get('users', []), pend = us.filter(u => statusDe(u) === 'pendente'), demais = us.filter(u => statusDe(u) !== 'pendente');
-    const fnCell = u => u.nivel === 'administrador' ? '<small>Todas (administrador)</small>' : Object.entries(FUNC).map(([k, v]) => `<label class="fn"><input type="checkbox" data-fn="${k}" data-em="${esc(u.email)}"${(u.funcoes || []).includes(k) ? ' checked' : ''}> ${v}</label>`).join('');
+    // Responsabilidades numa caixa flutuante (a linha da tabela não cresce): botão com a contagem; a lista abre ao clicar.
+    const fnCell = u => u.nivel === 'administrador' ? '<small>Todas (administrador)</small>' : `<div class="fn-pop"><button type="button" class="btn-visit fn-bt" aria-haspopup="true" aria-expanded="false" data-fnbt="${esc(u.email)}"><span class="fn-n">${(u.funcoes || []).filter(f => FUNC[f]).length} marcada(s)</span> <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="fn-box" role="group" aria-label="Responsabilidades de ${esc(u.nome)}" hidden>${Object.entries(FUNC).map(([k, v]) => `<label class="fn"><input type="checkbox" data-fn="${k}" data-em="${esc(u.email)}"${(u.funcoes || []).includes(k) ? ' checked' : ''}> ${v}</label>`).join('')}</div></div>`;
     const acoes = u => {
       if (u.email === me.email) return '';
       const st = statusDe(u), e = esc(u.email);
@@ -451,7 +452,18 @@ V.users = (me, root) => {
       salva(b.dataset.em, u => { u.status = novo; });
     });
     root.querySelectorAll('[data-nv]').forEach(s => s.onchange = () => { const l = db.get('users', []); l.find(u => u.email === s.dataset.nv).nivel = s.value; db.set('users', l); draw(); });
-    root.querySelectorAll('[data-fn]').forEach(c => c.onchange = () => { const l = db.get('users', []), u = l.find(x => x.email === c.dataset.em), f = new Set(u.funcoes || []); c.checked ? f.add(c.dataset.fn) : f.delete(c.dataset.fn); u.funcoes = [...f]; db.set('users', l); });
+    root.querySelectorAll('[data-fn]').forEach(c => c.onchange = () => { const l = db.get('users', []), u = l.find(x => x.email === c.dataset.em), f = new Set(u.funcoes || []); c.checked ? f.add(c.dataset.fn) : f.delete(c.dataset.fn); u.funcoes = [...f]; db.set('users', l); const pop = c.closest('.fn-pop'), n = pop && pop.querySelector('.fn-n'); if (n) n.textContent = [...pop.querySelectorAll('[data-fn]:checked')].length + ' marcada(s)'; });
+    const fechaFn = () => root.querySelectorAll('.fn-box').forEach(bx => { bx.hidden = true; const b = bx.previousElementSibling; if (b) b.setAttribute('aria-expanded', 'false'); });
+    root.querySelectorAll('.fn-bt').forEach(b => b.onclick = ev => {
+      ev.stopPropagation(); const bx = b.nextElementSibling, abrir = bx.hidden; fechaFn(); if (!abrir) return;
+      bx.hidden = false; b.setAttribute('aria-expanded', 'true');
+      const r = b.getBoundingClientRect(), w = Math.min(320, innerWidth - 16); bx.style.width = w + 'px'; bx.style.left = Math.max(8, Math.min(r.left, innerWidth - w - 8)) + 'px';
+      const abaixo = innerHeight - r.bottom - 12, acima = r.top - 12, sobe = abaixo < 220 && acima > abaixo; bx.style.maxHeight = Math.max(160, sobe ? acima : abaixo) + 'px';
+      bx.style.top = sobe ? '' : (r.bottom + 4) + 'px'; bx.style.bottom = sobe ? (innerHeight - r.top + 4) + 'px' : '';
+      const p1 = bx.querySelector('input'); if (p1) p1.focus();
+    });
+    root.querySelectorAll('.fn-box').forEach(bx => bx.addEventListener('click', ev => ev.stopPropagation()));
+    if (!root._fnFecha) { root._fnFecha = true; document.addEventListener('click', () => root.querySelectorAll('.fn-box').forEach(bx => { bx.hidden = true; })); document.addEventListener('keydown', ev => { if (ev.key === 'Escape') root.querySelectorAll('.fn-box').forEach(bx => { if (!bx.hidden) { bx.hidden = true; const b = bx.previousElementSibling; if (b) { b.setAttribute('aria-expanded', 'false'); b.focus(); } } }); }); window.addEventListener('scroll', () => root.querySelectorAll('.fn-box').forEach(bx => { bx.hidden = true; }), { passive: true }); }
     root.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if (confirm('Remover este responsável?')) { db.set('users', db.get('users', []).filter(u => u.email !== b.dataset.del)); draw(); } });
     if (window.PR_DADOS && PR_DADOS.modo === 'supabase') { // no servidor, a senha é de cada pessoa: ninguém cria conta pelos outros
       const fu = $('#fu', root), t = fu && fu.previousElementSibling;

@@ -87,7 +87,7 @@ async def main():
         await pg.select_option('[data-nvp="cida@x.com"]', 'editor'); await pg.click('[data-ap="cida@x.com"]')
         await espera_salvo(pg)
         ok(banco("select nivel||'/'||status from perfis where email='cida@x.com'") == ['editor/aprovado'], "aprovação gravada no perfil do banco")
-        await pg.check('[data-fn="documentos"][data-em="cida@x.com"]'); await espera_salvo(pg)
+        await pg.click('[data-fnbt="cida@x.com"]'); ok(await pg.locator('.fn-box:not([hidden])').count() == 1, 'caixa flutuante de responsabilidades abre'); await pg.check('[data-fn="documentos"][data-em="cida@x.com"]'); ok('1 marcada' in await pg.inner_text('[data-fnbt="cida@x.com"]'), 'contagem atualiza'); await pg.keyboard.press('Escape'); ok(await pg.locator('.fn-box:not([hidden])').count() == 0, 'Esc fecha a caixa'); await espera_salvo(pg)
         ok(banco("select array_to_string(funcoes, ',') from perfis where email='cida@x.com'") == ['documentos'], "função gravada no perfil do banco")
 
         # 5) outra pessoa (Beto, leitor) vê o livro; não consegue se promover
