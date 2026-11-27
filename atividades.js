@@ -102,6 +102,17 @@ async function imagemBanner(file) { // recorte centralizado na proporção 3:1 (
   return { img: c.toDataURL('image/jpeg', 0.8), aviso: im.width < BANNER_W ? `A imagem tem ${im.width} px de largura (o ideal é ${BANNER_W}); pode perder nitidez no banner.` : '' };
 }
 
+/* ---------- Atividade pronta: almoço de 29/11/2026 (cadastro com 1 clique, 26/11/2026) ---------- */
+const ALMOCO_ID = 'almoco-29-11-2026';
+const almocoModelo = me => ({ id: ALMOCO_ID, titulo: 'Entre Princípios e Vivências: um almoço para refletir sobre nossas ações', categoria: 'evento', origem: 'parque', dataAtiv: '2026-11-29',
+  local: 'Parque de Estudo e Reflexão Retiro, Maricá/RJ', organizacao: '', linkExterno: '',
+  lide: 'Um almoço e um intercâmbio sobre os 12 Princípios de Ação Válida, de Silo, domingo, 29 de novembro, a partir das 11h.',
+  texto: 'Que tal um encontro para compartilhar experiências, reflexões e uma boa comida?\n\nVamos nos reunir no Parque de Estudo e Reflexão Retiro para um almoço especial e um intercâmbio sobre os 12 Princípios de Ação Válida, de Silo.\n\nEsses princípios nos convidam a refletir sobre nossas escolhas e atitudes, buscando maior coerência entre o que pensamos, sentimos e fazemos, fortalecendo a solidariedade e a não violência em nossas relações.\n\nSerá um momento de troca, aprendizado e convivência!\n\nData: 29 de novembro (domingo), a partir das 11h.\nLocal: Parque de Estudo e Reflexão Retiro, Maricá/RJ.\nColaboração para o almoço: R$ 35,00 por pessoa.\n\nConfirme sua presença pelo botão "Quero participar", para que possamos organizar nosso almoço. Esperamos você!',
+  foto: '', banner: '', bannerAlt: '', bannerParticipar: true, destaque: false, autor: 'Parque Retiro', status: 'publicada',
+  criadoEm: new Date().toISOString(), atualizadoEm: new Date().toISOString(), por: me.nome, criadoPorEmail: me.email, criadoPorNome: me.nome || '', respEmail: me.email, respNome: me.nome || '' });
+const almocoConfig = me => ({ ativo: false, titulo: 'Entre Princípios e Vivências', data_texto: 'Domingo, 29 de novembro, a partir das 11h', local_texto: 'Parque de Estudo e Reflexão Retiro, Maricá/RJ', aviso: '',
+  opcoes: [{ id: 'almoco', nome: 'Almoço de domingo (29/11)', valor_centavos: 3500 }], pix_chave: '+5521999175882', pix_nome: 'Maria da Conceição Ribeiro', pix_cidade: 'Maricá', prazo: '', vagas: '', resp_email: me.email });
+
 /* ---------- Área restrita ---------- */
 function abrir(me, root, H) {
   const { $, db, uid: uid2 } = H;
@@ -124,6 +135,7 @@ function abrir(me, root, H) {
     root.innerHTML = `<h3><i class="fas fa-calendar-check"></i> Atividades</h3>
     <p>Registre por escrito o que acontece no Parque (eventos, encontros, retiros e reuniões) e também atividades externas que tenham relação com o Parque Retiro. As atividades <strong>publicadas</strong> aparecem na área aberta, em <a href="atividades.html" target="_blank" rel="noopener">O Parque &rsaquo; Atividades</a>, e as marcadas como destaque entram no banner do Início.</p>
     ${S.msg ? `<p class="tip-box" role="status">${esc(S.msg)}</p>` : ''}
+    ${admAtiv && !forma && !lista().some(a => a.id === ALMOCO_ID) ? '<p class="tip-box" role="note"><i class="fas fa-utensils"></i> <strong>Atividade pronta:</strong> almoço “Entre Princípios e Vivências” (29/11). <button type="button" class="btn-visit" id="at-almoco">Cadastrar esta atividade</button></p>' : ''}
     ${edita && !forma ? '<p><button type="button" class="btn-visit" id="at-novo"><i class="fas fa-plus"></i> Nova atividade</button></p>' : ''}
     <p class="tip-box" role="note">${admAtiv ? 'Você é <strong>Administrador das Atividades</strong>: pode corrigir, publicar, transferir ou excluir qualquer atividade.' : 'Qualquer pessoa da equipe pode criar uma atividade e fica <strong>responsável por ela</strong> (editar, publicar, passar para outra pessoa). O Administrador das Atividades pode corrigir qualquer atividade.'}</p>
     ${forma ? `<form id="at-form" class="form-reserva" novalidate><h4>${ed ? 'Editar atividade' : 'Nova atividade'}</h4>
@@ -157,6 +169,13 @@ function abrir(me, root, H) {
     <div class="rc-filtros"><div class="form-row"><label for="at-fil">Mostrar</label><select id="at-fil"><option value="">Todos os tipos</option>${Object.keys(CATS).map(k => `<option value="${k}"${S.cat === k ? ' selected' : ''}>${esc(CATS[k])}</option>`).join('')}</select></div></div>
     <h4>Atividades registradas (${itens.length})</h4>
     ${itens.length ? `<table class="doc-table"><thead><tr><th>Título</th><th>Tipo</th><th>Data</th><th>Situação</th><th>Banner</th><th>Responsável</th><th></th></tr></thead><tbody>${itens.map(a => `<tr><td>${esc(a.titulo)}${a.origem === 'externa' ? ' <small>(externa)</small>' : ''}</td><td>${esc(CAT1[catDe(a.categoria)])}</td><td>${esc(fmtData(a.dataAtiv))}</td><td><span class="badge-status ${a.status === 'publicada' ? 'badge-disponivel' : 'badge-pend'}">${a.status === 'publicada' ? 'Publicada' : 'Rascunho'}</span></td><td>${a.destaque && imgOk(a.banner) ? 'No Início' : '-'}</td><td>${esc(a.respNome || a.por || '-')}</td>${podeEd(a) ? `<td><button class="btn-visit" data-ed="${esc(a.id)}">Editar</button> <button class="btn-visit" data-part="${esc(a.id)}"><i class="fas fa-hand-holding-heart"></i> Participação</button> <button class="btn-visit" data-pub="${esc(a.id)}">${a.status === 'publicada' ? 'Tirar do site' : 'Publicar'}</button> <button class="btn-visit" data-del="${esc(a.id)}" style="background:#a33">Excluir</button></td>` : '<td></td>'}</tr>`).join('')}</tbody></table>` : '<p class="vazio">Nenhuma atividade registrada ainda.</p>'}`;
+    const al = $('#at-almoco', root); if (al) al.onclick = async () => {
+      if (lista().some(a => a.id === ALMOCO_ID)) return;
+      const l = lista(); l.push(almocoModelo(me)); if (!db.set('atividades', l)) { S.msg = 'Não foi possível salvar a atividade.'; return draw(); }
+      let extra = ' Falta: abrir “Participação”, conferir os dados do Pix e marcar “Receber inscrições”.';
+      try { const r = await window.PR_SUPABASE.rpc('pr_participacao_config_salvar', { p_id: ALMOCO_ID, p_cfg: almocoConfig(me) }); if (r && r.status >= 400) extra = ' Atenção: a configuração da inscrição não foi salva (a migração 0027 já foi aplicada?). Abra “Participação” depois de aplicá-la.'; } catch (e) { extra = ' Atenção: a configuração da inscrição não foi salva. Abra “Participação” e salve de novo.'; }
+      S.msg = 'Atividade do almoço cadastrada e publicada.' + extra; draw();
+    };
     const nv = $('#at-novo', root); if (nv) nv.onclick = () => { S.edit = 'novo'; S.foto = null; S.banner = null; S.msg = ''; S.erro = ''; draw(); };
     $('#at-fil', root).onchange = e => { S.cat = e.target.value; draw(); };
     root.querySelectorAll('[data-ed]').forEach(b => b.onclick = () => { S.edit = b.dataset.ed; S.foto = null; S.banner = null; S.msg = ''; S.erro = ''; draw(); window.scrollTo({ top: root.getBoundingClientRect().top + scrollY - 20 }); });
