@@ -166,7 +166,7 @@ function botaoParticipar(el, id) {
 /* ---------- Área restrita ---------- */
 const STATUS = { a_pagar: 'A pagar', informou: 'Disse que pagou', confirmado: 'Pago e confirmado', cancelado: 'Cancelada' };
 function painel(me, root, H, at, voltar) {
-  const S = { cfg: null, ins: [], tot: null, erro: '', msg: '', filtro: '', carregou: false, opc: null, tipo: '' };
+  const S = { cfg: null, ins: [], tot: null, erro: '', msg: '', filtro: '', carregou: false, opc: null, tipo: '', papel: '' };
   // PR_SUPABASE.rpc devolve { status, corpo }: aqui vira o corpo, ou um erro com a mensagem do servidor.
   const rpc = async (fn, c) => {
     if (!(window.PR_SUPABASE && window.PR_SUPABASE.rpc)) throw new Error('Disponível só no site publicado, com login.');
@@ -180,7 +180,7 @@ function painel(me, root, H, at, voltar) {
   async function carregar() {
     try {
       const r = await rpc('pr_participacao_listar', { p_id: at.id });
-      S.cfg = r.config; S.ins = r.inscricoes || []; S.tot = r.totais || {}; S.erro = '';
+      S.cfg = r.config; S.papel = r.papel || ''; S.ins = r.inscricoes || []; S.tot = r.totais || {}; S.erro = '';
     } catch (e) { S.erro = /42501|Sem permiss/.test(e.message) ? 'Você não tem permissão para ver as inscrições desta atividade.' : e.message; }
     S.carregou = true; if (!S.opc) S.opc = ((S.cfg && S.cfg.opcoes) || []).map(o => ({ id: o.id, nome: o.nome, valor: (o.valor_centavos / 100).toFixed(2).replace('.', ',') }));
     if (!S.opc.length) S.opc = [{ id: '', nome: '', valor: '' }];
@@ -194,7 +194,7 @@ function painel(me, root, H, at, voltar) {
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([t], { type: 'text/csv;charset=utf-8' })); a.download = 'inscricoes-' + at.id + '.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   }
   function draw() {
-    const c = S.cfg || {}, t = S.tot || {}, ativo = c.ativo !== undefined ? c.ativo : false;
+    const co = S.papel === 'co', c = S.cfg || {}, t = S.tot || {}, ativo = c.ativo !== undefined ? c.ativo : false;
     const lista = S.ins.filter(i => !S.filtro || (S.filtro === 'pagar' ? ['a_pagar', 'informou'].includes(i.status) : i.status === S.filtro));
     root.innerHTML = `<div class="pa-painel"><p><button type="button" class="btn-visit" id="pa-fecha"><i class="fas fa-arrow-left"></i> Voltar às atividades</button></p>
     <h3><i class="fas fa-hand-holding-heart"></i> Participação: ${esc(at.titulo)}</h3>
@@ -204,7 +204,8 @@ function painel(me, root, H, at, voltar) {
       <div><strong>${t.inscritos || 0}</strong><span>inscritos</span></div><div><strong>${t.presentes || 0}</strong><span>presentes</span></div>
       <div><strong>${t.vegetarianos || 0}</strong><span>vegetarianos</span></div><div><strong>${t.confirmados || 0}</strong><span>pagos e confirmados</span></div>
       <div><strong>${t.a_pagar || 0}</strong><span>a confirmar</span></div><div><strong>${brl(t.confirmado_centavos || 0)}</strong><span>recebido (de ${brl(t.esperado_centavos || 0)} esperados)</span></div></div>
-    ${admAtiv ? `<details class="pa-conf-det"${S.cfg ? '' : ' open'}><summary><strong>Configurar a inscrição</strong> ${ativo ? '(ativa)' : '(desativada)'}</summary>
+    ${co ? '<p class="tip-box" role="note"><i class="fas fa-user-friends"></i> Você é <strong>co-responsável</strong> desta atividade: vê nome e WhatsApp de quem se inscreveu, confirma pagamentos e marca presença.</p>' : ''}
+    ${admAtiv && !co ? `<details class="pa-conf-det"${S.cfg ? '' : ' open'}><summary><strong>Configurar a inscrição</strong> ${ativo ? '(ativa)' : '(desativada)'}</summary>
       <form id="pa-cfg" class="form-reserva" novalidate>
         <label><input type="checkbox" id="pc-ativo"${ativo ? ' checked' : ''}> Receber inscrições deste evento</label>
         <div class="form-row"><label for="pc-t">Título do evento</label><input id="pc-t" maxlength="160" value="${esc(c.titulo || at.titulo)}"></div>
@@ -222,16 +223,16 @@ function painel(me, root, H, at, voltar) {
         <div class="form-row"><label for="pc-p">Último dia para se inscrever (opcional)</label><input id="pc-p" type="date" value="${esc(c.prazo || '')}"></div>
         <div class="form-row"><label for="pc-v">Número de vagas (opcional)</label><input id="pc-v" type="number" min="1" max="2000" value="${c.vagas || ''}"></div>
         <p class="form-erro" id="pc-er" role="alert" hidden></p>
-        <button class="btn-visit btn-large"><i class="fas fa-save"></i> Salvar configuração</button></form></details>` : (S.cfg ? '' : '<p class="tip-box" role="note">A inscrição desta atividade ainda não foi configurada. Peça ao Administrador das Atividades.</p>')}
+        <button class="btn-visit btn-large"><i class="fas fa-save"></i> Salvar configuração</button></form></details>` : (S.cfg || co ? '' : '<p class="tip-box" role="note">A inscrição desta atividade ainda não foi configurada. Peça ao Administrador das Atividades.</p>')}
     ${S.cfg && ativo ? `<div class="form-row"><label for="pa-lk">Link do formulário (use no banner, Linktree e WhatsApp)</label><input id="pa-lk" readonly value="${esc(linkForm(at.id))}"> <button type="button" class="btn-visit" id="pa-lkc"><i class="fas fa-copy"></i> Copiar link</button></div>` : ''}
     ${S.cfg ? `<h4>Inscrições (${lista.length})</h4>
       <div class="rc-filtros"><div class="form-row"><label for="pa-fil">Mostrar</label><select id="pa-fil"><option value="">Todas</option><option value="pagar"${S.filtro === 'pagar' ? ' selected' : ''}>Falta confirmar pagamento</option><option value="confirmado"${S.filtro === 'confirmado' ? ' selected' : ''}>Pagas e confirmadas</option><option value="cancelado"${S.filtro === 'cancelado' ? ' selected' : ''}>Canceladas</option></select></div>
-        <button type="button" class="btn-visit" id="pa-csv"${S.ins.length ? '' : ' disabled'}><i class="fas fa-file-csv"></i> Baixar lista (CSV)</button> <button type="button" class="btn-visit" id="pa-rec"><i class="fas fa-sync"></i> Atualizar</button></div>
-      ${lista.length ? `<div class="doc-wrap"><table class="doc-table"><thead><tr><th>Código</th><th>Nome</th><th>Contato</th><th>Alimentação</th><th>Participação</th><th>Valor a receber</th><th>Situação</th><th></th></tr></thead><tbody>${lista.map(i => `<tr>
-        <td>${esc(i.codigo)}</td><td>${esc(i.nome)}${i.presente ? ' <i class="fas fa-user-check" title="Presente"></i>' : ''}<br><small>CEP ${esc(i.cep)}</small></td><td>${esc(i.email)}<br>${esc(i.telefone)}</td>
-        <td>${i.restricao === 'vegetariano' ? 'Vegetariano' : 'Não vegetariano'}${i.outra ? '<br><small>' + esc(i.outra) + '</small>' : ''}</td><td>${esc(i.opcao_nome)}<br><small>${i.forma === 'pix' ? 'Pix' : 'Presencial'}</small></td>
+        ${co ? '' : `<button type="button" class="btn-visit" id="pa-csv"${S.ins.length ? '' : ' disabled'}><i class="fas fa-file-csv"></i> Baixar lista (CSV)</button> `}<button type="button" class="btn-visit" id="pa-rec"><i class="fas fa-sync"></i> Atualizar</button></div>
+      ${lista.length ? `<div class="doc-wrap"><table class="doc-table"><thead><tr><th>Código</th><th>Nome</th><th>${co ? 'WhatsApp' : 'Contato'}</th>${co ? '' : '<th>Alimentação</th>'}<th>Participação</th><th>Valor a receber</th><th>Situação</th><th></th></tr></thead><tbody>${lista.map(i => `<tr>
+        <td>${esc(i.codigo)}</td><td>${esc(i.nome)}${i.presente ? ' <i class="fas fa-user-check" title="Presente"></i>' : ''}${co ? '' : '<br><small>CEP ' + esc(i.cep) + '</small>'}</td><td>${co ? '' : esc(i.email) + '<br>'}${esc(i.telefone)}</td>
+        ${co ? '' : `<td>${i.restricao === 'vegetariano' ? 'Vegetariano' : 'Não vegetariano'}${i.outra ? '<br><small>' + esc(i.outra) + '</small>' : ''}</td>`}<td>${esc(i.opcao_nome)}<br><small>${i.forma === 'pix' ? 'Pix' : 'Presencial'}</small></td>
         <td><strong>${brl(i.valor_centavos + i.extra_centavos)}</strong></td><td>${esc(STATUS[i.status])}</td>
-        <td>${i.status !== 'cancelado' ? `${i.status === 'confirmado' ? `<button type="button" class="btn-visit" data-a="desfazer" data-c="${esc(i.codigo)}">Desfazer</button>` : `<button type="button" class="btn-visit" data-a="confirmar" data-c="${esc(i.codigo)}"><i class="fas fa-check"></i> Confirmar pagamento</button>`} ${i.presente ? '' : `<button type="button" class="btn-visit" data-a="presente" data-c="${esc(i.codigo)}">Marcar presença</button>`} <button type="button" class="btn-visit" data-a="cancelar" data-c="${esc(i.codigo)}">Cancelar</button>` : `<button type="button" class="btn-visit" data-a="reabrir" data-c="${esc(i.codigo)}">Reabrir</button>`}</td></tr>`).join('')}</tbody></table></div>` : '<p class="vazio">Nenhuma inscrição por aqui ainda.</p>'}` : ''}`}</div>`;
+        <td>${i.status !== 'cancelado' ? `${i.status === 'confirmado' ? `<button type="button" class="btn-visit" data-a="desfazer" data-c="${esc(i.codigo)}">Desfazer</button>` : `<button type="button" class="btn-visit" data-a="confirmar" data-c="${esc(i.codigo)}"><i class="fas fa-check"></i> Confirmar pagamento</button>`} ${i.presente ? '' : `<button type="button" class="btn-visit" data-a="presente" data-c="${esc(i.codigo)}">Marcar presença</button>`} ${co ? '' : `<button type="button" class="btn-visit" data-a="cancelar" data-c="${esc(i.codigo)}">Cancelar</button>`}` : (co ? '' : `<button type="button" class="btn-visit" data-a="reabrir" data-c="${esc(i.codigo)}">Reabrir</button>`)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="vazio">Nenhuma inscrição por aqui ainda.</p>'}` : ''}`}</div>`;
     q('#pa-fecha').onclick = voltar;
     const lk = q('#pa-lkc'); if (lk) lk.onclick = async () => { S.msg = (await copiar(q('#pa-lk').value)) ? 'Link copiado.' : 'Selecione o link e copie.'; draw(); };
     const fi = q('#pa-fil'); if (fi) fi.onchange = e => { S.filtro = e.target.value; draw(); };

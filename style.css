@@ -1413,3 +1413,9 @@ body.modo-app #tab pre, body.modo-app #tab code { white-space: pre-wrap; word-br
 .pa-op { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
 .pa-op .pa-on { flex: 1 1 200px; }
 .atv-participar { margin: 14px 0; }
+.at-co { position: relative; }
+.at-co-det { display: inline-block; position: relative; }
+.at-co-det > summary { cursor: pointer; padding: 8px 12px; border: 1px solid #99a; border-radius: 6px; background: #fff; min-width: 260px; list-style: none; }
+.at-co-det > summary::after { content: ' ▾'; float: right; }
+.at-co-lista { position: absolute; z-index: 20; left: 0; top: 100%; min-width: 280px; max-height: 240px; overflow: auto; background: #fff; border: 1px solid #99a; border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.18); padding: 6px 10px; }
+.at-co-lista label { display: flex; gap: 8px; align-items: center; padding: 5px 0; }

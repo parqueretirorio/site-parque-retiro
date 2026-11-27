@@ -254,6 +254,8 @@ class SupabaseFalso:
                 r = psql(f"select pr_relatorio_visitas({dd((corpo or {}).get('p_ini'))}, {dd((corpo or {}).get('p_fim'))})", self.db, 'authenticated', uid)
             elif fn == 'pr_participacao_config_salvar':
                 r = psql(f"select pr_participacao_config_salvar({lit(corpo.get('p_id'))}, {lit(json.dumps(corpo.get('p_cfg') or {}))}::jsonb)", self.db, 'authenticated', uid)
+            elif fn == 'pr_participacao_equipe_salvar':
+                r = psql(f"select pr_participacao_equipe_salvar({lit(corpo.get('p_id'))}, {lit(corpo.get('p_resp'))}, {lit(json.dumps(corpo.get('p_co') or []))}::jsonb)", self.db, 'authenticated', uid)
             elif fn == 'pr_participacao_listar':
                 r = psql(f"select pr_participacao_listar({lit(corpo.get('p_id'))})", self.db, 'authenticated', uid)
             elif fn == 'pr_participacao_atualizar':
