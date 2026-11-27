@@ -10,6 +10,7 @@
 const CATS = { evento: 'Eventos', encontro: 'Encontros', retiro: 'Retiros', reuniao: 'Reuniões' };
 const CAT1 = { evento: 'Evento', encontro: 'Encontro', retiro: 'Retiro', reuniao: 'Reunião' };
 const ORIGENS = { parque: 'No Parque Retiro', externa: 'Externa, com relação ao Parque Retiro' };
+const BANNER_M_W = 1200, BANNER_M_H = 900; // banner opcional para celular (4:3, telas até 700 px)
 const BANNER_W = 1800, BANNER_H = 600; // 3:1, a mesma proporção dos banners do Início
 const MAX_BANNER = 5;                    // quantas atividades no máximo aparecem no banner do Início
 
@@ -77,7 +78,7 @@ function paginaArtigo() {
 // Slides para o banner do Início: só atividades publicadas, com banner e marcadas como destaque.
 function slidesBanner() {
   try {
-    return publicadas().filter(a => a.destaque && imgOk(a.banner)).slice(0, MAX_BANNER).map(a => ({ src: a.banner, alt: a.bannerAlt || a.titulo, link: a.bannerParticipar ? 'participar.html?id=' + encodeURIComponent(a.id) : hrefArtigo(a.id) }));
+    return publicadas().filter(a => a.destaque && imgOk(a.banner)).slice(0, MAX_BANNER).map(a => ({ src: a.banner, alt: a.bannerAlt || a.titulo, link: a.bannerParticipar ? 'participar.html?id=' + encodeURIComponent(a.id) : hrefArtigo(a.id), mobile: imgOk(a.bannerM) ? a.bannerM : '' }));
   } catch (e) { return []; }
 }
 
@@ -92,6 +93,14 @@ function checa(file) {
 async function fotoPequena(file) { // lado maior 640 px
   checa(file); const im = await carrega(file), k = Math.min(1, 640 / Math.max(im.width, im.height)), c = document.createElement('canvas');
   c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); return c.toDataURL('image/jpeg', 0.78);
+}
+async function imagemBannerM(file) { // recorte centralizado em 4:3, no máximo 1200 x 900
+  checa(file); const im = await carrega(file), alvo = BANNER_M_W / BANNER_M_H, r = im.width / im.height;
+  let sw = im.width, sh = im.height, sx = 0, sy = 0;
+  if (r > alvo) { sw = Math.round(im.height * alvo); sx = Math.round((im.width - sw) / 2); } else { sh = Math.round(im.width / alvo); sy = Math.round((im.height - sh) / 2); }
+  const w = Math.min(BANNER_M_W, sw), h = Math.round(w / alvo), c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(im, sx, sy, sw, sh, 0, 0, w, h);
+  return c.toDataURL('image/jpeg', 0.8);
 }
 async function imagemBanner(file) { // recorte centralizado na proporção 3:1 (sem esticar)
   checa(file); const im = await carrega(file), alvo = BANNER_W / BANNER_H, r = im.width / im.height;
@@ -108,7 +117,7 @@ const almocoModelo = me => ({ id: ALMOCO_ID, titulo: 'Entre Princípios e Vivên
   local: 'Parque de Estudo e Reflexão Retiro, Maricá/RJ', organizacao: '', linkExterno: '',
   lide: 'Um almoço e um intercâmbio sobre os 12 Princípios de Ação Válida, de Silo, domingo, 29 de novembro, a partir das 11h.',
   texto: 'Que tal um encontro para compartilhar experiências, reflexões e uma boa comida?\n\nVamos nos reunir no Parque de Estudo e Reflexão Retiro para um almoço especial e um intercâmbio sobre os 12 Princípios de Ação Válida, de Silo.\n\nEsses princípios nos convidam a refletir sobre nossas escolhas e atitudes, buscando maior coerência entre o que pensamos, sentimos e fazemos, fortalecendo a solidariedade e a não violência em nossas relações.\n\nSerá um momento de troca, aprendizado e convivência!\n\nData: 29 de novembro (domingo), a partir das 11h.\nLocal: Parque de Estudo e Reflexão Retiro, Maricá/RJ.\nColaboração para o almoço: R$ 35,00 por pessoa.\n\nConfirme sua presença pelo botão "Quero participar", para que possamos organizar nosso almoço. Esperamos você!',
-  foto: '', banner: '', bannerAlt: '', bannerParticipar: true, destaque: false, autor: 'Parque Retiro', status: 'publicada',
+  foto: '', banner: '', bannerM: '', bannerAlt: '', bannerParticipar: true, destaque: false, autor: 'Parque Retiro', status: 'publicada',
   criadoEm: new Date().toISOString(), atualizadoEm: new Date().toISOString(), por: me.nome, criadoPorEmail: me.email, criadoPorNome: me.nome || '', respEmail: me.email, respNome: me.nome || '' });
 const almocoConfig = me => ({ ativo: false, titulo: 'Entre Princípios e Vivências', data_texto: 'Domingo, 29 de novembro, a partir das 11h', local_texto: 'Parque de Estudo e Reflexão Retiro, Maricá/RJ', aviso: '',
   opcoes: [{ id: 'almoco', nome: 'Almoço de domingo (29/11)', valor_centavos: 3500 }], pix_chave: '+5521999175882', pix_nome: 'Maria da Conceição Ribeiro', pix_cidade: 'Maricá', prazo: '', vagas: '', resp_email: me.email });
@@ -125,14 +134,14 @@ function abrir(me, root, H) {
   // Co-responsável (escolhido pelo responsável ou pelo Administrador das Atividades): só acompanha a participação (nome, WhatsApp, pagamento, presença).
   const ehCo = a => !!a && Array.isArray(a.coResp) && a.coResp.map(x => String(x).toLowerCase()).includes(String(me.email || '').toLowerCase());
   const pessoas = () => (db.get('users', []) || []).filter(u => (u.status || 'aprovado') === 'aprovado' && u.email);
-  const S = { edit: '', msg: '', erro: '', foto: null, banner: null, cat: '', part: '' };
+  const S = { edit: '', msg: '', erro: '', foto: null, banner: null, bannerM: null, cat: '', part: '' };
   const lista = () => db.get('atividades', []);
   const draw = () => {
     if (S.part) { const at0 = lista().find(a => a.id === S.part); if (at0 && (podeEd(at0) || ehCo(at0)) && window.PR_PARTICIPACAO) { window.PR_PARTICIPACAO.painel(me, root, H, at0, () => { S.part = ''; draw(); }); return; } S.part = ''; }
     const ed = S.edit && S.edit !== 'novo' ? lista().find(a => a.id === S.edit) : null;
     const forma = !!S.edit && (S.edit === 'novo' || podeEd(ed));
     const v = ed || { titulo: '', categoria: 'evento', origem: 'parque', dataAtiv: hoje(), local: '', organizacao: '', linkExterno: '', lide: '', texto: '', foto: '', banner: '', bannerAlt: '', destaque: false, autor: me.nome || '', status: 'rascunho' };
-    if (S.foto === null) S.foto = v.foto || ''; if (S.banner === null) S.banner = v.banner || '';
+    if (S.foto === null) S.foto = v.foto || ''; if (S.banner === null) S.banner = v.banner || ''; if (S.bannerM === null) S.bannerM = v.bannerM || '';
     const itens = lista().filter(a => !S.cat || catDe(a.categoria) === S.cat).sort((a, b) => String(b.dataAtiv || '').localeCompare(String(a.dataAtiv || '')));
     root.innerHTML = `<h3><i class="fas fa-calendar-check"></i> Atividades</h3>
     <p>Registre por escrito o que acontece no Parque (eventos, encontros, retiros e reuniões) e também atividades externas que tenham relação com o Parque Retiro. As atividades <strong>publicadas</strong> aparecem na área aberta, em <a href="atividades.html" target="_blank" rel="noopener">O Parque &rsaquo; Atividades</a>, e as marcadas como destaque entram no banner do Início.</p>
@@ -170,6 +179,8 @@ function abrir(me, root, H) {
         <label><input type="checkbox" id="at-bpart"${v.bannerParticipar ? ' checked' : ''}> Ao clicar no banner, abrir direto o formulário de participação (configure em “Participação”)</label>
         <div class="form-row"><label for="at-b">Imagem do banner <small>(ideal: ${BANNER_W} × ${BANNER_H} px; imagens de outra proporção são recortadas no centro)</small></label><input id="at-b" type="file" accept="image/jpeg,image/png,image/webp">
           <div id="at-bp">${S.banner ? `<img src="${esc(S.banner)}" alt="Banner atual" style="max-width:360px;width:100%;height:auto;margin-top:6px;border:1px solid #ccd"> <button type="button" class="btn-visit" id="at-bx">Remover banner</button>` : ''}</div></div>
+        <div class="form-row"><label for="at-bm">Imagem do banner para celular <small>(opcional: ${BANNER_M_W} × ${BANNER_M_H} px, proporção 4:3; aparece em telas de até 700 px)</small></label><input id="at-bm" type="file" accept="image/jpeg,image/png,image/webp">
+          <div id="at-bmp">${S.bannerM ? `<img src="${esc(S.bannerM)}" alt="Banner para celular atual" style="max-width:200px;width:100%;height:auto;margin-top:6px;border:1px solid #ccd"> <button type="button" class="btn-visit" id="at-bmx">Remover banner do celular</button>` : ''}</div></div>
         <div class="form-row"><label for="at-ba">Descrição do banner e da foto (para quem não enxerga a imagem)</label><input id="at-ba" maxlength="200" value="${esc(v.bannerAlt)}"> <button type="button" class="btn-visit" id="at-desc"><i class="fas fa-universal-access" aria-hidden="true"></i> Ajudar a descrever</button><small>O leitor de tela lê este texto em voz alta. Diga o que a imagem mostra e o que está escrito nela.</small></div>
       </fieldset>` : ''}
       <div class="form-row"><label for="at-s">Situação</label><select id="at-s"><option value="rascunho"${v.status !== 'publicada' ? ' selected' : ''}>Rascunho (só aparece aqui)</option><option value="publicada"${v.status === 'publicada' ? ' selected' : ''}>Publicada (aparece no site)</option></select></div>
@@ -187,9 +198,9 @@ function abrir(me, root, H) {
       S.msg = 'Atividade do almoço cadastrada e publicada.' + extra; draw();
     };
     const dsc = $('#at-desc', root); if (dsc) dsc.onclick = () => { const img = S.banner || S.foto; if (!img) { erro('Escolha antes a foto ou o banner para descrever.'); return; } if (window.PR_DESCREVER) window.PR_DESCREVER.abrir({ imagem: img, campo: $('#at-ba', root), titulo: ($('#at-t', root) || {}).value }); };
-    const nv = $('#at-novo', root); if (nv) nv.onclick = () => { S.edit = 'novo'; S.foto = null; S.banner = null; S.msg = ''; S.erro = ''; draw(); };
+    const nv = $('#at-novo', root); if (nv) nv.onclick = () => { S.edit = 'novo'; S.foto = null; S.banner = null; S.bannerM = null; S.msg = ''; S.erro = ''; draw(); };
     $('#at-fil', root).onchange = e => { S.cat = e.target.value; draw(); };
-    root.querySelectorAll('[data-ed]').forEach(b => b.onclick = () => { S.edit = b.dataset.ed; S.foto = null; S.banner = null; S.msg = ''; S.erro = ''; draw(); window.scrollTo({ top: root.getBoundingClientRect().top + scrollY - 20 }); });
+    root.querySelectorAll('[data-ed]').forEach(b => b.onclick = () => { S.edit = b.dataset.ed; S.foto = null; S.banner = null; S.bannerM = null; S.msg = ''; S.erro = ''; draw(); window.scrollTo({ top: root.getBoundingClientRect().top + scrollY - 20 }); });
     { const upd = () => { const s = root.querySelector('#at-co-s'); if (s) { const n = root.querySelectorAll('.at-coc:checked').length; s.textContent = n ? n + (n > 1 ? ' pessoas marcadas' : ' pessoa marcada') : 'Escolher co-responsáveis'; } }; root.querySelectorAll('.at-coc').forEach(c => c.onchange = upd); const rs0 = root.querySelector('#at-r'); const sync = () => { root.querySelectorAll('.at-coc').forEach(c => { const igual = !!rs0 && c.value === String(rs0.value).toLowerCase(); c.closest('label').hidden = igual; if (igual) c.checked = false; }); upd(); }; if (rs0) rs0.onchange = sync; sync();
       const dig = s => String(s || '').replace(/\D/g, ''), wpp = n => { const d = dig(n); return d.length <= 11 ? '55' + d : d; };
       const cvMsg = (txt, erro) => { const m = root.querySelector('#cv-msg'); if (m) { m.textContent = txt; m.hidden = !txt; m.className = erro ? 'form-erro' : 'tip-box'; } };
@@ -231,6 +242,8 @@ function abrir(me, root, H) {
     $('#at-o', root).onchange = e => { $('#at-ext', root).hidden = e.target.value !== 'externa'; };
     const erro = m => { const er = $('#at-er', root); er.textContent = m; er.hidden = false; };
     const px = $('#at-fx', root); if (px) px.onclick = () => { S.foto = ''; $('#at-fp', root).innerHTML = ''; };
+    const bmx = () => { const b = $('#at-bmx', root); if (b) b.onclick = () => { S.bannerM = ''; $('#at-bmp', root).innerHTML = ''; }; }; bmx();
+    if ($('#at-bm', root)) $('#at-bm', root).onchange = async e => { const fl = e.target.files[0]; if (!fl) return; try { S.bannerM = await imagemBannerM(fl); $('#at-bmp', root).innerHTML = `<img src="${esc(S.bannerM)}" alt="Banner para celular escolhido" style="max-width:200px;width:100%;height:auto;margin-top:6px;border:1px solid #ccd"> <button type="button" class="btn-visit" id="at-bmx">Remover banner do celular</button>`; bmx(); $('#at-er', root).hidden = true; } catch (x) { e.target.value = ''; erro(x.message || 'Imagem inválida.'); } };
     const bx = $('#at-bx', root); if (bx) bx.onclick = () => { S.banner = ''; $('#at-bp', root).innerHTML = ''; };
     $('#at-f', root).onchange = async e => { const fl = e.target.files[0]; if (!fl) return; try { S.foto = await fotoPequena(fl); $('#at-fp', root).innerHTML = `<img src="${esc(S.foto)}" alt="Foto escolhida" style="max-width:160px;height:auto;margin-top:6px">`; $('#at-er', root).hidden = true; } catch (x) { e.target.value = ''; erro(x.message || 'Imagem inválida.'); } };
     if ($('#at-b', root)) $('#at-b', root).onchange = async e => { const fl = e.target.files[0]; if (!fl) return; try { const r = await imagemBanner(fl); S.banner = r.img; $('#at-bp', root).innerHTML = `<img src="${esc(S.banner)}" alt="Banner escolhido" style="max-width:360px;width:100%;height:auto;margin-top:6px;border:1px solid #ccd">`; if (r.aviso) erro(r.aviso); else $('#at-er', root).hidden = true; } catch (x) { e.target.value = ''; erro(x.message || 'Imagem inválida.'); } };
@@ -247,7 +260,7 @@ function abrir(me, root, H) {
       const destaque = admAtiv ? $('#at-dest', root).checked : !!(ed && ed.destaque);
       if (destaque && !S.banner) return erro('Para destacar no banner do Início, escolha a imagem do banner.');
       const agora = new Date().toISOString();
-      const reg = { id: ed ? ed.id : uid2(), titulo: g('at-t'), categoria: g('at-c'), origem: g('at-o'), dataAtiv: g('at-d'), local: g('at-l'), organizacao: ext ? g('at-og') : '', linkExterno: link, lide: g('at-li'), texto: $('#at-x', root).value.trim(), foto: S.foto || '', banner: S.banner || '', bannerParticipar: admAtiv ? $('#at-bpart', root).checked : !!(ed && ed.bannerParticipar), bannerAlt: admAtiv ? g('at-ba') : (ed ? ed.bannerAlt || '' : ''), destaque, autor: g('at-a'), status: g('at-s'), criadoEm: ed ? ed.criadoEm : agora, atualizadoEm: agora, por: me.nome,
+      const reg = { id: ed ? ed.id : uid2(), titulo: g('at-t'), categoria: g('at-c'), origem: g('at-o'), dataAtiv: g('at-d'), local: g('at-l'), organizacao: ext ? g('at-og') : '', linkExterno: link, lide: g('at-li'), texto: $('#at-x', root).value.trim(), foto: S.foto || '', banner: S.banner || '', bannerM: S.banner ? (S.bannerM || '') : '', bannerParticipar: admAtiv ? $('#at-bpart', root).checked : !!(ed && ed.bannerParticipar), bannerAlt: admAtiv ? g('at-ba') : (ed ? ed.bannerAlt || '' : ''), destaque, autor: g('at-a'), status: g('at-s'), criadoEm: ed ? ed.criadoEm : agora, atualizadoEm: agora, por: me.nome,
         criadoPorEmail: ed ? (ed.criadoPorEmail || '') : me.email, criadoPorNome: ed ? (ed.criadoPorNome || ed.por || '') : (me.nome || '') };
       { const rs = $('#at-r', root), re = rs ? rs.value : (ed ? ed.respEmail || '' : me.email), pu = pessoas().find(u => u.email === re);
         const cs = Array.from(root.querySelectorAll('.at-coc:checked')).map(c => c.value).filter(e => e !== String(re).toLowerCase());
@@ -255,7 +268,7 @@ function abrir(me, root, H) {
         reg.respEmail = re; reg.respNome = pu ? pu.nome : (ed && ed.respNome) || (re === me.email ? me.nome : re); }
       const l = lista().filter(a => a.id !== reg.id); l.push(reg);
       if (!db.set('atividades', l)) return erro('Não foi possível salvar: o espaço do navegador está cheio. Use imagens menores ou remova atividades antigas.');
-      S.msg = reg.status === 'publicada' ? 'Atividade salva e publicada no site.' : 'Atividade salva como rascunho.'; S.edit = ''; S.erro = ''; S.foto = S.banner = null; draw();
+      S.msg = reg.status === 'publicada' ? 'Atividade salva e publicada no site.' : 'Atividade salva como rascunho.'; S.edit = ''; S.erro = ''; S.foto = S.banner = S.bannerM = null; draw();
       // A equipe (responsável e co-responsáveis) também vai ao servidor, para valer na lista de inscritos. Sem inscrição configurada, não há o que atualizar.
       if ((admAtiv || minha(ed)) && root.querySelector && window.PR_SUPABASE && window.PR_SUPABASE.rpc) {
         window.PR_SUPABASE.rpc('pr_participacao_equipe_salvar', { p_id: reg.id, p_resp: reg.respEmail || '', p_co: reg.coResp || [] }).then(r => {
