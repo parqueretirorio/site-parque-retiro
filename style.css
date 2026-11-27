@@ -1419,3 +1419,6 @@ body.modo-app #tab pre, body.modo-app #tab code { white-space: pre-wrap; word-br
 .at-co-det > summary::after { content: ' ▾'; float: right; }
 .at-co-lista { position: absolute; z-index: 20; left: 0; top: 100%; min-width: 280px; max-height: 240px; overflow: auto; background: #fff; border: 1px solid #99a; border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.18); padding: 6px 10px; }
 .at-co-lista label { display: flex; gap: 8px; align-items: center; padding: 5px 0; }
+.at-conv { margin: 8px 0; }
+.at-conv > summary { cursor: pointer; color: var(--primary-color); font-weight: 600; }
+.at-conv-corpo { border: 1px solid #ccd; border-radius: 6px; padding: 10px 12px; margin-top: 6px; max-width: 520px; }

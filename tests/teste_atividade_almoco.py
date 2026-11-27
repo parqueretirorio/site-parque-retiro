@@ -43,6 +43,26 @@ async def main():
         await ad.click('#at-form button.btn-large'); await ad.wait_for_timeout(2000)
         ok(q("select resp_email||'|'||co_emails::text from participacao_eventos where id='almoco-29-11-2026'") == 'conceicao@t.com|{ana@t.com}', "responsável e co-responsável chegam ao servidor ao salvar a atividade")
         a = (await ad.evaluate("PR_DADOS.db.get('atividades',[])"))[0]; ok(a['respEmail'] == 'conceicao@t.com' and a['coResp'] == ['ana@t.com'], "atividade guarda o responsável e o co-responsável")
+        # --- convite de co-responsável que ainda não tem cadastro ---
+        envios = []
+        async def falso_email(route):
+            import json as j; envios.append(j.loads(route.request.post_data)); await route.fulfill(status=200, content_type='application/json', body=j.dumps({'enviados': [envios[-1]['mensagens'][0]['para']], 'falhas': []}), headers={'access-control-allow-origin': '*'})
+        await ad.route('**/functions/v1/enviar-email', falso_email)
+        await ad.click('[data-ed="almoco-29-11-2026"]'); await ad.wait_for_selector('#cv-mail', state='attached')
+        await ad.click('.at-conv summary'); await ad.click('#cv-mail'); ok('Informe o nome' in await ad.inner_text('#cv-msg'), "convite sem nome é recusado")
+        await ad.fill('#cv-n', 'Carlos Novo'); await ad.fill('#cv-e', 'carlos@novo.com'); await ad.fill('#cv-w', '(21) 98888-0020')
+        await ad.click('#cv-mail'); await ad.wait_for_timeout(800)
+        ok(len(envios) == 1 and envios[0]['mensagens'][0]['para'] == 'carlos@novo.com' and 'Criar conta' in envios[0]['mensagens'][0]['texto'] and 'carlos@novo.com' in envios[0]['mensagens'][0]['texto'] and 'co-responsável' in envios[0]['mensagens'][0]['assunto'], "convite por e-mail sai pela função do Parque, com o passo a passo e o e-mail a usar")
+        ok(await ad.locator('.at-coc[value="carlos@novo.com"]').is_checked() and 'aguardando cadastro' in await ad.text_content('.at-co-lista'), "convidado entra na lista de co-responsáveis como 'aguardando cadastro'")
+        await ad.context.route('https://wa.me/**', lambda r: r.fulfill(status=200, content_type='text/html', body='ok'))
+        async with ad.expect_popup() as pop: await ad.click('#cv-wpp')
+        pp = await pop.value; await pp.wait_for_load_state(); await pp.wait_for_timeout(500); ok(pp.url.startswith('https://wa.me/5521988880020?text='), "WhatsApp abre com o número certo e a mensagem pronta")
+        ok('Carlos' in __import__('urllib.parse').parse.unquote(pp.url) and 'Criar conta' in __import__('urllib.parse').parse.unquote(pp.url), "mensagem do WhatsApp com nome e passo a passo"); await pp.close()
+        await ad.click('#at-form button.btn-large'); await ad.wait_for_timeout(2000)
+        ok(q("select co_emails::text from participacao_eventos where id='almoco-29-11-2026'") == '{ana@t.com,carlos@novo.com}', "o e-mail do convidado vai para a lista do servidor ao salvar")
+        a2 = (await ad.evaluate("PR_DADOS.db.get('atividades',[])"))[0]; ok(a2['coConvidados'] == [{'email': 'carlos@novo.com', 'nome': 'Carlos Novo', 'whatsapp': '(21) 98888-0020'}], "atividade guarda quem foi convidado")
+        await ad.click('[data-ed="almoco-29-11-2026"]'); await ad.wait_for_selector('.at-coc', state='attached'); ok('aguardando cadastro' in await ad.text_content('.at-co-lista') and await ad.locator('.at-coc[value="carlos@novo.com"]').is_checked(), "ao reabrir, o convidado continua na lista")
+        await ad.click('#at-form button.btn-large'); await ad.wait_for_timeout(1500)
         psql("update participacao_eventos set ativo=true where id='almoco-29-11-2026'")
         import json as _j
         for n, em in (('Pedro Inscrito', 'p1@t.com'), ('Maria Inscrita', 'p2@t.com')):
