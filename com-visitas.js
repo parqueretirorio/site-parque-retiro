@@ -8,7 +8,7 @@ const ROTULOS = {
   instagram: 'Instagram', youtube: 'YouTube', facebook: 'Facebook', whatsapp: 'WhatsApp (conversas e contatos)',
   canal: 'Canal do Parque Retiro no WhatsApp', comunidade: 'Comunidade do Parque no WhatsApp (aviso geral)',
   email: 'Comunicado por e-mail', google: 'Google', busca: 'Outros buscadores', direto: 'Acesso direto (ou origem não informada)',
-  'outros-sites': 'Outros sites', outros: 'Outras marcas', x: 'X (Twitter)', linkedin: 'LinkedIn', telegram: 'Telegram', pressenza: 'Pressenza', linktree: 'Linktree'
+  'outros-sites': 'Outros sites', outros: 'Outras marcas', x: 'X (Twitter)', linkedin: 'LinkedIn', telegram: 'Telegram', pressenza: 'Pressenza', linktree: 'Linktree', 'status-whatsapp': 'Status do WhatsApp'
 };
 const DESTINOS_ROTULO = {
   comunidade: 'Comunidade do Parque Retiro (WhatsApp)', canal: 'Canal do Parque Retiro (WhatsApp)', instagram: 'Instagram do Parque',
@@ -20,7 +20,7 @@ const ORIGENS_GERADOR = [
   ['instagram', 'Instagram'], ['youtube', 'YouTube'], ['facebook', 'Facebook'], ['whatsapp', 'WhatsApp (conversas e contatos)'],
   ['canal', 'Canal do Parque Retiro no WhatsApp'], ['comunidade', 'Comunidade do Parque no WhatsApp (aviso geral)'],
   ['grupo-mestres', 'Grupo dos Mestres (WhatsApp)'], ['grupo-geral', 'Bate-papo Geral do Parque (WhatsApp)'],
-  ['grupo-', 'Outro grupo da Comunidade (WhatsApp): informe o nome'], ['email', 'Comunicado por e-mail'], ['linktree', 'Linktree'], ['outro', 'Outra origem: informe o nome']
+  ['grupo-', 'Outro grupo da Comunidade (WhatsApp): informe o nome'], ['email', 'Comunicado por e-mail'], ['status-whatsapp', 'Status do WhatsApp'], ['linktree', 'Linktree'], ['outro', 'Outra origem: informe o nome']
 ];
 const PAGINAS_GERADOR = [
   ['', 'Início'], ['newsletter.html', 'Comunicado (cadastro)'], ['atividades.html', 'Atividades'], ['reservas.html', 'Reservas'],

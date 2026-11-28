@@ -2517,6 +2517,7 @@
 "Não foi possível concluir agora. Tente de novo em instantes.": "No fue posible completar ahora. Intenta de nuevo en unos instantes.",
 "Entre de novo na área restrita.": "Vuelve a entrar al área restringida.",
 "Linktree": "Linktree",
+"Status do WhatsApp": "Estado de WhatsApp",
 "Painel de visitantes": "Panel de visitantes",
 "Ontem": "Ayer",
 "Mês anterior": "Mes anterior",
