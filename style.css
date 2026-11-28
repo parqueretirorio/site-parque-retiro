@@ -1460,3 +1460,9 @@ body.modo-app #tab pre, body.modo-app #tab code { white-space: pre-wrap; word-br
 .fn-box[hidden] { display: none; }
 .fn-box .fn { display: flex; gap: 8px; align-items: flex-start; padding: 6px 4px; font-size: .9rem; }
 .fn-box .fn input { margin-top: 3px; }
+
+/* Texto explicativo (Escola e Nivelação): logo abaixo do banner, alinhado e justificado. 27/11/2026 */
+.texto-explicativo { max-width: 90ch; margin: 28px auto 36px; }
+.texto-explicativo h3 { margin: 22px 0 10px; text-align: left; }
+.texto-explicativo p, .texto-explicativo li { text-align: justify; hyphens: auto; line-height: 1.7; margin: 0 0 12px 0; }
+.texto-explicativo ul { padding-left: 22px; margin: 0 0 12px 0; }
