@@ -406,7 +406,7 @@ V.users = (me, root) => {
   const ST = { pendente: 'Aguardando', aprovado: 'Aprovado', recusado: 'Recusado', bloqueado: 'Bloqueado' };
   const salva = (email, fn) => { const l = db.get('users', []), u = l.find(x => x.email === email); if (u) fn(u); db.set('users', l); draw(); const b = document.querySelector('[data-tab="users"] .badge'); const n = l.filter(x => statusDe(x) === 'pendente').length; if (b) { n ? b.textContent = n : b.remove(); } };
   const draw = () => {
-    const us = db.get('users', []), pend = us.filter(u => statusDe(u) === 'pendente'), demais = us.filter(u => statusDe(u) !== 'pendente');
+    const us = db.get('users', []), pend = us.filter(u => statusDe(u) === 'pendente' && !visitanteEvento(u)), demais = us.filter(u => statusDe(u) !== 'pendente' || visitanteEvento(u));
     // Responsabilidades numa caixa flutuante (a linha da tabela não cresce): botão com a contagem; a lista abre ao clicar.
     const fnCell = u => u.nivel === 'administrador' ? '<small>Todas (administrador)</small>' : `<div class="fn-pop"><button type="button" class="btn-visit fn-bt" aria-haspopup="true" aria-expanded="false" data-fnbt="${esc(u.email)}"><span class="fn-n">${(u.funcoes || []).filter(f => FUNC[f]).length} marcada(s)</span> <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="fn-box" role="group" aria-label="Responsabilidades de ${esc(u.nome)}" hidden>${Object.entries(FUNC).map(([k, v]) => `<label class="fn"><input type="checkbox" data-fn="${k}" data-em="${esc(u.email)}"${(u.funcoes || []).includes(k) ? ' checked' : ''}> ${v}</label>`).join('')}</div></div>`;
     const acoes = u => {
@@ -441,7 +441,7 @@ V.users = (me, root) => {
     <h4>Responsáveis cadastrados</h4>
     <table class="doc-table"><thead><tr><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Perfil</th><th>Situação</th><th>Responsabilidades</th><th></th></tr></thead><tbody>${demais.map(u => {
       const eu = u.email === me.email;
-      return `<tr><td>${esc(u.nome)}${eu ? ' (você)' : ''}${cadastroIncompleto(u) ? ' <span class="badge st-pendente" title="Falta WhatsApp, nome completo ou autorização LGPD">cadastro incompleto</span>' : ''}</td><td>${esc(u.email)}</td><td>${esc(u.whatsapp || '—')}</td><td>${eu ? `<span class="badge ${u.nivel}">${NIVN[u.nivel]}</span>` : `<select data-nv="${esc(u.email)}" aria-label="Perfil de ${esc(u.nome)}">${Object.keys(NIVN).map(k => `<option value="${k}"${k === u.nivel ? ' selected' : ''}>${NIVN[k]}</option>`).join('')}</select>`}</td><td><span class="badge st-${statusDe(u)}">${ST[statusDe(u)]}</span></td><td>${fnCell(u)}</td><td>${acoes(u)}</td></tr>`;
+      return `<tr><td>${esc(u.nome)}${eu ? ' (você)' : ''}${visitanteEvento(u) ? ' <span class="badge" title="Criou conta ao se inscrever num evento. Não tem acesso à área restrita.">visitante (inscrição)</span>' : ''}${cadastroIncompleto(u) ? ' <span class="badge st-pendente" title="Falta WhatsApp, nome completo ou autorização LGPD">cadastro incompleto</span>' : ''}</td><td>${esc(u.email)}</td><td>${esc(u.whatsapp || '—')}</td><td>${eu ? `<span class="badge ${u.nivel}">${NIVN[u.nivel]}</span>` : `<select data-nv="${esc(u.email)}" aria-label="Perfil de ${esc(u.nome)}">${Object.keys(NIVN).map(k => `<option value="${k}"${k === u.nivel ? ' selected' : ''}>${NIVN[k]}</option>`).join('')}</select>`}</td><td><span class="badge st-${statusDe(u)}">${ST[statusDe(u)]}</span></td><td>${fnCell(u)}</td><td>${acoes(u)}</td></tr>`;
     }).join('')}</tbody></table>`;
     root.querySelectorAll('[data-ap]').forEach(b => b.onclick = () => { const em = CSS.escape(b.dataset.ap), nv = root.querySelector(`[data-nvp="${em}"]`).value;
       const box = root.querySelector(`[data-fnbox="${em}"]`), fns = box ? [...box.querySelectorAll('[data-fnp]:checked')].map(i => i.dataset.fnp) : [];
@@ -1595,7 +1595,7 @@ function painel() {
     sessionStorage.setItem('pr_sess', s.user.email);
     if (est.estado === 'offline' && !db.get('users', []).length) { $('#app').innerHTML = `<p class="tip-box" role="alert"><strong>Não foi possível falar com o servidor.</strong> Confira a internet e <a href="area-restrita.html">tente de novo</a>. ${esc(est.erro || '')}</p>`; return; }
   }
-  const pendN = () => db.get('users', []).filter(u => statusDe(u) === 'pendente').length;
+  const pendN = () => db.get('users', []).filter(u => statusDe(u) === 'pendente' && !visitanteEvento(u)).length;
   let me = db.get('users', []).find(u => u.email === sessionStorage.getItem('pr_sess'));
   // Acesso temporário (script.js): enquanto estiver ativo, quem clicou na mandala entra sem login.
   const cfgTemp = window.PR_ACESSO_TEMPORARIO, temp = !!(cfgTemp && cfgTemp.ativo && sessionStorage.getItem('pr_temp') === '1');
@@ -1733,7 +1733,8 @@ const STATUS_MSG = {
   recusado: 'Seu cadastro não foi aprovado. Fale com o administrador do Parque.',
   bloqueado: 'Esta conta está bloqueada. Fale com o administrador do Parque.'
 };
-const statusDe = u => u.status || 'aprovado'; // contas antigas, sem status, contam como aprovadas
+const statusDe = u => u.status || 'aprovado';
+const visitanteEvento = u => !!(u && u.lgpd && u.lgpd.origem === 'evento' && statusDe(u) === 'pendente'); // criou conta ao se inscrever em evento: não é pedido de acesso // contas antigas, sem status, contam como aprovadas
 
 // Login com o servidor do Parque (Supabase Auth): entrar, criar conta, esqueci minha senha e nova senha.
 function loginServidor() {

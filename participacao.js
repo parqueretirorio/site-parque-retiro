@@ -56,11 +56,48 @@ async function perfilLogado() {
     return p && p.status === 'aprovado' && p.email ? p : null;
   } catch (e) { return null; }
 }
+// Conta na hora (etapa 1): cria o cadastro no CONecta Retiro como visitante (fica "Aguardando" na área restrita, sem acesso).
+// A inscrição NÃO depende da confirmação do e-mail: o link é enviado e a pessoa termina a inscrição na hora.
+const authCfg = () => (window.PR_CONFIG_DADOS && window.PR_CONFIG_DADOS.supabase) || {};
+async function authPost(caminho, corpo) {
+  const c = authCfg(); if (!c.url || !c.chavePublica) return { status: 0, corpo: null };
+  try {
+    const r = await fetch(c.url.replace(/\/$/, '') + caminho, { method: 'POST', headers: { apikey: c.chavePublica, 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) });
+    let j = null; try { j = await r.json(); } catch (e) { /* vazio */ }
+    return { status: r.status, corpo: j };
+  } catch (e) { return { status: 0, corpo: null }; }
+}
+const idiomaPag = () => { let s = null; try { s = localStorage.getItem('pr_idioma'); } catch (e) { /* ignora */ } return ['pt', 'es', 'it', 'fr', 'en', 'de'].includes(s) ? s : 'pt'; };
+async function criarContaVisitante(d) {
+  const volta = location.origin.replace(/\/$/, '') + location.pathname.replace(/[^/]*$/, '') + 'login.html';
+  const r = await authPost('/auth/v1/signup?redirect_to=' + encodeURIComponent(volta), { email: d.email.trim().toLowerCase(), password: d.senha, data: { nome: d.nome.trim(), whatsapp: d.tel.trim(), idioma: idiomaPag(), lgpd: { aceite: true, imagem: false, em: new Date().toISOString(), versao: 'rascunho-1', origem: 'evento' } } });
+  const m = String((r.corpo && (r.corpo.msg || r.corpo.message || r.corpo.error_description || r.corpo.error)) || '');
+  if (r.status === 200 || r.status === 201) {
+    const u = r.corpo && (r.corpo.user || r.corpo);
+    if (u && Array.isArray(u.identities) && u.identities.length === 0) return { existe: true }; // e-mail já cadastrado (o Supabase não avisa de outro jeito)
+    return { ok: true };
+  }
+  if (/already|registered|exists/i.test(m)) return { existe: true };
+  if (/password/i.test(m)) return { erro: 'Senha fraca: use ao menos 8 caracteres, misturando letras e números.' };
+  return { falhou: true }; // sem internet, limite de e-mails etc.: a inscrição segue como visitante
+}
+async function conferirSenha(email, senha) {
+  const r = await authPost('/auth/v1/token?grant_type=password', { email: email.trim().toLowerCase(), password: senha });
+  if (r.status === 200 && r.corpo && r.corpo.access_token) {
+    let p = null; try { const c = authCfg(); const q = await fetch(c.url.replace(/\/$/, '') + '/rest/v1/perfis?select=nome,whatsapp&id=eq.' + encodeURIComponent(r.corpo.user.id), { headers: { apikey: c.chavePublica, Authorization: 'Bearer ' + r.corpo.access_token } }); p = q.ok ? (await q.json())[0] : null; } catch (e) { /* segue sem preencher */ }
+    return { ok: true, perfil: p }; // a sessão não é guardada: serve só para confirmar quem é
+  }
+  const cod = r.corpo && r.corpo.error_code;
+  if (cod === 'email_not_confirmed') return { ok: true, naoConfirmado: true };
+  if (r.status === 429) return { erro: 'Muitas tentativas seguidas. Espere alguns minutos e tente de novo.' };
+  if (r.status === 0) return { erro: 'Sem conexão com o servidor. Confira a internet e tente de novo.' };
+  return { erro: 'Senha incorreta. Confira e tente de novo, ou use "Esqueci minha senha".' };
+}
 function paginaPublica() {
   const raiz = document.getElementById('pa-app'); if (!raiz) return;
   const id = new URLSearchParams(location.search).get('id') || '';
   const chaveLocal = 'pr-part-' + id;
-  const S = { ev: null, etapa: 1, d: { nome: '', email: '', tel: '', cep: '', rest: '', outra: '', opcao: '', forma: 'pix', ok: false }, erro: '', env: false, res: null, perfil: null };
+  const S = { ev: null, etapa: 1, d: { nome: '', email: '', tel: '', cep: '', rest: '', outra: '', opcao: '', forma: 'pix', ok: false, senha: '', lgpd: false }, erro: '', env: false, res: null, perfil: null, existe: false, conta: '' };
   try { S.res = JSON.parse(localStorage.getItem(chaveLocal) || 'null'); } catch (e) { S.res = null; }
   const msg = (t, cls) => { raiz.innerHTML = `<p class="${cls || 'vazio'}" role="status">${esc(t)}</p><p><a class="btn-visit" href="atividades.html">Ver as atividades do Parque</a></p>`; };
 
@@ -70,7 +107,7 @@ function paginaPublica() {
     const copia = opc ? payload({ chave: pix.chave, nome: pix.nome, cidade: pix.cidade, centavos: r.total_centavos, txid: r.txid }) : '';
     let qr = ''; try { qr = copia && window.PR_QR ? window.PR_QR.svg(copia, { escala: 5 }) : ''; } catch (e) { qr = ''; }
     raiz.innerHTML = `<div class="pa-res" aria-live="polite"><h3><i class="fas fa-check-circle"></i> Inscrição recebida, ${esc((r.nome || '').split(' ')[0])}!</h3>
-      <p>${esc(r.opcao_nome || '')} · seu código é <strong>${esc(r.codigo)}</strong>. Guarde este código.</p>
+      ${r.conta === 'nova' ? '<p class="tip-box" role="status"><i class="fas fa-envelope"></i> <span>Enviamos um e-mail para confirmar o seu cadastro no CONecta Retiro. Abra a mensagem e toque no link (veja também o spam).</span></p>' : ''}<p>${esc(r.opcao_nome || '')} · seu código é <strong>${esc(r.codigo)}</strong>. Guarde este código.</p>
       ${r.forma === 'presencial' || !r.total_centavos ? `<p class="tip-box" role="note"><i class="fas fa-hand-holding-heart"></i> ${r.total_centavos ? 'Você escolheu <strong>pagar presencialmente</strong> (' + brl(r.total_centavos) + '). A equipe anota o pagamento na chegada.' : 'Sua participação não tem contribuição a pagar.'}</p>` : `
       <p class="tip-box" role="note"><i class="fas fa-qrcode"></i> Contribuição: <strong class="pa-valor">${brl(r.total_centavos)}</strong>${r.extra_centavos ? ` <small>(${brl(r.total_centavos - r.extra_centavos)} + ${r.extra_centavos} centavo${r.extra_centavos > 1 ? 's' : ''} que identificam o seu pagamento: não arredonde)</small>` : ''}</p>
       ${r.sem_centavos_livres ? '<p class="tip-box" role="note">Muitas pessoas pagaram ao mesmo tempo, então o valor ficou sem centavos. Depois de pagar, toque em “Já paguei” e escreva seu código no comprovante se puder.</p>' : ''}
@@ -91,7 +128,7 @@ function paginaPublica() {
 
   function lerCampos() {
     const g = n => { const el = raiz.querySelector('#pa-' + n); return el ? el.value : ''; };
-    if (S.etapa === 1) Object.assign(S.d, { nome: g('nome'), email: g('email'), tel: g('tel'), cep: g('cep') });
+    if (S.etapa === 1) { Object.assign(S.d, { nome: g('nome'), email: g('email'), tel: g('tel'), cep: g('cep'), senha: g('senha') }); const l = raiz.querySelector('#pa-lgpd'); if (l) S.d.lgpd = l.checked; }
     if (S.etapa === 2) { const r = raiz.querySelector('input[name=pa-rest]:checked'); S.d.rest = r ? r.value : ''; S.d.outra = g('outra'); }
     if (S.etapa === 3) { const o = raiz.querySelector('input[name=pa-opcao]:checked'), f = raiz.querySelector('input[name=pa-forma]:checked'), c = raiz.querySelector('#pa-ok'); S.d.opcao = o ? o.value : ''; S.d.forma = f ? f.value : 'pix'; S.d.ok = !!(c && c.checked); }
   }
@@ -102,6 +139,9 @@ function paginaPublica() {
       if (!/^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]{2,}$/.test(d.email.trim())) return 'Informe um e-mail válido.';
       if (d.tel.replace(/\D/g, '').length < 10) return 'Informe o telefone/WhatsApp com DDD.';
       if (d.cep.replace(/\D/g, '').length !== 8) return 'Informe o CEP com 8 números.';
+      if (!S.perfil && !S.conta && !d.senha) return S.existe ? 'Digite a senha do seu cadastro.' : 'Crie uma senha para o seu cadastro.';
+      if (!S.perfil && !S.conta && !S.existe && d.senha.length < 8) return 'A senha precisa ter ao menos 8 caracteres.';
+      if (!S.perfil && !S.conta && !S.existe && !d.lgpd) return 'Marque a autorização para tratarmos seus dados (LGPD).';
     }
     if (S.etapa === 2 && !d.rest) return 'Escolha uma opção de alimentação.';
     if (S.etapa === 3) { if (!d.opcao) return 'Escolha uma opção de participação.'; if (!d.ok) return 'Marque a confirmação para concluir.'; }
@@ -114,7 +154,7 @@ function paginaPublica() {
       S.env = false;
       if (!x || !x.ok) { S.erro = (x && x.erro) || 'Não foi possível concluir a inscrição.'; draw(); return; }
       const o = (S.ev.opcoes || []).find(z => z.id === d.opcao) || {};
-      S.res = { codigo: x.codigo, token: x.token, txid: x.txid, total_centavos: x.total_centavos, extra_centavos: x.extra_centavos, sem_centavos_livres: !!x.sem_centavos_livres, forma: d.forma, opcao_nome: o.nome || '', nome: d.nome.trim(), informou: false };
+      S.res = { codigo: x.codigo, token: x.token, txid: x.txid, total_centavos: x.total_centavos, extra_centavos: x.extra_centavos, sem_centavos_livres: !!x.sem_centavos_livres, forma: d.forma, opcao_nome: o.nome || '', nome: d.nome.trim(), informou: false, conta: S.conta };
       try { localStorage.setItem(chaveLocal, JSON.stringify(S.res)); } catch (e) { /* sem armazenamento */ }
       telaResultado();
     } catch (e) { S.env = false; S.erro = e.message; draw(); }
@@ -125,11 +165,14 @@ function paginaPublica() {
     raiz.innerHTML = `<ol class="pa-passos" aria-label="Etapas">${passos.map((p, i) => `<li${i + 1 === e ? ' aria-current="step" class="on"' : i + 1 < e ? ' class="feito"' : ''}><span>${i + 1}</span> <span>${p}</span></li>`).join('')}</ol>
     <form id="pa-form" class="form-reserva" novalidate>
     ${e === 1 ? `<h3>Seus dados</h3>
-      ${S.perfil ? `<p class="tip-box" role="status"><i class="fas fa-user-check"></i> <span>Você entrou no CONecta Retiro como</span> <strong>${esc(S.perfil.nome || S.perfil.email)}</strong>. <span>Preenchemos seus dados; confira e complete o CEP.</span></p>` : `<p class="tip-box" role="note"><i class="fas fa-user-lock"></i> <span>Já tem cadastro no CONecta Retiro?</span> <button type="button" class="btn-visit" id="pa-entrar">Entrar para preencher meus dados</button><br><small>Não tem cadastro? Siga normalmente: não é preciso criar conta para se inscrever.</small></p>`}
+      ${S.perfil ? `<p class="tip-box" role="status"><i class="fas fa-user-check"></i> <span>Você entrou no CONecta Retiro como</span> <strong>${esc(S.perfil.nome || S.perfil.email)}</strong>. <span>Preenchemos seus dados; confira e complete o CEP.</span></p>` : `<p class="tip-box" role="note"><i class="fas fa-user-lock"></i> <span>Já tem cadastro no CONecta Retiro?</span> <button type="button" class="btn-visit" id="pa-entrar">Entrar para preencher meus dados</button><br><small>Não tem? Sem problema: é só criar sua senha abaixo, leva um instante.</small></p>`}
       <div class="form-row"><label for="pa-nome">Nome completo *</label><input id="pa-nome" maxlength="120" autocomplete="name" value="${esc(d.nome)}"></div>
       <div class="form-row"><label for="pa-email">E-mail *</label><input id="pa-email" type="email" maxlength="160" autocomplete="email" value="${esc(d.email)}"${S.perfil ? ' readonly aria-describedby="pa-email-n"' : ''}>${S.perfil ? '<small id="pa-email-n">O e-mail do seu cadastro identifica a sua inscrição.</small>' : ''}</div>
       <div class="form-row"><label for="pa-tel">Telefone / WhatsApp *</label><input id="pa-tel" type="tel" maxlength="30" autocomplete="tel" placeholder="(21) 99999-9999" value="${esc(d.tel)}"></div>
-      <div class="form-row"><label for="pa-cep">CEP *</label><input id="pa-cep" inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="00000-000" value="${esc(d.cep)}"></div>` : ''}
+      <div class="form-row"><label for="pa-cep">CEP *</label><input id="pa-cep" inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="00000-000" value="${esc(d.cep)}"></div>
+      ${S.perfil ? '' : S.conta ? '<p class="tip-box" role="status"><i class="fas fa-user-check"></i> <span>Seu cadastro no CONecta Retiro está pronto. Siga para as próximas etapas.</span></p>' : S.existe ? `<p class="tip-box" role="status"><i class="fas fa-key"></i> <span>Este e-mail já tem cadastro no CONecta Retiro. Digite a senha dele para continuar.</span></p>
+      <div class="form-row"><label for="pa-senha">Senha do seu cadastro *</label><input id="pa-senha" type="password" autocomplete="current-password" maxlength="72" value="${esc(d.senha)}"><small><a href="login.html" id="pa-esq"><span>Esqueci minha senha</span></a></small></div>` : `<div class="form-row"><label for="pa-senha">Crie uma senha *</label><input id="pa-senha" type="password" autocomplete="new-password" maxlength="72" value="${esc(d.senha)}" aria-describedby="pa-senha-n"><small id="pa-senha-n">Mínimo de 8 caracteres. Com ela você cria o seu cadastro no CONecta Retiro e poderá entrar depois. Enviaremos um e-mail para confirmar o endereço.</small></div>
+      <label class="pa-conf"><input type="checkbox" id="pa-lgpd"${d.lgpd ? ' checked' : ''}> <span>Estou de acordo com o tratamento dos meus dados pessoais (nome, e-mail, WhatsApp e CEP) pelo Parque de Estudo e Reflexão Retiro, nos termos da LGPD.</span></label>`}` : ''}
     ${e === 2 ? `<h3>Informações importantes</h3>
       <fieldset class="funcoes"><legend>Possui alguma restrição alimentar ou necessidade especial em relação à alimentação? *</legend>
         <label><input type="radio" name="pa-rest" value="nao_vegetariano"${d.rest === 'nao_vegetariano' ? ' checked' : ''}> Não vegetariano</label>
@@ -145,9 +188,23 @@ function paginaPublica() {
     <p class="form-erro" role="alert"${S.erro ? '' : ' hidden'}>${esc(S.erro)}</p>
     <p class="pa-botoes">${e > 1 ? '<button type="button" class="btn-visit" id="pa-volta"><i class="fas fa-arrow-left"></i> Voltar</button> ' : ''}<button class="btn-visit btn-large" id="pa-segue"${S.env ? ' disabled' : ''}>${e < 3 ? 'Continuar <i class="fas fa-arrow-right"></i>' : (S.env ? 'Enviando…' : '<i class="fas fa-check"></i> Concluir inscrição')}</button></p></form>`;
     const f = raiz.querySelector('#pa-form');
-    f.onsubmit = ev2 => { ev2.preventDefault(); lerCampos(); const er = valida(); if (er) { S.erro = er; draw(); return; } S.erro = ''; if (S.etapa < 3) { S.etapa++; draw(); window.scrollTo(0, 0); } else enviar(); };
+    f.onsubmit = async ev2 => { ev2.preventDefault(); lerCampos(); const er = valida(); if (er) { S.erro = er; draw(); return; } S.erro = ''; if (S.etapa === 1 && !S.perfil && !S.conta && !(await contaNaHora())) return; if (S.etapa < 3) { S.etapa++; draw(); window.scrollTo(0, 0); } else enviar(); };
     const en = raiz.querySelector('#pa-entrar'); if (en) en.onclick = () => { try { sessionStorage.setItem('pr_volta', 'participar.html?id=' + encodeURIComponent(id)); } catch (x) { /* sem armazenamento */ } location.href = 'login.html'; };
     const v = raiz.querySelector('#pa-volta'); if (v) v.onclick = () => { lerCampos(); S.erro = ''; S.etapa--; draw(); };
+  }
+  // Etapa 1 sem login: cria a conta (ou confere a senha de quem já tem). Devolve true quando pode passar à etapa 2.
+  async function contaNaHora() {
+    const d = S.d, bt = raiz.querySelector('#pa-segue'); if (bt) bt.disabled = true;
+    if (S.existe) {
+      const r = await conferirSenha(d.email, d.senha);
+      if (r.erro) { S.erro = r.erro; draw(); return false; }
+      if (r.perfil) { if (r.perfil.nome) d.nome = r.perfil.nome; if (r.perfil.whatsapp && !d.tel) d.tel = r.perfil.whatsapp; }
+      S.conta = 'entrou'; d.senha = ''; return true;
+    }
+    const r = await criarContaVisitante(d);
+    if (r.erro) { S.erro = r.erro; draw(); return false; }
+    if (r.existe) { S.existe = true; d.senha = ''; S.erro = 'Este e-mail já tem cadastro. Digite a senha dele para continuar.'; draw(); return false; }
+    S.conta = r.ok ? 'nova' : 'falhou'; d.senha = ''; return true;
   }
   function cabecalho() {
     const ev = S.ev;
