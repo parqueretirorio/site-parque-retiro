@@ -1394,10 +1394,10 @@ body.modo-app #tab pre, body.modo-app #tab code { white-space: pre-wrap; word-br
 .pa-app { max-width: 640px; margin: 0 auto; }
 .pa-passos { display: flex; gap: 8px; list-style: none; padding: 0; margin: 0 0 18px; flex-wrap: wrap; }
 .pa-passos li { flex: 1 1 140px; padding: 8px 10px; border-radius: 6px; background: #eef2f2; color: #456; font-size: .9rem; }
-.pa-passos li span { display: inline-block; min-width: 22px; height: 22px; line-height: 22px; border-radius: 50%; background: #9ab; color: #fff; text-align: center; margin-right: 4px; }
+.pa-passos li > span:first-child { display: inline-block; min-width: 22px; height: 22px; line-height: 22px; border-radius: 50%; background: #9ab; color: #fff; text-align: center; margin-right: 4px; }
 .pa-passos li.on { background: var(--primary-color); color: #fff; font-weight: 600; }
-.pa-passos li.on span { background: #fff; color: var(--primary-color); }
-.pa-passos li.feito span { background: #2e7d32; }
+.pa-passos li.on > span:first-child { background: #fff; color: var(--primary-color); }
+.pa-passos li.feito > span:first-child { background: #2e7d32; }
 .pa-conf { display: flex; gap: 8px; align-items: flex-start; font-weight: 600; margin: 12px 0; }
 .pa-conf input { margin-top: 4px; }
 .pa-peq { font-size: .85rem; color: #566; }
@@ -1466,3 +1466,9 @@ body.modo-app #tab pre, body.modo-app #tab code { white-space: pre-wrap; word-br
 .texto-explicativo h3 { margin: 22px 0 10px; text-align: left; }
 .texto-explicativo p, .texto-explicativo li { text-align: justify; hyphens: auto; line-height: 1.7; margin: 0 0 12px 0; }
 .texto-explicativo ul { padding-left: 22px; margin: 0 0 12px 0; }
+/* Etapas da inscrição no celular: três quadros iguais, número em cima e rótulo curto embaixo (28/11/2026) */
+@media (max-width: 600px) {
+  .pa-passos { flex-wrap: nowrap; gap: 6px; }
+  .pa-passos li { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; padding: 8px 4px; font-size: .78rem; line-height: 1.25; overflow-wrap: anywhere; }
+  .pa-passos li > span:first-child { margin-right: 0; }
+}
