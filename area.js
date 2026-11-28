@@ -1,7 +1,7 @@
 ﻿// Área restrita, login e biblioteca. Dados salvos no navegador (localStorage).
 (function () {
 const NIV = { leitor: 1, comentador: 2, editor: 3, administrador: 4 };
-const NIVN = { leitor: 'Leitor', comentador: 'Comentador', editor: 'Editor', administrador: 'Administrador' };
+const NIVN = { leitor: 'Leitor', comentador: 'Comentador', editor: 'Editor', administrador: 'Administrador Geral' };
 const FUNC = { reservas: 'Responsável de Reservas', estela: 'Responsável pela Estela', album: 'Responsável pelo Álbum Parque Retiro', inventario: 'Responsável pelo Inventário', financeiro: 'Responsável Financeiro (Prestação de Contas e Compras)', compras: 'Departamento de Compras (cotações e registro das compras)', solicitante: 'Solicitante de compras (faz pedidos de compra)', documentos: 'Responsável pelos Documentos e Calendários', comunicacao: 'Responsável pela CONecta Comunicação', lojinha: 'Responsável pela Lojinha', rifa: 'Responsável pela Rifa Solidária', vaquinha: 'Responsável pela Vaquinha Coletiva', voluntario: 'Responsável pelos Voluntários', jardinagem: 'Responsável pela Jardinagem / Área Externa', atividades: 'Administrador das Atividades (corrige qualquer atividade e organiza a Reunião de Escola)', multiuso: 'Responsável pelo Multiuso', construcao: 'Responsável pela Construção', manutencao: 'Responsável pela Manutenção', traducoes: 'Responsável pelas Traduções', ajuda: 'Responsável pela Central de Ajuda' };
 const tem = (me, f) => me.nivel === 'administrador' || (me.funcoes || []).includes(f);
 const $ = (s, r = document) => r.querySelector(s);
@@ -439,9 +439,9 @@ V.users = (me, root) => {
       <div class="form-row"><label for="u-s">Senha provisória (mín. 8 caracteres) *</label><input id="u-s" type="password" autocomplete="new-password" required></div>
       <p class="form-erro" id="u-er" role="alert" hidden></p><button class="btn-visit btn-large"><i class="fas fa-user-shield"></i> Cadastrar responsável</button></form>
     <h4>Responsáveis cadastrados</h4>
-    <table class="doc-table"><thead><tr><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Perfil</th><th>Situação</th><th>Responsabilidades</th><th></th></tr></thead><tbody>${demais.map(u => {
+    <table class="doc-table"><thead><tr><th>Nome</th><th>E-mail</th><th>WhatsApp</th><th>Tipo de acesso</th><th>Perfil</th><th>Situação</th><th>Responsabilidades</th><th></th></tr></thead><tbody>${demais.map(u => {
       const eu = u.email === me.email;
-      return `<tr><td>${esc(u.nome)}${eu ? ' (você)' : ''}${visitanteEvento(u) ? ' <span class="badge" title="Criou conta ao se inscrever num evento. Não tem acesso à área restrita.">visitante (inscrição)</span>' : ''}${cadastroIncompleto(u) ? ' <span class="badge st-pendente" title="Falta WhatsApp, nome completo ou autorização LGPD">cadastro incompleto</span>' : ''}</td><td>${esc(u.email)}</td><td>${esc(u.whatsapp || '—')}</td><td>${eu ? `<span class="badge ${u.nivel}">${NIVN[u.nivel]}</span>` : `<select data-nv="${esc(u.email)}" aria-label="Perfil de ${esc(u.nome)}">${Object.keys(NIVN).map(k => `<option value="${k}"${k === u.nivel ? ' selected' : ''}>${NIVN[k]}</option>`).join('')}</select>`}</td><td><span class="badge st-${statusDe(u)}">${ST[statusDe(u)]}</span></td><td>${fnCell(u)}</td><td>${acoes(u)}</td></tr>`;
+      return `<tr><td>${esc(u.nome)}${eu ? ' (você)' : ''}${visitanteEvento(u) ? ' <span class="badge" title="Criou conta ao se inscrever num evento. Não tem acesso à área restrita.">visitante (inscrição)</span>' : ''}${cadastroIncompleto(u) ? ' <span class="badge st-pendente" title="Falta WhatsApp, nome completo ou autorização LGPD">cadastro incompleto</span>' : ''}</td><td>${esc(u.email)}</td><td>${esc(u.whatsapp || '—')}</td><td>${eu ? `<span class="badge ${u.nivel}">${TIPOS[tipoDe(u)]}</span>` : `<select data-tp="${esc(u.email)}" aria-label="Tipo de acesso de ${esc(u.nome)}">${Object.keys(TIPOS).map(k => `<option value="${k}"${k === tipoDe(u) ? ' selected' : ''}>${TIPOS[k]}</option>`).join('')}</select>`}</td><td>${u.nivel === 'administrador' ? '<small>Todos os acessos</small>' : eu ? `<span class="badge ${u.nivel}">${NIVN[u.nivel]}</span>` : `<select data-nv="${esc(u.email)}" aria-label="Perfil de ${esc(u.nome)}">${Object.keys(NIVN).filter(k => k !== 'administrador').map(k => `<option value="${k}"${k === u.nivel ? ' selected' : ''}>${NIVN[k]}</option>`).join('')}</select>`}</td><td><span class="badge st-${statusDe(u)}">${ST[statusDe(u)]}</span></td><td>${fnCell(u)}</td><td>${acoes(u)}</td></tr>`;
     }).join('')}</tbody></table>`;
     root.querySelectorAll('[data-ap]').forEach(b => b.onclick = () => { const em = CSS.escape(b.dataset.ap), nv = root.querySelector(`[data-nvp="${em}"]`).value;
       const box = root.querySelector(`[data-fnbox="${em}"]`), fns = box ? [...box.querySelectorAll('[data-fnp]:checked')].map(i => i.dataset.fnp) : [];
@@ -450,6 +450,13 @@ V.users = (me, root) => {
       const novo = b.dataset.st, msg = novo === 'bloqueado' ? 'Bloquear este usuário? Ele perde o acesso à área restrita.' : novo === 'recusado' ? 'Não aprovar este cadastro?' : null;
       if (msg && !confirm(msg)) return;
       salva(b.dataset.em, u => { u.status = novo; });
+    });
+    root.querySelectorAll('[data-tp]').forEach(sel => sel.onchange = () => {
+      const l = db.get('users', []), u = l.find(x => x.email === sel.dataset.tp), t = sel.value, f = new Set(u.funcoes || []);
+      if (tipoDe(u) === 'geral' && t !== 'geral' && !confirm('Tirar o acesso total (Administrador Geral) desta pessoa? Ela passa a ter só o Perfil e as responsabilidades marcadas.')) { draw(); return; }
+      if (t === 'geral') { u.nivel = 'administrador'; f.delete('adm'); }
+      else { if (u.nivel === 'administrador') u.nivel = 'editor'; t === 'area' ? f.add('adm') : f.delete('adm'); }
+      u.funcoes = [...f]; db.set('users', l); draw();
     });
     root.querySelectorAll('[data-nv]').forEach(s => s.onchange = () => { const l = db.get('users', []); l.find(u => u.email === s.dataset.nv).nivel = s.value; db.set('users', l); draw(); });
     root.querySelectorAll('[data-fn]').forEach(c => c.onchange = () => { const l = db.get('users', []), u = l.find(x => x.email === c.dataset.em), f = new Set(u.funcoes || []); c.checked ? f.add(c.dataset.fn) : f.delete(c.dataset.fn); u.funcoes = [...f]; db.set('users', l); const pop = c.closest('.fn-pop'), n = pop && pop.querySelector('.fn-n'); if (n) n.textContent = [...pop.querySelectorAll('[data-fn]:checked')].length + ' marcada(s)'; });
@@ -1734,6 +1741,9 @@ const STATUS_MSG = {
   bloqueado: 'Esta conta está bloqueada. Fale com o administrador do Parque.'
 };
 const statusDe = u => u.status || 'aprovado';
+// Tipo de acesso: Administrador Geral (nivel 'administrador': tudo) · Administrador (marca 'adm' nas responsabilidades: administra as áreas que receber) · Membro.
+const TIPOS = { geral: 'Administrador Geral', area: 'Administrador', membro: 'Membro (sem administração)' };
+const tipoDe = u => u.nivel === 'administrador' ? 'geral' : (u.funcoes || []).includes('adm') ? 'area' : 'membro';
 const visitanteEvento = u => !!(u && u.lgpd && u.lgpd.origem === 'evento' && statusDe(u) === 'pendente'); // criou conta ao se inscrever em evento: não é pedido de acesso // contas antigas, sem status, contam como aprovadas
 
 // Login com o servidor do Parque (Supabase Auth): entrar, criar conta, esqueci minha senha e nova senha.

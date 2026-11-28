@@ -90,6 +90,15 @@ async def main():
         await pg.click('[data-fnbt="cida@x.com"]'); ok(await pg.locator('.fn-box:not([hidden])').count() == 1, 'caixa flutuante de responsabilidades abre'); await pg.check('[data-fn="documentos"][data-em="cida@x.com"]'); ok('1 marcada' in await pg.inner_text('[data-fnbt="cida@x.com"]'), 'contagem atualiza'); await pg.keyboard.press('Escape'); ok(await pg.locator('.fn-box:not([hidden])').count() == 0, 'Esc fecha a caixa'); await espera_salvo(pg)
         ok(banco("select array_to_string(funcoes, ',') from perfis where email='cida@x.com'") == ['documentos'], "função gravada no perfil do banco")
 
+        # 4b) Tipo de acesso: Administrador (áreas recebidas) × Administrador Geral × Membro; Perfil sem a opção Administrador
+        ok(await pg.locator('[data-nv="cida@x.com"] option[value=administrador]').count() == 0, "caixa de Perfil não tem mais 'Administrador'")
+        await pg.select_option('[data-tp="cida@x.com"]', 'area'); await espera_salvo(pg)
+        ok(banco("select nivel||'/'||array_to_string(funcoes, ',') from perfis where email='cida@x.com'") == ['editor/documentos,adm'], "Administrador (áreas): marca 'adm' e mantém o Perfil")
+        await pg.select_option('[data-tp="cida@x.com"]', 'geral'); await espera_salvo(pg)
+        ok(banco("select nivel||'/'||array_to_string(funcoes, ',') from perfis where email='cida@x.com'") == ['administrador/documentos'], "Administrador Geral: nível total, sem a marca 'adm'")
+        await pg.select_option('[data-tp="cida@x.com"]', 'membro'); await espera_salvo(pg)
+        ok(banco("select nivel||'/'||array_to_string(funcoes, ',') from perfis where email='cida@x.com'") == ['editor/documentos'], "Membro: perde o acesso total e volta a Editor")
+
         # 5) outra pessoa (Beto, leitor) vê o livro; não consegue se promover
         ctx2, pg2, erros2 = await nova_pagina(br, sb)
         await entrar(pg2, 'beto@x.com', 'senhaBeto123'); await pg2.wait_for_url('**/area-restrita.html', timeout=8000)
