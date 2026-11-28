@@ -110,11 +110,19 @@
 </div>
 
 <div class="container">
-<section class="texto-explicativo" lang="es" translate="no" aria-label="Texto explicativo">
-    <h3>¿Qué es la Nivelación?</h3>
-    <p>El trabajo disciplinario no es un trabajo puramente personal sino conjunto. El intenso trabajo de intercambio de experiencias, problemas, descubrimientos y planteos realizado con otros acelera los tiempos de transformación. Para que esto sea posible se deben manejar un lenguaje y unos elementos de conocimiento interno comunes, por lo que antes de empezar una Disciplina se realizan trabajos de nivelación. En estos trabajos se abordan estudios de psicología, técnicas de relajación, mejoramiento conductual y operativa. Luego se está en condiciones de elegir y desarrollar una de las cuatro disciplinas.</p>
-    <h3>Recomendaciones generales para los Postulantes a la Nivelación</h3>
-    <ul><li>Aplicarse a las actividades del conjunto. Estos trabajos no deberían afectar las actividades que cada uno tiene en marcha en otros campos, sino por el contrario esas actividades deberían tomar el entusiasmo y mayor comprensión que estos trabajos de nivelación conllevan y aplicarlos en las tareas en que cada uno está.</li><li>Recomendamos eliminar el consumo de psicofármacos, alcohol y drogas, ya que estas aficiones son un impedimento para el ingreso a los trabajos de nivelación y disciplinarios.</li><li>La pulcritud y la amabilidad en el ámbito son condiciones necesarias. Dado el tipo de trabajos a realizar en las diferentes etapas de nivelación, recordamos que una buena condición de trabajo tiene en cuenta la confidencialidad y discreción.</li><li>El ordenamiento en los ámbitos personales permitirá la disponibilidad necesaria para los trabajos futuros.</li></ul>
+<section class="texto-explicativo" aria-label="Texto explicativo">
+    <div class="texto-lang" lang="pt" data-tx="pt" translate="no">
+        <h3>O que é a Nivelação?</h3>
+        <p>O trabalho disciplinar não é um trabalho puramente pessoal, mas conjunto. O intenso trabalho de intercâmbio de experiências, problemas, descobertas e propostas realizado com outras pessoas acelera os tempos de transformação. Para que isso seja possível, é preciso manejar uma linguagem e elementos de conhecimento interno comuns; por isso, antes de começar uma Disciplina, realizam-se trabalhos de nivelação. Nesses trabalhos são abordados estudos de psicologia, técnicas de relaxamento, melhoria comportamental e operativa. Depois disso, está-se em condições de escolher e desenvolver uma das quatro disciplinas.</p>
+        <h3>Recomendações gerais para os Postulantes à Nivelação</h3>
+        <ul><li>Aplicar-se às atividades do conjunto. Estes trabalhos não devem afetar as atividades que cada um tem em andamento em outros campos; pelo contrário, essas atividades devem receber o entusiasmo e a maior compreensão que estes trabalhos de nivelação trazem, aplicando-os nas tarefas em que cada um está.</li><li>Recomendamos eliminar o consumo de psicofármacos, álcool e drogas, pois esses hábitos são um impedimento para o ingresso nos trabalhos de nivelação e disciplinares.</li><li>O asseio e a amabilidade no ambiente são condições necessárias. Dado o tipo de trabalhos a realizar nas diferentes etapas da nivelação, lembramos que uma boa condição de trabalho leva em conta a confidencialidade e a discrição.</li><li>A ordem nos âmbitos pessoais permitirá a disponibilidade necessária para os trabalhos futuros.</li></ul>
+    </div>
+    <div class="texto-lang" lang="es" data-tx="es" translate="no" hidden>
+        <h3>¿Qué es la Nivelación?</h3>
+        <p>El trabajo disciplinario no es un trabajo puramente personal sino conjunto. El intenso trabajo de intercambio de experiencias, problemas, descubrimientos y planteos realizado con otros acelera los tiempos de transformación. Para que esto sea posible se deben manejar un lenguaje y unos elementos de conocimiento interno comunes, por lo que antes de empezar una Disciplina se realizan trabajos de nivelación. En estos trabajos se abordan estudios de psicología, técnicas de relajación, mejoramiento conductual y operativa. Luego se está en condiciones de elegir y desarrollar una de las cuatro disciplinas.</p>
+        <h3>Recomendaciones generales para los Postulantes a la Nivelación</h3>
+        <ul><li>Aplicarse a las actividades del conjunto. Estos trabajos no deberían afectar las actividades que cada uno tiene en marcha en otros campos, sino por el contrario esas actividades deberían tomar el entusiasmo y mayor comprensión que estos trabajos de nivelación conllevan y aplicarlos en las tareas en que cada uno está.</li><li>Recomendamos eliminar el consumo de psicofármacos, alcohol y drogas, ya que estas aficiones son un impedimento para el ingreso a los trabajos de nivelación y disciplinarios.</li><li>La pulcritud y la amabilidad en el ámbito son condiciones necesarias. Dado el tipo de trabajos a realizar en las diferentes etapas de nivelación, recordamos que una buena condición de trabajo tiene en cuenta la confidencialidad y discreción.</li><li>El ordenamiento en los ámbitos personales permitirá la disponibilidad necesaria para los trabajos futuros.</li></ul>
+    </div>
 </section>
     <section>
         <h2 class="section-title">Textos</h2>
@@ -220,6 +228,14 @@
 <script src="script.js"></script>
 <script src="banners.js"></script>
 <script src="idioma.js"></script>
+<script>
+// Texto explicativo: português (padrão) e espanhol; nos demais idiomas fica o português. Segue o idioma escolhido no seletor do site.
+(function () {
+  function mostra(l) { l = l === 'es' ? 'es' : 'pt'; document.querySelectorAll('.texto-explicativo [data-tx]').forEach(function (d) { d.hidden = d.getAttribute('data-tx') !== l; }); }
+  document.addEventListener('pr-idioma', function (e) { mostra(e.detail); });
+  var s = null; try { s = localStorage.getItem('pr_idioma'); } catch (x) { /* sem armazenamento */ } mostra(s);
+})();
+</script>
 <script src="ajuda-conteudo.js"></script>
 <script src="ajuda.js"></script>
 <script src="visitas.js" defer></script>
